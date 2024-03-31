@@ -154,7 +154,9 @@ def get_dataset(
                 desc="Running tokenizer on dataset",
             )
 
-        dataset = dataset.map(preprocess_func, batched=True, remove_columns=column_names, **kwargs)
+        # dataset = dataset.map(preprocess_func, batched=True, remove_columns=column_names, **kwargs)
+        dataset = dataset.map(preprocess_func, batched=True, **kwargs)
+
 
         if data_args.cache_path is not None and not os.path.exists(data_args.cache_path):
             if training_args.should_save:
