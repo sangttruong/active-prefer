@@ -82,9 +82,13 @@ def get_dataset_list(data_args: "DataArguments") -> List["DatasetAttr"]:
                 dataset_attr = DatasetAttr("hf_hub", dataset_name=dataset_info[name]["hf_hub_url"])
         elif "script_url" in dataset_info[name]:
             dataset_attr = DatasetAttr("script", dataset_name=dataset_info[name]["script_url"])
+        elif "id" in dataset_info[name]:# question id
+            dataset_attr = DatasetAttr("id", dataset_name=dataset_info[name]["id"]) 
         else:
             dataset_attr = DatasetAttr("file", dataset_name=dataset_info[name]["file_name"])
 
+        
+        
         dataset_attr.set_attr("file_sha1", dataset_info[name])
         dataset_attr.set_attr("subset", dataset_info[name])
         dataset_attr.set_attr("folder", dataset_info[name])
