@@ -1,0 +1,392 @@
+[
+    {
+        "id": "Mercury_7220990",
+        "instruction": "Which factor will most likely cause a person to develop a fever?",
+        "input": "",
+        "output": [
+            "a bacterial population in the bloodstream",
+            "a leg muscle relaxing after exercise"
+        ],
+        "choice_label": [
+            "B",
+            "A"
+        ]
+    },
+    {
+        "id": "Mercury_7220990",
+        "instruction": "Which factor will most likely cause a person to develop a fever?",
+        "input": "",
+        "output": [
+            "a bacterial population in the bloodstream",
+            "several viral particles on the skin"
+        ],
+        "choice_label": [
+            "B",
+            "C"
+        ]
+    },
+    {
+        "id": "Mercury_7220990",
+        "instruction": "Which factor will most likely cause a person to develop a fever?",
+        "input": "",
+        "output": [
+            "a bacterial population in the bloodstream",
+            "carbohydrates being digested in the stomach"
+        ],
+        "choice_label": [
+            "B",
+            "D"
+        ]
+    },
+    {
+        "id": "MCAS_2007_8_5189",
+        "instruction": "Lichens are symbiotic organisms made of green algae and fungi. What do the green algae supply to the fungi in this symbiotic relationship?",
+        "input": "",
+        "output": [
+            "food",
+            "carbon dioxide"
+        ],
+        "choice_label": [
+            "B",
+            "A"
+        ]
+    },
+    {
+        "id": "MCAS_2007_8_5189",
+        "instruction": "Lichens are symbiotic organisms made of green algae and fungi. What do the green algae supply to the fungi in this symbiotic relationship?",
+        "input": "",
+        "output": [
+            "food",
+            "protection"
+        ],
+        "choice_label": [
+            "B",
+            "C"
+        ]
+    },
+    {
+        "id": "MCAS_2007_8_5189",
+        "instruction": "Lichens are symbiotic organisms made of green algae and fungi. What do the green algae supply to the fungi in this symbiotic relationship?",
+        "input": "",
+        "output": [
+            "food",
+            "water"
+        ],
+        "choice_label": [
+            "B",
+            "D"
+        ]
+    },
+    {
+        "id": "Mercury_SC_401169",
+        "instruction": "When a switch is used in an electrical circuit, the switch can",
+        "input": "",
+        "output": [
+            "stop and start the flow of current.",
+            "cause the charge to build."
+        ],
+        "choice_label": [
+            "D",
+            "A"
+        ]
+    },
+    {
+        "id": "Mercury_SC_401169",
+        "instruction": "When a switch is used in an electrical circuit, the switch can",
+        "input": "",
+        "output": [
+            "stop and start the flow of current.",
+            "increase and decrease the voltage."
+        ],
+        "choice_label": [
+            "D",
+            "B"
+        ]
+    },
+    {
+        "id": "Mercury_SC_401169",
+        "instruction": "When a switch is used in an electrical circuit, the switch can",
+        "input": "",
+        "output": [
+            "stop and start the flow of current.",
+            "cause the current to change direction."
+        ],
+        "choice_label": [
+            "D",
+            "C"
+        ]
+    },
+    {
+        "id": "MCAS_2004_8_27",
+        "instruction": "Which of the following is an example of an assistive device?",
+        "input": "",
+        "output": [
+            "contact lens",
+            "motorcycle"
+        ],
+        "choice_label": [
+            "A",
+            "B"
+        ]
+    },
+    {
+        "id": "MCAS_2004_8_27",
+        "instruction": "Which of the following is an example of an assistive device?",
+        "input": "",
+        "output": [
+            "contact lens",
+            "raincoat"
+        ],
+        "choice_label": [
+            "A",
+            "C"
+        ]
+    },
+    {
+        "id": "MCAS_2004_8_27",
+        "instruction": "Which of the following is an example of an assistive device?",
+        "input": "",
+        "output": [
+            "contact lens",
+            "coffee pot"
+        ],
+        "choice_label": [
+            "A",
+            "D"
+        ]
+    },
+    {
+        "id": "NYSEDREGENTS_2006_8_10",
+        "instruction": "Rocks are classified as igneous, metamorphic, or sedimentary according to",
+        "input": "",
+        "output": [
+            "how they formed",
+            "their color"
+        ],
+        "choice_label": [
+            "3",
+            "1"
+        ]
+    },
+    {
+        "id": "NYSEDREGENTS_2006_8_10",
+        "instruction": "Rocks are classified as igneous, metamorphic, or sedimentary according to",
+        "input": "",
+        "output": [
+            "how they formed",
+            "their shape"
+        ],
+        "choice_label": [
+            "3",
+            "2"
+        ]
+    },
+    {
+        "id": "NYSEDREGENTS_2006_8_10",
+        "instruction": "Rocks are classified as igneous, metamorphic, or sedimentary according to",
+        "input": "",
+        "output": [
+            "how they formed",
+            "the minerals they contain"
+        ],
+        "choice_label": [
+            "3",
+            "4"
+        ]
+    },
+    {
+        "id": "Mercury_7013388",
+        "instruction": "A chewable calcium carbonate tablet is a common treatment for stomach discomfort. Calcium carbonate is most likely used as this type of medicine because calcium carbonate",
+        "input": "",
+        "output": [
+            "neutralizes digestive acid.",
+            "has a pleasant flavor."
+        ],
+        "choice_label": [
+            "C",
+            "A"
+        ]
+    },
+    {
+        "id": "Mercury_7013388",
+        "instruction": "A chewable calcium carbonate tablet is a common treatment for stomach discomfort. Calcium carbonate is most likely used as this type of medicine because calcium carbonate",
+        "input": "",
+        "output": [
+            "neutralizes digestive acid.",
+            "is inexpensive to produce."
+        ],
+        "choice_label": [
+            "C",
+            "B"
+        ]
+    },
+    {
+        "id": "Mercury_7013388",
+        "instruction": "A chewable calcium carbonate tablet is a common treatment for stomach discomfort. Calcium carbonate is most likely used as this type of medicine because calcium carbonate",
+        "input": "",
+        "output": [
+            "neutralizes digestive acid.",
+            "occurs naturally in the body."
+        ],
+        "choice_label": [
+            "C",
+            "D"
+        ]
+    },
+    {
+        "id": "Mercury_7179953",
+        "instruction": "Which two body systems are directly involved in movement?",
+        "input": "",
+        "output": [
+            "muscular and skeletal",
+            "digestive and muscular"
+        ],
+        "choice_label": [
+            "A",
+            "B"
+        ]
+    },
+    {
+        "id": "Mercury_7179953",
+        "instruction": "Which two body systems are directly involved in movement?",
+        "input": "",
+        "output": [
+            "muscular and skeletal",
+            "skeletal and respiratory"
+        ],
+        "choice_label": [
+            "A",
+            "C"
+        ]
+    },
+    {
+        "id": "Mercury_7179953",
+        "instruction": "Which two body systems are directly involved in movement?",
+        "input": "",
+        "output": [
+            "muscular and skeletal",
+            "respiratory and digestive"
+        ],
+        "choice_label": [
+            "A",
+            "D"
+        ]
+    },
+    {
+        "id": "Mercury_7205118",
+        "instruction": "Which change in the state of water particles causes the particles to become arranged in a fixed position?",
+        "input": "",
+        "output": [
+            "freezing",
+            "boiling"
+        ],
+        "choice_label": [
+            "C",
+            "A"
+        ]
+    },
+    {
+        "id": "Mercury_7205118",
+        "instruction": "Which change in the state of water particles causes the particles to become arranged in a fixed position?",
+        "input": "",
+        "output": [
+            "freezing",
+            "melting"
+        ],
+        "choice_label": [
+            "C",
+            "B"
+        ]
+    },
+    {
+        "id": "Mercury_7205118",
+        "instruction": "Which change in the state of water particles causes the particles to become arranged in a fixed position?",
+        "input": "",
+        "output": [
+            "freezing",
+            "evaporating"
+        ],
+        "choice_label": [
+            "C",
+            "D"
+        ]
+    },
+    {
+        "id": "MCAS_2016_8_13",
+        "instruction": "Earth's core is primarily composed of which of the following materials?",
+        "input": "",
+        "output": [
+            "iron",
+            "basalt"
+        ],
+        "choice_label": [
+            "B",
+            "A"
+        ]
+    },
+    {
+        "id": "MCAS_2016_8_13",
+        "instruction": "Earth's core is primarily composed of which of the following materials?",
+        "input": "",
+        "output": [
+            "iron",
+            "magma"
+        ],
+        "choice_label": [
+            "B",
+            "C"
+        ]
+    },
+    {
+        "id": "MCAS_2016_8_13",
+        "instruction": "Earth's core is primarily composed of which of the following materials?",
+        "input": "",
+        "output": [
+            "iron",
+            "quartz"
+        ],
+        "choice_label": [
+            "B",
+            "D"
+        ]
+    },
+    {
+        "id": "Mercury_7283255",
+        "instruction": "Which of the following events during meiosis contributes most to the variation within a species?",
+        "input": "",
+        "output": [
+            "segregation of alleles",
+            "pairing of chromosomes"
+        ],
+        "choice_label": [
+            "C",
+            "A"
+        ]
+    },
+    {
+        "id": "Mercury_7283255",
+        "instruction": "Which of the following events during meiosis contributes most to the variation within a species?",
+        "input": "",
+        "output": [
+            "segregation of alleles",
+            "creation of haploid gametes"
+        ],
+        "choice_label": [
+            "C",
+            "B"
+        ]
+    },
+    {
+        "id": "Mercury_7283255",
+        "instruction": "Which of the following events during meiosis contributes most to the variation within a species?",
+        "input": "",
+        "output": [
+            "segregation of alleles",
+            "separation of chromatids"
+        ],
+        "choice_label": [
+            "C",
+            "D"
+        ]
+    }
+]
