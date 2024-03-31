@@ -1,4 +1,14 @@
 {
+  "arc_sample": {
+    "file_name": "arc_sample.json",
+    "columns": {
+      "id": "id",
+      "prompt": "instruction",
+      "query": "input",
+      "response": "output",
+      "choice_label": "choice_label"
+    }
+  },
   "alpaca_en": {
     "file_name": "alpaca_data_en_52k.json",
     "file_sha1": "607f94a7f581341e59685aef32f531095232cf23"
