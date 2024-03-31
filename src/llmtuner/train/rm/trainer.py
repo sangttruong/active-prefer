@@ -94,7 +94,7 @@ class PairwiseTrainer(Trainer):
 
         return loss
 
-    def save_predictions(self, predict_results: "PredictionOutput") -> None:
+    def save_predictions(self, predict_results: "PredictionOutput", question_id: List) -> None:
         r"""
         Saves model predictions to `output_dir`.
 
@@ -109,6 +109,6 @@ class PairwiseTrainer(Trainer):
 
         with open(output_prediction_file, "w", encoding="utf-8") as writer:
             res: List[str] = []
-            for c_score, r_score in zip(chosen_scores, rejected_scores):
-                res.append(json.dumps({"chosen": round(float(c_score), 2), "rejected": round(float(r_score), 2)}))
+            for c_score, r_score, id in zip(chosen_scores, rejected_scores, question_id):
+                res.append(json.dumps({"question": id, "chosen": round(float(c_score), 2), "rejected": round(float(r_score), 2)}))
             writer.write("\n".join(res))

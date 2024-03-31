@@ -69,7 +69,10 @@ def run_rm(
         predict_results = trainer.predict(dataset, metric_key_prefix="predict")
         trainer.log_metrics("predict", predict_results.metrics)
         trainer.save_metrics("predict", predict_results.metrics)
-        trainer.save_predictions(predict_results)
+
+        #
+        question_id = dataset['id']
+        trainer.save_predictions(predict_results, question_id)
 
     # Create model card
     create_modelcard_and_push(trainer, model_args, data_args, training_args, finetuning_args)
