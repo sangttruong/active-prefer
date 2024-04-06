@@ -124,7 +124,7 @@ def main(args):
         prepare_data = f"""cd data/arc/ && python arc.py"""
         dataset = 'arc_challenge'
     elif args.dataset_name in ['truthful_qa']:
-        prepare_data = f"""cd data/truthfull_qa/ && python truthfull_qa.py"""
+        prepare_data = f"""cd data/truthful_qa/ && python truthful_qa.py"""
         dataset = 'truthful_qa'
     elif args.dataset_name in ['Rowan/hellaswag', 'hellaswag']:
         prepare_data = f"""cd data/hellaswag/ && python hellaswag.py"""
