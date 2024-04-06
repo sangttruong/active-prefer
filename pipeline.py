@@ -148,11 +148,11 @@ def main(args):
     num_sample_select = -1
 
     for iter in range(args.num_iters):
-        print(f"{"="*20} ITERARION: {iter} {"="*20}")
+        print(f"ITERARION: {iter} ")
         ##########################################################
         #### Inference
         ##########################################################
-        print(f"{"-"*10} Inference {"-"*10}")
+        print(f" Inference ")
         
         batch_size_for_inference = 4
         if iter == 0:
@@ -191,7 +191,7 @@ def main(args):
         ##########################################################
         #### Selection
         ##########################################################
-        print(f"{"="*10} Selection {"="*10}")
+        print(f" Selection ")
 
         prediction_path = f"{reward_model_path}/generated_predictions.jsonl"
         data_path = f"{args.dataset_dir}/{dataset}.json"
@@ -226,7 +226,7 @@ def main(args):
         ##########################################################
         #### Train DPO
         ##########################################################
-        print(f"{"-"*10} Train DPO {"-"*10}")
+        print(f" Train DPO ")
 
         active_dataset = new_data_info # replace dataset by ACTIVE QUERIES
         
@@ -267,7 +267,7 @@ def main(args):
         ##########################################################
         #### Train Reward
         ##########################################################    
-        print(f"{"-"*10} Train Reward {"-"*10}")
+        print(f" Train Reward ")
         active_dataset = new_data_info # replace dataset by ACTIVE QUERIES
 
         rm_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch \
@@ -324,8 +324,8 @@ def main(args):
         run_cli_command(eval_command)  
         
         ########################################################## 
-        run_cli_command("cd ..") 
-        print(f"{"="*100}")
+        # run_cli_command("cd ..") 
+        print(f"=========================================================")
         
     print("DONE!!!")
     delete_selected_info(args.data_info_path)
