@@ -141,14 +141,18 @@ def main(args):
 
     run_cli_command(prepare_data)
 
-
+    reward_model_path = f"saves/llama2_7b/{dataset}/reward"
+    dpo_adapter_path = f"saves/llama2_7b/{dataset}/dpo"
+    
     num_sample_select = -1
+
     for iter in range(args.num_iters):
         print(f"{"="*20} ITERARION: {iter} {"="*20}")
         ##########################################################
         #### Inference
         ##########################################################
         print(f"{"-"*10} Inference {"-"*10}")
+        
         batch_size_for_inference = 4
         if iter == 0:
             inference_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
@@ -158,7 +162,7 @@ def main(args):
                 --dataset_dir {args.dataset_dir} \
                 --dataset {dataset} \
                 --template {args.template} \
-                --output_dir {args.reward_model_path} \
+                --output_dir {reward_model_path} \
                 --per_device_eval_batch_size {batch_size_for_inference} \
                 --quantization_bit {args.quantization_bit} \
                 --fp16
@@ -168,13 +172,13 @@ def main(args):
                 --stage rm \
                 --do_predict \
                 --model_name_or_path {args.model_name_or_path} \
-                --adapter_name_or_path {args.reward_model_path}\
+                --adapter_name_or_path {reward_model_path}\
                 --finetuning_type {args.finetuning_type} \
                 --lora_target {args.lora_target} \
                 --dataset_dir {args.dataset_dir} \
                 --dataset {dataset} \
                 --template {args.template} \
-                --output_dir {args.reward_model_path} \
+                --output_dir {reward_model_path} \
                 --per_device_eval_batch_size {batch_size_for_inference} \
                 --quantization_bit {args.quantization_bit} \
                 --fp16
@@ -188,7 +192,7 @@ def main(args):
         ##########################################################
         print(f"{"="*10} Selection {"="*10}")
 
-        prediction_path = f"{args.reward_model_path}/generated_predictions.jsonl"
+        prediction_path = f"{reward_model_path}/generated_predictions.jsonl"
         data_path = f"{args.dataset_dir}/{dataset}.json"
         output_file = f"{args.dataset_dir}/selected_entries.json"  # Name of the output file
 
@@ -206,10 +210,10 @@ def main(args):
         with open(args.data_info_path, 'r') as file:
             data_info = json.load(file)
             
-            if args.dataset in data_info:
+            if dataset in data_info:
                 # append new info to data_infor and store result in json file
-                new_data_info = args.dataset + f"_iter_{iter}"
-                data_info[new_data_info] = copy.deepcopy(data_info[args.dataset])
+                new_data_info = dataset + f"_iter_{iter}"
+                data_info[new_data_info] = copy.deepcopy(data_info[dataset])
                 data_info[new_data_info]["file_name"] = "selected_entries.json"
 
                 with open(args.data_info_path, 'w') as outfile:
@@ -235,7 +239,7 @@ def main(args):
             --template {args.template} \
             --finetuning_type {args.finetuning_type} \
             --lora_target {args.lora_target} \
-            --output_dir {args.dpo_adapter_path} \
+            --output_dir {dpo_adapter_path} \
             --overwrite_output_dir \
             --cutoff_len {args.cutoff_len} \
             --preprocessing_num_workers 16 \
@@ -271,8 +275,8 @@ def main(args):
             --do_train \
             --flash_attn True\
             --model_name_or_path {args.model_name_or_path}\
-            --adapter_name_or_path {args.dpo_adapter_path}\
-            --output_dir {args.reward_model_path} \
+            --adapter_name_or_path {dpo_adapter_path}\
+            --output_dir {reward_model_path} \
             --dataset {active_dataset} \
             --dataset_dir {args.dataset_dir} \
             --template {args.template} \
@@ -307,7 +311,7 @@ def main(args):
         ########################################################## 
         task = "arc_easy"
         eval_output_path = f"saves/output_eval/iter_{iter}"
-        adapter_path = f"../{args.dpo_adapter_path}"
+        adapter_path = f"../{dpo_adapter_path}"
         eval_command = f"""cd lm-evaluation-harness && lm_eval --model hf \
             --model_args pretrained={args.model_name_or_path},parallelize=True,load_in_4bit=True,peft={adapter_path} \
             --tasks {task} \
@@ -352,8 +356,6 @@ def parse_arguments():
     parser.add_argument("--model_name_or_path", type=str, default="meta-llama/Llama-2-7b-hf", help="Model name or path")
     parser.add_argument("--num_train_epochs", type=float, default=1.0, help="Number of training epochs")    
 
-    parser.add_argument("--reward_model_path", type=str, default="saves/llama2_7b/test/reward", help="Path to reward model")
-    parser.add_argument("--dpo_adapter_path", type=str, default="saves/llama2_7b/test/dpo", help="Path to DPO adapter")
 
     parser.add_argument("--num_iters", type=int, default=5, help="Number of iterations")
     parser.add_argument("--percentage", type=float, default=0.1, help="Percentage of top questions to select")
