@@ -263,7 +263,7 @@ def main(args):
             """
 
         run_cli_command(dpo_ft_command) 
-        print(f"Done Train DPO {"-"*10}")
+        print(f"Done Train DPO")
         ##########################################################
         #### Train Reward
         ##########################################################    
@@ -306,7 +306,7 @@ def main(args):
             """
 
         run_cli_command(rm_ft_command) 
-        print(f"Done train Reward {"-"*10}")
+        print(f"Done train Reward ")
         ##########################################################
         #### Eval
         ########################################################## 
