@@ -121,8 +121,10 @@ def run_cli_command(command):
 def main(args):
     # Prepare dataset
 
-    if args.dataset_name == 'arc':
+    if args.dataset_name in ['allenai/ai2_arc', 'arc']:
         prepare_data = f"""cd data/arc/ && python arc.py"""
+    else:
+        raise("")
 
     run_cli_command(prepare_data)
 
