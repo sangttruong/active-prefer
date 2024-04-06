@@ -122,17 +122,21 @@ def main(args):
 
     if args.dataset_name in ['allenai/ai2_arc', 'arc']:
         prepare_data = f"""cd data/arc/ && python arc.py"""
+        dataset = 'arc_challenge'
     elif args.dataset_name in ['truthful_qa']:
         prepare_data = f"""cd data/truthfull_qa/ && python truthfull_qa.py"""
+        dataset = 'truthfull_qa'
     elif args.dataset_name in ['Rowan/hellaswag', 'hellaswag']:
         prepare_data = f"""cd data/hellaswag/ && python hellaswag.py"""
+        dataset = 'hellaswag'
     elif args.dataset_name in ['winogrande']:
         prepare_data = f"""cd data/winogrande/ && python winogrande.py"""
+        dataset = 'winogrande'
     elif args.dataset_name in ['cais/mmlu', "mmlu"]:
         prepare_data = f"""cd data/mmlu/ && python mmlu.py"""
+        dataset = 'mmlu'
     else:
         raise(f"Does not support {args.dataset_name} dataset yet")
-
 
 
     run_cli_command(prepare_data)
@@ -152,7 +156,7 @@ def main(args):
                 --do_predict \
                 --model_name_or_path {args.model_name_or_path} \
                 --dataset_dir {args.dataset_dir} \
-                --dataset {args.dataset} \
+                --dataset {dataset} \
                 --template {args.template} \
                 --output_dir {args.reward_model_path} \
                 --per_device_eval_batch_size {batch_size_for_inference} \
@@ -168,7 +172,7 @@ def main(args):
                 --finetuning_type {args.finetuning_type} \
                 --lora_target {args.lora_target} \
                 --dataset_dir {args.dataset_dir} \
-                --dataset {args.dataset} \
+                --dataset {dataset} \
                 --template {args.template} \
                 --output_dir {args.reward_model_path} \
                 --per_device_eval_batch_size {batch_size_for_inference} \
