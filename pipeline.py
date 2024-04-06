@@ -125,7 +125,7 @@ def main(args):
         dataset = 'arc_challenge'
     elif args.dataset_name in ['truthful_qa']:
         prepare_data = f"""cd data/truthfull_qa/ && python truthfull_qa.py"""
-        dataset = 'truthfull_qa'
+        dataset = 'truthful_qa'
     elif args.dataset_name in ['Rowan/hellaswag', 'hellaswag']:
         prepare_data = f"""cd data/hellaswag/ && python hellaswag.py"""
         dataset = 'hellaswag'
@@ -135,10 +135,16 @@ def main(args):
     elif args.dataset_name in ['cais/mmlu', "mmlu"]:
         prepare_data = f"""cd data/mmlu/ && python mmlu.py"""
         dataset = 'mmlu'
+    elif args.dataset_name in ['Anthropic/hh-rlhf', "hh-rlhf"]:
+        prepare_data = f"""cd data/hh_rlhf/ && python hh_rlhf.py"""
+        dataset = 'hh_rlhf'
+    elif args.dataset_name in ['allenai/reward-bench', "reward-bench", "reward_bench"]:
+        prepare_data = f"""cd data/reward_bench/ && python reward_bench.py"""
+        dataset = 'reward_bench'
     else:
         raise(f"Does not support {args.dataset_name} dataset yet")
 
-
+    print("Prepare Dataset")
     run_cli_command(prepare_data)
 
     model_name = args.model_name_or_path.split('/')[-1]
@@ -148,7 +154,7 @@ def main(args):
     num_sample_select = -1
 
     for iter in range(args.num_iters):
-        print(f"ITERARION: {iter} ")
+        print(f"ITERARION: {iter}")
         ##########################################################
         #### Inference
         ##########################################################
@@ -263,11 +269,11 @@ def main(args):
             """
 
         run_cli_command(dpo_ft_command) 
-        print(f"Done Train DPO")
+        print("Done Train DPO")
         ##########################################################
         #### Train Reward
         ##########################################################    
-        print(f" Train Reward ")
+        print(" Train Reward ")
         active_dataset = new_data_info # replace dataset by ACTIVE QUERIES
 
         rm_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch \
@@ -306,26 +312,28 @@ def main(args):
             """
 
         run_cli_command(rm_ft_command) 
-        print(f"Done train Reward ")
+        print("Done train Reward ")
         ##########################################################
         #### Eval
         ########################################################## 
-        task = "arc_easy"
+        task_eval = dataset
         eval_output_path = f"saves/output_eval/iter_{iter}"
         adapter_path = f"../{dpo_adapter_path}"
+        device = args.gpu_ids.split(",")[0]
         eval_command = f"""cd lm-evaluation-harness && lm_eval --model hf \
             --model_args pretrained={args.model_name_or_path},parallelize=True,load_in_4bit=True,peft={adapter_path} \
-            --tasks {task} \
+            --tasks {task_eval} \
             --output_path {eval_output_path} \
             --batch_size 16 \
-            --device cuda:0
+            --device cuda:{device}
             """
+  
 
         run_cli_command(eval_command)  
         
         ########################################################## 
         # run_cli_command("cd ..") 
-        print(f"=========================================================")
+        print("=========================================================")
         
     print("DONE!!!")
     delete_selected_info(args.data_info_path)

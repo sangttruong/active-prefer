@@ -6,15 +6,15 @@ def convert_multiple_choice_to_prompt(dataset, json_file_path):
     new_samples = []
 
     for question_id, example in enumerate(dataset):
-        correct_choice_index = 0 # 
-        correct_choice_text = example["mc1_targets"]["choices"]
-        correct_choice_label = example["mc1_targets"]["labels"]
+        question = example["prompt"]
+        correct_choice_index = 0 
+        correct_choice_text = [example["chosen"], example["rejected"]]
 
-        for i, (choice_text, choice_label) in enumerate(zip(correct_choice_text, correct_choice_label)):
+        for i, choice_text in enumerate(correct_choice_text):
             if i != correct_choice_index:
                 new_samples.append({
-                    "id": f"question_{question_id}",
-                    "instruction": example["question"],
+                    "id": f"{example['id']}",
+                    "instruction": question,
                     'input': "",
                     "output": [correct_choice_text[correct_choice_index], choice_text],
                     "choice_label": [correct_choice_index, i],
@@ -23,6 +23,7 @@ def convert_multiple_choice_to_prompt(dataset, json_file_path):
     # Write to JSON
     with open(json_file_path, 'w') as json_file:
         json.dump(new_samples, json_file, indent=4)
+
 
 if __name__ == "__main__":
     # Load the original dataset

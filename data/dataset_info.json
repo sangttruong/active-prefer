@@ -9,7 +9,7 @@
             "choice_label": "choice_label"
         }
     },
-    "truthfull_qa": {
+    "truthful_qa": {
         "file_name": "truthfull_qa.json",
         "columns": {
             "id": "id",
@@ -48,5 +48,26 @@
             "response": "output",
             "choice_label": "choice_label"
         }
+    },
+    "reward_bench": {
+        "file_name": "reward_bench.json",
+        "columns": {
+            "id": "id",
+            "prompt": "instruction",
+            "query": "input",
+            "response": "output",
+            "choice_label": "choice_label"
+        }
+    },
+    "hh_rlhf": {
+        "file_name": "hh_rlhf.json",
+        "columns": {
+            "id": "id",
+            "prompt": "instruction",
+            "query": "input",
+            "response": "output",
+            "choice_label": "choice_label"
+        }
     }
+
 }
