@@ -9,8 +9,6 @@ import copy
 import numpy as np
 from scipy.stats import entropy
 
-
-
 def read_inference_results(prediction_path):
     question_scores = {}
 
@@ -130,7 +128,8 @@ def main(args):
         print(f"{"-"*10} Inference {"-"*10}")
         batch_size_for_inference = 4
         if iter == 0:
-            inference_command = f"""CUDA_VISIBLE_DEVICES=0 python src/train_bash.py \
+            inference_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch \
+                src/train_bash.py \
                 --stage rm \
                 --do_predict \
                 --model_name_or_path {args.model_name_or_path} \
@@ -143,7 +142,8 @@ def main(args):
                 --fp16
                 """
         else:
-            inference_command = f"""CUDA_VISIBLE_DEVICES=1 python src/train_bash.py \
+            inference_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch
+                src/train_bash.py \
                 --stage rm \
                 --do_predict \
                 --model_name_or_path {args.model_name_or_path} \
@@ -204,7 +204,7 @@ def main(args):
 
         active_dataset = new_data_info # replace dataset by ACTIVE QUERIES
         
-        dpo_ft_command = f"""CUDA_VISIBLE_DEVICES=0,1 accelerate launch\
+        dpo_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch\
             src/train_bash.py \
             --stage dpo \
             --do_train \
@@ -244,7 +244,7 @@ def main(args):
         print(f"{"-"*10} Train Reward {"-"*10}")
         active_dataset = new_data_info # replace dataset by ACTIVE QUERIES
 
-        rm_ft_command = f"""CUDA_VISIBLE_DEVICES=0,1 accelerate launch \
+        rm_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch \
             src/train_bash.py \
             --stage rm \
             --do_train \
@@ -284,23 +284,23 @@ def main(args):
         ##########################################################
         #### Eval
         ########################################################## 
-        # task = "arc_easy"
-        # eval_output_path = f"saves/output_eval/iter_{iter}"
-        # eval_command = f"""lm_eval --model hf \
-        #     --model_args pretrained={args.model_name_or_path},parallelize=True,load_in_4bit=True,peft={args.dpo_adapter_path} \
-        #     --tasks {task} \
-        #     --output_path {eval_output_path} \
-        #     --device cuda:0 
-        #     """
+        task = "arc_easy"
+        eval_output_path = f"saves/output_eval/iter_{iter}"
+        eval_command = f"""cd lm-evaluation-harness && lm_eval --model hf \
+            --model_args pretrained={args.model_name_or_path},parallelize=True,load_in_4bit=True,peft={args.dpo_adapter_path} \
+            --tasks {task} \
+            --output_path {eval_output_path} \
+            --device cuda:0 
+            """
 
-        # run_cli_command(eval_command)  
+        run_cli_command(eval_command)  
         
-        ##########################################################  
+        ########################################################## 
+        run_cli_command("cd ..") 
         print(f"{"="*100}")
         
     print("DONE!!!")
     delete_selected_info(args.data_info_path)
-
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Iterative training and evaluation script")
@@ -335,6 +335,8 @@ def parse_arguments():
     parser.add_argument("--percentage", type=float, default=0.1, help="Percentage of top questions to select")
     parser.add_argument("--method", type=str, default="max_entropy", help="Selection method")
     parser.add_argument("--dataset", type=str, default="arc_sample", help="Dataset name")
+    parser.add_argument("--gpu_ids", type=str, default="0,1", help="")
+    
     return parser.parse_args()
 
 if __name__ == "__main__":
