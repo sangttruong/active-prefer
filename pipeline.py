@@ -300,7 +300,7 @@ def main(args):
             --tasks {task} \
             --output_path {eval_output_path} \
             --batch_size 16 \
-            --device cuda:0 
+            --device --device cuda:0
             """
 
         run_cli_command(eval_command)  
