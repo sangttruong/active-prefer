@@ -402,7 +402,6 @@ def main(args):
             --tasks {task_eval} \
             --output_path {eval_output_path} \
             --batch_size 16 \
-            --limit 200 \
             --device cuda:{device}
             """
   
