@@ -1,0 +1,67 @@
+[
+    {
+        "id": "question_0",
+        "instruction": "John moved the couch from the garage to the backyard to create space. The _ is small.",
+        "input": "",
+        "output": [
+            "garage",
+            "backyard"
+        ],
+        "choice_label": [
+            0,
+            1
+        ]
+    },
+    {
+        "id": "question_1",
+        "instruction": "The doctor diagnosed Justin with bipolar and Robert with anxiety. _ had terrible nerves recently.",
+        "input": "",
+        "output": [
+            "Robert",
+            "Justin"
+        ],
+        "choice_label": [
+            1,
+            0
+        ]
+    },
+    {
+        "id": "question_2",
+        "instruction": "Dennis drew up a business proposal to present to Logan because _ wants his investment.",
+        "input": "",
+        "output": [
+            "Dennis",
+            "Logan"
+        ],
+        "choice_label": [
+            0,
+            1
+        ]
+    },
+    {
+        "id": "question_3",
+        "instruction": "Felicia unexpectedly made fried eggs for breakfast in the morning for Katrina and now _ owes a favor.",
+        "input": "",
+        "output": [
+            "Katrina",
+            "Felicia"
+        ],
+        "choice_label": [
+            1,
+            0
+        ]
+    },
+    {
+        "id": "question_4",
+        "instruction": "My shampoo did not lather easily on my Afro hair because the _ is too dirty.",
+        "input": "",
+        "output": [
+            "hair",
+            "shampoo"
+        ],
+        "choice_label": [
+            1,
+            0
+        ]
+    }
+]

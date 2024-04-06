@@ -1,6 +1,46 @@
 {
-    "arc_sample": {
-        "file_name": "arc_sample.json",
+    "arc_challenge": {
+        "file_name": "arc_challenge.json",
+        "columns": {
+            "id": "id",
+            "prompt": "instruction",
+            "query": "input",
+            "response": "output",
+            "choice_label": "choice_label"
+        }
+    },
+    "truthfull_qa": {
+        "file_name": "truthfull_qa.json",
+        "columns": {
+            "id": "id",
+            "prompt": "instruction",
+            "query": "input",
+            "response": "output",
+            "choice_label": "choice_label"
+        }
+    },
+    "hellaswag": {
+        "file_name": "hellaswag.json",
+        "columns": {
+            "id": "id",
+            "prompt": "instruction",
+            "query": "input",
+            "response": "output",
+            "choice_label": "choice_label"
+        }
+    },
+    "winogrande": {
+        "file_name": "winogrande.json",
+        "columns": {
+            "id": "id",
+            "prompt": "instruction",
+            "query": "input",
+            "response": "output",
+            "choice_label": "choice_label"
+        }
+    },
+    "mmlu": {
+        "file_name": "mmlu.json",
         "columns": {
             "id": "id",
             "prompt": "instruction",

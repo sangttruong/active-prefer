@@ -107,11 +107,10 @@ def delete_selected_info(data_info_path, pattern="iter"):
     print("New data info with selected entries removed has been saved.")
 
 def count_len_dataset(prediction_path):
-    with open(prediction_path, 'r') as file:
-        data_count = len(file.readlines())
-    
-    # Return the count of data
-    return data_count
+    with open(prediction_path, 'r') as f:
+        data = json.load(f)
+        ids = set(item['id'] for item in data)
+    return len(ids)
 
 
 def run_cli_command(command):
@@ -123,8 +122,18 @@ def main(args):
 
     if args.dataset_name in ['allenai/ai2_arc', 'arc']:
         prepare_data = f"""cd data/arc/ && python arc.py"""
+    elif args.dataset_name in ['truthful_qa']:
+        prepare_data = f"""cd data/truthfull_qa/ && python truthfull_qa.py"""
+    elif args.dataset_name in ['Rowan/hellaswag', 'hellaswag']:
+        prepare_data = f"""cd data/hellaswag/ && python hellaswag.py"""
+    elif args.dataset_name in ['winogrande']:
+        prepare_data = f"""cd data/winogrande/ && python winogrande.py"""
+    elif args.dataset_name in ['cais/mmlu', "mmlu"]:
+        prepare_data = f"""cd data/mmlu/ && python mmlu.py"""
     else:
-        raise("")
+        raise(f"Does not support {args.dataset_name} dataset yet")
+
+
 
     run_cli_command(prepare_data)
 
@@ -180,7 +189,7 @@ def main(args):
         output_file = f"{args.dataset_dir}/selected_entries.json"  # Name of the output file
 
         if num_sample_select == -1:
-            num_sample_select = int(count_len_dataset(prediction_path) * args.percentage // 3)
+            num_sample_select = int(count_len_dataset(data_path) * args.percentage)
 
         # SELECTION METHOD
         if args.method == "max_entropy":
@@ -300,7 +309,7 @@ def main(args):
             --tasks {task} \
             --output_path {eval_output_path} \
             --batch_size 16 \
-            --device --device cuda:0
+            --device cuda:0
             """
 
         run_cli_command(eval_command)  
