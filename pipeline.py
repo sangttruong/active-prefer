@@ -119,6 +119,14 @@ def run_cli_command(command):
     os.system(command)
 
 def main(args):
+    # Prepare dataset
+
+    if args.dataset_name == 'arc':
+        prepare_data = f"""cd data/arc/ && python arc.py"""
+
+    run_cli_command(prepare_data)
+
+
     num_sample_select = -1
     for iter in range(args.num_iters):
         print(f"{"="*20} ITERARION: {iter} {"="*20}")
@@ -128,8 +136,7 @@ def main(args):
         print(f"{"-"*10} Inference {"-"*10}")
         batch_size_for_inference = 4
         if iter == 0:
-            inference_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch \
-                src/train_bash.py \
+            inference_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
                 --stage rm \
                 --do_predict \
                 --model_name_or_path {args.model_name_or_path} \
@@ -142,8 +149,7 @@ def main(args):
                 --fp16
                 """
         else:
-            inference_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch
-                src/train_bash.py \
+            inference_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
                 --stage rm \
                 --do_predict \
                 --model_name_or_path {args.model_name_or_path} \
@@ -286,10 +292,12 @@ def main(args):
         ########################################################## 
         task = "arc_easy"
         eval_output_path = f"saves/output_eval/iter_{iter}"
+        adapter_path = f"../{args.dpo_adapter_path}"
         eval_command = f"""cd lm-evaluation-harness && lm_eval --model hf \
-            --model_args pretrained={args.model_name_or_path},parallelize=True,load_in_4bit=True,peft={args.dpo_adapter_path} \
+            --model_args pretrained={args.model_name_or_path},parallelize=True,load_in_4bit=True,peft={adapter_path} \
             --tasks {task} \
             --output_path {eval_output_path} \
+            --batch_size 16 \
             --device cuda:0 
             """
 
@@ -304,7 +312,6 @@ def main(args):
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Iterative training and evaluation script")
-    parser.add_argument("--model_name_or_path", type=str, default="meta-llama/Llama-2-7b-hf", help="Model name or path")
     parser.add_argument("--template", type=str, default="default", help="Template name")
     parser.add_argument("--finetuning_type", type=str, default="lora", help="Fine-tuning type")
     parser.add_argument("--lora_target", type=str, default="q_proj,v_proj", help="LORA target")
@@ -326,10 +333,12 @@ def parse_arguments():
     parser.add_argument("--data_info_path", type=str, default="data/dataset_info.json", help="Path to dataset info")
 
     #######################
-    parser.add_argument("--num_train_epochs", type=float, default=1.0, help="Number of training epochs")
+    parser.add_argument("--dataset_name", type=str, default="arc", help="Dataset name")
+    parser.add_argument("--model_name_or_path", type=str, default="meta-llama/Llama-2-7b-hf", help="Model name or path")
+    parser.add_argument("--num_train_epochs", type=float, default=1.0, help="Number of training epochs")    
 
-    parser.add_argument("--reward_model_path", type=str, default="saves/llama2_7b/random/reward", help="Path to reward model")
-    parser.add_argument("--dpo_adapter_path", type=str, default="saves/llama2_7b/random/dpo", help="Path to DPO adapter")
+    parser.add_argument("--reward_model_path", type=str, default="saves/llama2_7b/test/reward", help="Path to reward model")
+    parser.add_argument("--dpo_adapter_path", type=str, default="saves/llama2_7b/test/dpo", help="Path to DPO adapter")
 
     parser.add_argument("--num_iters", type=int, default=5, help="Number of iterations")
     parser.add_argument("--percentage", type=float, default=0.1, help="Percentage of top questions to select")
