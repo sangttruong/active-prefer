@@ -148,8 +148,8 @@ def main(args):
     run_cli_command(prepare_data)
 
     model_name = args.model_name_or_path.split('/')[-1]
-    reward_model_path = f"saves/{model_name}/{dataset}/reward"
-    dpo_adapter_path = f"saves/{model_name}/{dataset}/dpo"
+    reward_model_path = f"saves/{model_name}/{args.method}/{dataset}/reward"
+    dpo_adapter_path = f"saves/{model_name}/{args.method}/{dataset}/dpo"
     
     num_sample_select = -1
 
