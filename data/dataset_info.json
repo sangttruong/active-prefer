@@ -10,7 +10,7 @@
         }
     },
     "truthful_qa": {
-        "file_name": "truthfull_qa.json",
+        "file_name": "truthful_qa.json",
         "columns": {
             "id": "id",
             "prompt": "instruction",

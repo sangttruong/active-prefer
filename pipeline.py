@@ -316,7 +316,18 @@ def main(args):
         ##########################################################
         #### Eval
         ########################################################## 
-        task_eval = dataset
+        if dataset == "arc_challenge":
+            task_eval = "arc_challenge"
+        elif dataset == "truthful_qa":
+            task_eval = "truthfulqa_mc1"
+        elif dataset == 'hellaswag':
+            task_eval = "hellaswag"
+        elif dataset == 'winogrande':
+            task_eval = "winogrande"
+        else:
+            raise(f"Not support {dataset}")
+   
+        
         eval_output_path = f"saves/output_eval/iter_{iter}"
         adapter_path = f"../{dpo_adapter_path}"
         device = args.gpu_ids.split(",")[0]
@@ -325,10 +336,10 @@ def main(args):
             --tasks {task_eval} \
             --output_path {eval_output_path} \
             --batch_size 16 \
+            --limit 200 \
             --device cuda:{device}
             """
   
-
         run_cli_command(eval_command)  
         
         ########################################################## 
