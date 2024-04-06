@@ -26,7 +26,7 @@ def convert_multiple_choice_to_prompt(dataset, json_file_path):
 
 if __name__ == "__main__":
     # Load the original dataset
-    dataset = load_dataset("Rowan/hellaswag", split="train")
+    dataset = load_dataset("Rowan/hellaswag", split="train[:20]")
     
     output_dataset_path = '../hellaswag.json'
     convert_multiple_choice_to_prompt(dataset, output_dataset_path)
