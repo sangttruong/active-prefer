@@ -189,7 +189,7 @@ def main(args):
         print(f"{"="*10} Selection {"="*10}")
 
         prediction_path = f"{args.reward_model_path}/generated_predictions.jsonl"
-        data_path = f"{args.dataset_dir}/{args.dataset}.json"
+        data_path = f"{args.dataset_dir}/{dataset}.json"
         output_file = f"{args.dataset_dir}/selected_entries.json"  # Name of the output file
 
         if num_sample_select == -1:
