@@ -27,7 +27,7 @@ def convert_multiple_choice_to_prompt(dataset, json_file_path):
 
 if __name__ == "__main__":
     # Load the original dataset
-    train_dataset = load_dataset("allenai/ai2_arc", "ARC-Challenge", split='train[:50]')
+    train_dataset = load_dataset("allenai/ai2_arc", "ARC-Challenge", split='train')
     
     output_dataset_path = '../arc_challenge.json'
     convert_multiple_choice_to_prompt(train_dataset, output_dataset_path)
