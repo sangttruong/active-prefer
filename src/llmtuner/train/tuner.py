@@ -63,7 +63,7 @@ def export_model(args: Optional[Dict[str, Any]] = None):
         setattr(model.config, "torch_dtype", output_dtype)
         for param in model.parameters():
             param.data = param.data.to(output_dtype)
-
+            
     model.save_pretrained(
         save_directory=model_args.export_dir,
         max_shard_size="{}GB".format(model_args.export_size),
@@ -85,10 +85,10 @@ def export_model(args: Optional[Dict[str, Any]] = None):
             tokenizer.push_to_hub(model_args.export_hub_model_id, token=model_args.hf_hub_token)
     except Exception:
         logger.warning("Cannot save tokenizer, please copy the files manually.")
-
-
-
-
-
+    
+    import gc
+    del model
+    gc.collect()
+    torch.cuda.empty_cache()
 if __name__ == "__main__":
     run_exp()

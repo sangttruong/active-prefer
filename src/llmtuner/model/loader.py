@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING, Any, Dict, Tuple
 
 from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
 from trl import AutoModelForCausalLMWithValueHead
+import torch
 
 from ..extras.logging import get_logger
 from ..extras.misc import count_parameters, get_current_device, try_download_model_from_ms
@@ -87,7 +88,7 @@ def load_model(
 
     if model is None:
         model = AutoModelForCausalLM.from_pretrained(model_args.model_name_or_path, config=config, **init_kwargs)
-
+        
     patch_model(model, tokenizer, model_args, is_trainable)
     register_autoclass(config, model, tokenizer)
 
@@ -106,7 +107,8 @@ def load_model(
         if vhead_params is not None:
             model.load_state_dict(vhead_params, strict=False)
             logger.info("Loaded valuehead from checkpoint: {}".format(vhead_path))
-
+    
+    
     if not is_trainable:
         model.requires_grad_(False)
         model.eval()
@@ -124,6 +126,8 @@ def load_model(
     else:
         param_stats = "all params: {:d}".format(all_param)
     logger.info(param_stats)
+
+
 
     if model_args.print_param_status:
         for name, param in model.named_parameters():

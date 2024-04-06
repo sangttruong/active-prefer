@@ -150,6 +150,11 @@ class ModelArguments:
         metadata={"help": "For debugging purposes, print the status of the parameters in the model."},
     )
 
+    is_remove_lm_head: bool = field(
+        default=False,
+        metadata={"help": "For debugging purposes, print the status of the parameters in the model."},
+    )
+
     def __post_init__(self):
         self.compute_dtype = None
         self.device_map = None

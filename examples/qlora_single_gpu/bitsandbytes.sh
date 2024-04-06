@@ -1,10 +1,10 @@
 #!/bin/bash
 
 CUDA_VISIBLE_DEVICES=0 python ../../src/train_bash.py \
-    --stage sft \
+    --stage dpo \
     --do_train \
     --model_name_or_path meta-llama/Llama-2-7b-hf \
-    --dataset alpaca_gpt4_en,glaive_toolcall \
+    --dataset arc_sample \
     --dataset_dir ../../data \
     --template default \
     --finetuning_type lora \

@@ -6,6 +6,7 @@ CUDA_VISIBLE_DEVICES=0,1 accelerate launch \
     --stage rm \
     --do_train \
     --model_name_or_path meta-llama/Llama-2-7b-hf \
+    --use_unsloth True \
     --dataset arc_sample \
     --dataset_dir ../../data \
     --template default \

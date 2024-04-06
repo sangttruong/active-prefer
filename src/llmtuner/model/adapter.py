@@ -68,6 +68,7 @@ def init_adapter(
                 freeze_modules.add(name.split(".0.")[-1].split(".")[0])
 
         trainable_layers = []
+        
         for module_name in finetuning_args.name_module_trainable:
             if module_name not in freeze_modules:
                 raise ValueError(

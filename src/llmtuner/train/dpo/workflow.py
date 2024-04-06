@@ -11,6 +11,9 @@ from ..utils import create_modelcard_and_push, create_ref_model
 from .collator import DPODataCollatorWithPadding
 from .trainer import CustomDPOTrainer
 
+import torch
+import gc
+
 
 if TYPE_CHECKING:
     from transformers import Seq2SeqTrainingArguments, TrainerCallback
@@ -78,3 +81,9 @@ def run_dpo(
 
     # Create model card
     create_modelcard_and_push(trainer, model_args, data_args, training_args, finetuning_args)
+
+    del trainer, model
+    gc.collect()
+    torch.cuda.empty_cache()
+    
+    

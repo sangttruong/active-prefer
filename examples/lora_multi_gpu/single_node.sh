@@ -1,12 +1,12 @@
 #!/bin/bash
 
-CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 accelerate launch \
+CUDA_VISIBLE_DEVICES=0,1 accelerate launch \
     --config_file ../accelerate/single_config.yaml \
     ../../src/train_bash.py \
-    --stage sft \
+    --stage rm \
     --do_train \
     --model_name_or_path meta-llama/Llama-2-7b-hf \
-    --dataset alpaca_gpt4_en,glaive_toolcall \
+    --dataset arc_sample \
     --dataset_dir ../../data \
     --template default \
     --finetuning_type lora \
@@ -25,7 +25,6 @@ CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 accelerate launch \
     --save_steps 100 \
     --eval_steps 100 \
     --evaluation_strategy steps \
-    --load_best_model_at_end \
     --learning_rate 5e-5 \
     --num_train_epochs 3.0 \
     --max_samples 3000 \

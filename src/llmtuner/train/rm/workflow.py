@@ -2,6 +2,9 @@
 
 from typing import TYPE_CHECKING, List, Optional
 
+import torch
+import gc
+
 from ...data import get_dataset, split_dataset
 from ...extras.callbacks import FixValueHeadModelCallback
 from ...extras.misc import fix_valuehead_checkpoint
@@ -26,10 +29,21 @@ def run_rm(
     finetuning_args: "FinetuningArguments",
     callbacks: Optional[List["TrainerCallback"]] = None,
 ):
+    # import gc
+    # gc.collect()
+    # torch.cuda.empty_cache()
+
     tokenizer = load_tokenizer(model_args)
     dataset = get_dataset(tokenizer, model_args, data_args, training_args, stage="rm")
     model = load_model(tokenizer, model_args, finetuning_args, training_args.do_train, add_valuehead=True)
     data_collator = PairwiseDataCollatorWithPadding(tokenizer, pad_to_multiple_of=8)
+
+    if training_args.do_train:
+        for name, param in model.named_parameters():
+            if 'v_head' in name:
+                param.requires_grad = True
+            else:
+                param.requires_grad = False
 
     # Update arguments
     training_args.remove_unused_columns = False  # important for pairwise dataset
@@ -45,7 +59,7 @@ def run_rm(
         compute_metrics=compute_accuracy,
         **split_dataset(dataset, data_args, training_args),
     )
-
+    
     # Training
     if training_args.do_train:
         train_result = trainer.train(resume_from_checkpoint=training_args.resume_from_checkpoint)
@@ -59,20 +73,26 @@ def run_rm(
             plot_loss(training_args.output_dir, keys=["loss", "eval_loss"])
 
     # Evaluation
-    if training_args.do_eval:
-        metrics = trainer.evaluate(metric_key_prefix="eval")
-        trainer.log_metrics("eval", metrics)
-        trainer.save_metrics("eval", metrics)
+    # if training_args.do_eval:
+    #     metrics = trainer.evaluate(metric_key_prefix="eval")
+    #     trainer.log_metrics("eval", metrics)
+    #     trainer.save_metrics("eval", metrics)
 
     # Predict
     if training_args.do_predict:
         predict_results = trainer.predict(dataset, metric_key_prefix="predict")
         trainer.log_metrics("predict", predict_results.metrics)
         trainer.save_metrics("predict", predict_results.metrics)
-
-        #
+        
+        # get id question
         question_id = dataset['id']
         trainer.save_predictions(predict_results, question_id)
 
     # Create model card
     create_modelcard_and_push(trainer, model_args, data_args, training_args, finetuning_args)
+
+    del trainer, model
+    gc.collect()
+    torch.cuda.empty_cache()
+    
+    

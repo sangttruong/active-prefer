@@ -1,11 +1,11 @@
 #!/bin/bash
 
-deepspeed --num_gpus 4 ../../src/train_bash.py \
+deepspeed --num_gpus 2 ../../src/train_bash.py \
     --deepspeed ../deepspeed/ds_z3_config.json \
-    --stage sft \
+    --stage rm \
     --do_train \
     --model_name_or_path meta-llama/Llama-2-7b-hf \
-    --dataset alpaca_gpt4_en,glaive_toolcall \
+    --dataset arc_sample \
     --dataset_dir ../../data \
     --template default \
     --finetuning_type full \
@@ -28,5 +28,4 @@ deepspeed --num_gpus 4 ../../src/train_bash.py \
     --max_samples 3000 \
     --val_size 0.1 \
     --ddp_timeout 1800000 \
-    --plot_loss \
-    --fp16
+    --plot_loss 

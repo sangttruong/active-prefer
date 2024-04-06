@@ -33,6 +33,7 @@ class DatasetAttr:
     query: Optional[str] = "input"
     response: Optional[str] = "output"
     history: Optional[str] = None
+    id: Optional[str] = "id"
     """ columns for the sharegpt format """
     messages: Optional[str] = "conversations"
     tools: Optional[str] = None
@@ -106,7 +107,7 @@ def get_dataset_list(data_args: "DataArguments") -> List["DatasetAttr"]:
 
             for column_name in column_names:
                 dataset_attr.set_attr(column_name, dataset_info[name]["columns"])
-
+            
         if dataset_attr.formatting == "sharegpt" and "tags" in dataset_info[name]:
             tag_names = (
                 "role_tag",

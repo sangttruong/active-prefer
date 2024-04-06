@@ -14,7 +14,9 @@ if TYPE_CHECKING:
 
 
 def convert_alpaca(examples: Dict[str, List[Any]], dataset_attr: "DatasetAttr") -> Dict[str, List[Any]]:
-    outputs = {"prompt": [], "response": [], "system": [], "tools": []}
+    # outputs = {"prompt": [], "response": [], "system": [], "tools": []}
+    outputs = {"prompt": [], "response": [], "system": [], "tools": [], "id": []}
+
     for i in range(len(examples[dataset_attr.prompt])):
         prompt = []
         if dataset_attr.history and isinstance(examples[dataset_attr.history][i], list):
@@ -28,6 +30,10 @@ def convert_alpaca(examples: Dict[str, List[Any]], dataset_attr: "DatasetAttr") 
 
         if dataset_attr.query and examples[dataset_attr.query][i]:
             content.append(examples[dataset_attr.query][i])
+            
+        # track id question
+        if dataset_attr.id and examples[dataset_attr.id][i]:
+            id = examples[dataset_attr.id][i]
 
         prompt.append({"role": Role.USER.value, "content": "\n".join(content)})
 
@@ -38,13 +44,14 @@ def convert_alpaca(examples: Dict[str, List[Any]], dataset_attr: "DatasetAttr") 
         elif dataset_attr.response and isinstance(examples[dataset_attr.response][i], str):
             response = [{"role": Role.ASSISTANT.value, "content": examples[dataset_attr.response][i]}]
         else:
-            response = []
-
+            response = [] 
+        
+        outputs["id"].append(id)
         outputs["prompt"].append(prompt)
         outputs["response"].append(response)
         outputs["system"].append(examples[dataset_attr.system][i] if dataset_attr.system else "")
         outputs["tools"].append("")
-
+    
     return outputs
 
 
@@ -104,6 +111,8 @@ def align_dataset(
         convert_func = partial(convert_sharegpt, dataset_attr=dataset_attr)
 
     column_names = list(next(iter(dataset)).keys())
+    
+
     features = Features.from_dict(
         {
             "prompt": [
@@ -114,6 +123,7 @@ def align_dataset(
             ],
             "system": {"dtype": "string", "_type": "Value"},
             "tools": {"dtype": "string", "_type": "Value"},
+            "id": {"dtype": "string", "_type": "Value"}
         }
     )
     kwargs = {}
@@ -123,7 +133,7 @@ def align_dataset(
             load_from_cache_file=(not data_args.overwrite_cache),
             desc="Converting format of dataset",
         )
-
+    
     return dataset.map(
         convert_func,
         batched=True,
