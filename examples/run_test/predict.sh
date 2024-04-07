@@ -2,8 +2,8 @@
 
 # 
 
-# CUDA_VISIBLE_DEVICES=0,1 accelerate launch \
-CUDA_VISIBLE_DEVICES=0,1 python ../../src/train_bash.py \
+CUDA_VISIBLE_DEVICES=0,1 accelerate launch \
+    ../../src/train_bash.py \
     --stage sft \
     --do_predict \
     --model_name_or_path meta-llama/Llama-2-7b-hf \
@@ -19,6 +19,6 @@ CUDA_VISIBLE_DEVICES=0,1 python ../../src/train_bash.py \
     --per_device_eval_batch_size 1 \
     --max_samples 20 \
     --predict_with_generate \
-    --quantization_bit 4\
-    --bf16
+    --quantization_bit 4
+    # --bf16
 
