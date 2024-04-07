@@ -237,7 +237,7 @@ def main(args):
         active_dataset = new_data_info # replace dataset by ACTIVE QUERIES
         
         dpo_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch\
-            --config_file ../accelerate/default.yaml \
+            --config_file examples/accelerate/default.yaml \
             src/train_bash.py \
             --stage dpo \
             --do_train \
@@ -310,7 +310,7 @@ def main(args):
         active_dataset = new_data_info # replace dataset by ACTIVE QUERIES
 
         rm_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch \
-            --config_file ../accelerate/default.yaml \
+            --config_file examples/accelerate/default.yaml \
             src/train_bash.py \
             --stage rm \
             --do_train \
