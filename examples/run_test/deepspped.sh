@@ -28,4 +28,5 @@ deepspeed --num_gpus 2 ../../src/train_bash.py \
     --max_samples 3000 \
     --val_size 0.1 \
     --ddp_timeout 1800000 \
+    --quantization_bit 4 \
     --plot_loss 
