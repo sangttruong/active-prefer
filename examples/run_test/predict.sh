@@ -2,7 +2,7 @@
 
 
 CUDA_VISIBLE_DEVICES=0,1 accelerate launch \
-    --config_file ../accelerate/fsdp_config.yaml \
+    --config_file ../deepspeed/ds_z2_config.json \
     ../../src/train_bash.py \
     --stage sft \
     --do_predict \
@@ -20,5 +20,4 @@ CUDA_VISIBLE_DEVICES=0,1 accelerate launch \
     --max_samples 20 \
     --predict_with_generate \
     --quantization_bit 4
-    # --bf16
 
