@@ -4,7 +4,7 @@
 # --overwrite_cache \
 
 CUDA_VISIBLE_DEVICES=0,1 accelerate launch \
-    --config_file ../accelerate/single_config.yaml \
+    --config_file ../accelerate/default.yaml \
     ../../src/train_bash.py \
     --stage rm \
     --do_train \
