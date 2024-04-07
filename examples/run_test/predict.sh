@@ -4,7 +4,6 @@ deepspeed --num_gpus 2 ../../src/train_bash.py \
     --deepspeed ../deepspeed/ds_z3_config.json \
     --stage rm \
     --do_train \
-    --do_predict \
     --model_name_or_path meta-llama/Llama-2-7b-hf \
     --dataset arc_challenge \
     --dataset_dir ../../data \
