@@ -29,7 +29,7 @@ def convert_multiple_choice_to_prompt(dataset, json_file_path):
 
 if __name__ == "__main__":
     # Load the original dataset
-    dataset = load_dataset("winogrande", "winogrande_debiased", split="train[:5]")
+    dataset = load_dataset("winogrande", "winogrande_debiased", split="train[:100]")
     
     output_dataset_path = '../winogrande.json'
     convert_multiple_choice_to_prompt(dataset, output_dataset_path)
