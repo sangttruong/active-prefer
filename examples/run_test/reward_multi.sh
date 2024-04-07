@@ -9,7 +9,6 @@ CUDA_VISIBLE_DEVICES=0,1 accelerate launch \
     --stage rm \
     --do_train \
     --model_name_or_path meta-llama/Llama-2-7b-hf \
-    --adapter_name_or_path ../../saves/dpo_llama2_7b_arc_sample\
     --flash_attn True\
     --dataset arc_challenge \
     --dataset_dir ../../data \
