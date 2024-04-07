@@ -6,12 +6,12 @@ CUDA_VISIBLE_DEVICES=0,1 accelerate launch \
     --stage rm \
     --do_train \
     --model_name_or_path meta-llama/Llama-2-7b-hf \
-    --dataset arc_sample \
+    --dataset arc_challenge \
     --dataset_dir ../../data \
     --template default \
     --finetuning_type lora \
     --lora_target q_proj,v_proj \
-    --output_dir ../../saves/LLaMA2-7B/lora/sft \
+    --output_dir ../../saves/test/lora/sft \
     --overwrite_cache \
     --overwrite_output_dir \
     --cutoff_len 1024 \
