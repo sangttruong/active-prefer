@@ -4,7 +4,7 @@
 # --overwrite_cache \
 
 CUDA_VISIBLE_DEVICES=0,1 accelerate launch \
-    --config_file ../deepspeed/ds_z3_config.json \
+    --config_file ../accelerate/single_config \
     ../../src/train_bash.py \
     --stage rm \
     --do_predict \
