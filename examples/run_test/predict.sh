@@ -2,7 +2,7 @@
 
 
 CUDA_VISIBLE_DEVICES=0,1 accelerate launch \
-    --config_file ../deepspeed/ds_z2_config.json \
+    --config_file ../accelerate/infer_config.yaml \
     ../../src/train_bash.py \
     --stage sft \
     --do_predict \
