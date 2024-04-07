@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# 
 
 CUDA_VISIBLE_DEVICES=0,1 accelerate launch \
+    --config_file ../accelerate/fsdp_config.yaml \
     ../../src/train_bash.py \
     --stage sft \
     --do_predict \
