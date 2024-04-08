@@ -3,7 +3,6 @@
 CUDA_VISIBLE_DEVICES=0,1 python ../../src/train_bash.py \
     --stage rm \
     --do_train \
-    --do_predict \
     --model_name_or_path meta-llama/Llama-2-7b-hf \
     --dataset arc_challenge \
     --dataset_dir ../../data \
@@ -24,7 +23,7 @@ CUDA_VISIBLE_DEVICES=0,1 python ../../src/train_bash.py \
     --eval_steps 100 \
     --evaluation_strategy steps \
     --learning_rate 1e-5 \
-    --num_train_epochs 1.0 \
+    --num_train_epochs 3.0 \
     --max_samples 2000 \
     --val_size 0.1 \
     --plot_loss \
