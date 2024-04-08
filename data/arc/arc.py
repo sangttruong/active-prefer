@@ -37,7 +37,6 @@ def parse_arguments():
 if __name__ == "__main__":
     # Load the original dataset
     args = parse_arguments()
-    breakpoint()
     if args.sanity_check:
         train_dataset = load_dataset("allenai/ai2_arc", "ARC-Challenge", split='train[:100]')
     else:
