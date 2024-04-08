@@ -90,7 +90,7 @@ def select_entries_by_ids(data_path, id_list, output_file):
         json.dump(selected_entries, outfile, indent=4)
 
 def delete_selected_info(data_info_path, pattern="iter"):
-    # Read data from dataset.json
+    # Read data from dataset_info.json
     with open(data_info_path, 'r') as file:
         data = json.load(file)
 

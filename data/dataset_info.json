@@ -58,16 +58,5 @@
             "response": "output",
             "choice_label": "choice_label"
         }
-    },
-    "hh_rlhf": {
-        "file_name": "hh_rlhf.json",
-        "columns": {
-            "id": "id",
-            "prompt": "instruction",
-            "query": "input",
-            "response": "output",
-            "choice_label": "choice_label"
-        }
     }
-
 }
