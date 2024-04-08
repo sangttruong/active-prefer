@@ -25,9 +25,20 @@ def convert_multiple_choice_to_prompt(dataset, json_file_path):
     with open(json_file_path, 'w') as json_file:
         json.dump(new_samples, json_file, indent=4)
 
+
+def parse_arguments():
+    import argparse
+    parser = argparse.ArgumentParser(description="Iterative training and evaluation script")
+    parser.add_argument("--sanity_check", type=bool, default=False, help="Test")
+
+
+
 if __name__ == "__main__":
     # Load the original dataset
-    train_dataset = load_dataset("allenai/ai2_arc", "ARC-Challenge", split='train')
-    
+    args = parse_arguments()
+    if args.sanity_check:
+        train_dataset = load_dataset("allenai/ai2_arc", "ARC-Challenge", split='train[:100]')
+    else:
+        train_dataset = load_dataset("allenai/ai2_arc", "ARC-Challenge", split='train')
     output_dataset_path = '../arc_challenge.json'
     convert_multiple_choice_to_prompt(train_dataset, output_dataset_path)

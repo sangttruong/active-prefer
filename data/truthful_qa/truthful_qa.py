@@ -24,10 +24,19 @@ def convert_multiple_choice_to_prompt(dataset, json_file_path):
     with open(json_file_path, 'w') as json_file:
         json.dump(new_samples, json_file, indent=4)
 
+def parse_arguments():
+    import argparse
+    parser = argparse.ArgumentParser(description="Iterative training and evaluation script")
+    parser.add_argument("--sanity_check", type=bool, default=False, help="Test")
+
+
+
 if __name__ == "__main__":
-    # Load the original dataset
-    dataset = load_dataset("truthful_qa", "multiple_choice", split="validation")
-    
+    args = parse_arguments()
+    if args.sanity_check:
+        dataset = load_dataset("truthful_qa", "multiple_choice", split="validation[:100]")
+    else:
+        dataset = load_dataset("truthful_qa", "multiple_choice", split="validation")
     output_dataset_path = '../truthful_qa.json'
     convert_multiple_choice_to_prompt(dataset, output_dataset_path)
     
