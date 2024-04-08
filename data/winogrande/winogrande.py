@@ -41,6 +41,6 @@ if __name__ == "__main__":
     else:
         dataset = load_dataset("winogrande", "winogrande_debiased", split="train")
     
-    output_dataset_path = '../winogrande.json'
+    output_dataset_path = 'data/winogrande.json'
     convert_multiple_choice_to_prompt(dataset, output_dataset_path)
     

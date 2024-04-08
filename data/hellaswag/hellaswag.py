@@ -38,6 +38,6 @@ if __name__ == "__main__":
         dataset = load_dataset("Rowan/hellaswag", split="train[:100]")
     else:
         dataset = load_dataset("Rowan/hellaswag", split="train")   
-    output_dataset_path = '../hellaswag.json'
+    output_dataset_path = 'data/hellaswag.json'
     convert_multiple_choice_to_prompt(dataset, output_dataset_path)
     

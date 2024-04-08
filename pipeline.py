@@ -112,7 +112,6 @@ def count_len_dataset(prediction_path):
         ids = set(item['id'] for item in data)
     return len(ids)
 
-
 def run_cli_command(command):
     # Run the command
     os.system(command)

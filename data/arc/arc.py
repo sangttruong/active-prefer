@@ -33,7 +33,6 @@ def parse_arguments():
     return parser.parse_args()
 
 
-
 if __name__ == "__main__":
     # Load the original dataset
     args = parse_arguments()
@@ -41,5 +40,5 @@ if __name__ == "__main__":
         train_dataset = load_dataset("allenai/ai2_arc", "ARC-Challenge", split='train[:100]')
     else:
         train_dataset = load_dataset("allenai/ai2_arc", "ARC-Challenge", split='train')
-    output_dataset_path = '../arc_challenge.json'
+    output_dataset_path = 'data/arc_challenge.json'
     convert_multiple_choice_to_prompt(train_dataset, output_dataset_path)

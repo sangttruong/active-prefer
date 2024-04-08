@@ -37,6 +37,6 @@ if __name__ == "__main__":
         dataset = load_dataset("truthful_qa", "multiple_choice", split="validation[:100]")
     else:
         dataset = load_dataset("truthful_qa", "multiple_choice", split="validation")
-    output_dataset_path = '../truthful_qa.json'
+    output_dataset_path = 'data/truthful_qa.json'
     convert_multiple_choice_to_prompt(dataset, output_dataset_path)
     

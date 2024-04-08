@@ -39,6 +39,6 @@ if __name__ == "__main__":
     else:
         dataset = load_dataset("cais/mmlu", "all", split="auxiliary_train")
 
-    output_dataset_path = '../mmlu.json'
+    output_dataset_path = 'data/mmlu.json'
     convert_multiple_choice_to_prompt(dataset, output_dataset_path)
     
