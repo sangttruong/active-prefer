@@ -103,17 +103,17 @@ def load_model(
         model: "AutoModelForCausalLMWithValueHead" = AutoModelForCausalLMWithValueHead.from_pretrained(model)
         patch_valuehead_model(model)
 
+        prev_vhead_path = None
         if model_args.adapter_name_or_path is not None:
             vhead_path = model_args.adapter_name_or_path[-1]
-
+            prev_vhead_path = vhead_path.replace("dpo", "reward")
         else:
             vhead_path = model_args.model_name_or_path
 
         # Load prev vhead
-        prev_head_path = vhead_path.replace("dpo", "reward")
-        if "value_head.safetensors" in os.listdir(prev_head_path):
-            vhead_params = load_valuehead_params(prev_head_path, model_args)
-            logger.info("Loaded valuehead from checkpoint: {}".format(prev_head_path))
+        if prev_vhead_path and "value_head.safetensors" in os.listdir(prev_vhead_path):
+            vhead_params = load_valuehead_params(prev_vhead_path, model_args)
+            logger.info("Loaded valuehead from checkpoint: {}".format(prev_vhead_path))
         else:
             vhead_params = load_valuehead_params(vhead_path, model_args)
             logger.info("Loaded valuehead from checkpoint: {}".format(vhead_path))
