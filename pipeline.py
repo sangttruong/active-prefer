@@ -236,7 +236,7 @@ def main(args):
         active_dataset = new_data_info # replace dataset by ACTIVE QUERIES
         
         if len(args.gpu_ids) > 1: 
-            dpo_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch\
+            dpo_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port}\
                 --config_file examples/accelerate/default.yaml \
                 src/train_bash.py \
                 --stage dpo \
@@ -309,7 +309,7 @@ def main(args):
         active_dataset = new_data_info # replace dataset by ACTIVE QUERIES
 
         if len(args.gpu_ids) > 1: 
-            rm_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch \
+            rm_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port} \
                 --config_file examples/accelerate/default.yaml \
                 src/train_bash.py \
                 --stage rm \
@@ -447,6 +447,7 @@ def parse_arguments():
     parser.add_argument("--quantization_bit", type=int, default=4, help="Quantization bit")
     parser.add_argument("--dataset_dir", type=str, default="data", help="Directory containing the dataset")
     parser.add_argument("--data_info_path", type=str, default="data/dataset_info.json", help="Path to dataset info")
+
     parser.add_argument("--sanity_check", type=bool, default=True, help="Test")
 
     #######################
@@ -460,7 +461,7 @@ def parse_arguments():
     parser.add_argument("--method", type=str, default="max_entropy", help="Selection method")
     parser.add_argument("--dataset", type=str, default="arc_sample", help="Dataset name")
     parser.add_argument("--gpu_ids", type=str, default="0,1", help="")
-    
+    parser.add_argument("--main_process_port", type=int, default=29500, help="Test")
     return parser.parse_args()
 
 if __name__ == "__main__":
