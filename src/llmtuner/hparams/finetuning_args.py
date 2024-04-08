@@ -225,6 +225,10 @@ class FinetuningArguments(FreezeArguments, LoraArguments, RLHFArguments, GaloreA
         default=False,
         metadata={"help": "Whether or not to save the training loss curves."},
     )
+    only_training_vhead: bool = field(
+        default=False,
+        metadata={"help": "Whether or not to save the training loss curves."},
+    )
 
     def __post_init__(self):
         def split_arg(arg):

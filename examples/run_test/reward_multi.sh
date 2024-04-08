@@ -34,4 +34,5 @@ CUDA_VISIBLE_DEVICES=0,1 accelerate launch \
     --val_size 0.1 \
     --ddp_timeout 1800000 \
     --plot_loss \
-    --quantization_bit 4
+    --quantization_bit 4 \
+    --only_training_vhead True

@@ -5,7 +5,7 @@ CUDA_VISIBLE_DEVICES=0,1 python ../../src/train_bash.py \
     --do_train \
     --do_predict \
     --model_name_or_path meta-llama/Llama-2-7b-hf \
-    --dataset arc_sample \
+    --dataset arc_challenge \
     --dataset_dir ../../data \
     --template default \
     --finetuning_type lora \
@@ -28,4 +28,5 @@ CUDA_VISIBLE_DEVICES=0,1 python ../../src/train_bash.py \
     --max_samples 2000 \
     --val_size 0.1 \
     --plot_loss \
-    --quantization_bit 4
+    --quantization_bit 4\
+    --only_training_vhead True
