@@ -218,7 +218,7 @@ def main(args):
             
             if dataset in data_info:
                 # append new info to data_infor and store result in json file
-                new_data_info = dataset + f"_iter_{iter}"
+                new_data_info = f"{dataset}_{model_name}_iter_{iter}"
                 data_info[new_data_info] = copy.deepcopy(data_info[dataset])
                 data_info[new_data_info]["file_name"] = "selected_entries.json"
 
@@ -424,7 +424,7 @@ def main(args):
         print("=========================================================")
         
     print("DONE!!!")
-    delete_selected_info(args.data_info_path)
+    delete_selected_info(args.data_info_path, f"{model_name}_iter")
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Iterative training and evaluation script")
