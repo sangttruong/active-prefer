@@ -28,7 +28,7 @@ def parse_arguments():
     import argparse
     parser = argparse.ArgumentParser(description="Iterative training and evaluation script")
     parser.add_argument("--sanity_check", type=bool, default=False, help="Test")
-
+    return parser.parse_args()
 
 
 if __name__ == "__main__":
