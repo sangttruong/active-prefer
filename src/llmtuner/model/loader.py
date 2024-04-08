@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING, Any, Dict, Tuple
+import os
 
 from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
 from trl import AutoModelForCausalLMWithValueHead
@@ -48,6 +49,10 @@ def load_tokenizer(model_args: "ModelArguments") -> "PreTrainedTokenizer":
     patch_tokenizer(tokenizer)
     return tokenizer
 
+def check_file_exists(folder_path, filename):
+    import os
+    file_path = os.path.join(folder_path, filename)
+    return os.path.exists(file_path)
 
 def load_model(
     tokenizer: "PreTrainedTokenizer",
@@ -100,13 +105,21 @@ def load_model(
 
         if model_args.adapter_name_or_path is not None:
             vhead_path = model_args.adapter_name_or_path[-1]
+
         else:
             vhead_path = model_args.model_name_or_path
 
-        vhead_params = load_valuehead_params(vhead_path, model_args)
+        # Load prev vhead
+        prev_head_path = vhead_path.replace("dpo", "reward")
+        if "value_head.safetensors" in os.listdir(prev_head_path):
+            vhead_params = load_valuehead_params(prev_head_path, model_args)
+            logger.info("Loaded valuehead from checkpoint: {}".format(prev_head_path))
+        else:
+            vhead_params = load_valuehead_params(vhead_path, model_args)
+            logger.info("Loaded valuehead from checkpoint: {}".format(vhead_path))
+
         if vhead_params is not None:
             model.load_state_dict(vhead_params, strict=False)
-            logger.info("Loaded valuehead from checkpoint: {}".format(vhead_path))
     
     
     if not is_trainable:
