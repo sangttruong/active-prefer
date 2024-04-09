@@ -154,8 +154,8 @@ class CustomSeq2SeqTrainer(Seq2SeqTrainer):
                 id = example['id']
                 prompt = example['prompt'][0]['content']
                 res.append(json.dumps({"id": id, 
-                                       "prompt":prompt, 
-                                       "query": "", 
-                                       "instruction": pred},
+                                       "instruction":prompt, 
+                                       "input": "", 
+                                       "output": pred},
                                         ensure_ascii=False))
             writer.write("\n".join(res))
