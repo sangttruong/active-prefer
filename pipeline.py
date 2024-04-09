@@ -199,13 +199,14 @@ def save_eval_metric(file_path, accuracy, iteration):
         with open(file_path, 'r') as file:
             json_data = json.load(file)
         
-        json_data.append({'iteration': iteration, 'accuracy': accuracy})
-        
+        if json_data: 
+            json_data.append({'iteration': iteration, 'accuracy': accuracy})
+        else:
+            json_data = [{'iteration': iteration, 'accuracy': accuracy}]
+
         with open(file_path, 'w') as file:
             json.dump(json_data, file)
-    else:
-        with open(file_path, 'w') as file:
-            json.dump([{'iteration': iteration, 'accuracy': accuracy}], file)
+   
 
 
 def main(args):
