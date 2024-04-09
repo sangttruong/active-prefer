@@ -151,9 +151,8 @@ class CustomSeq2SeqTrainer(Seq2SeqTrainer):
             res: List[str] = []
             for i, pred  in enumerate(decoded_preds):
                 example = dataset[i]
-                breakpoint()
                 id = example['id']
-                prompt = example['prompt']['content']
+                prompt = example['prompt'][0]['content']
                 res.append(json.dumps({"id": id, 
                                        "prompt":prompt, 
                                        "query": "", 
