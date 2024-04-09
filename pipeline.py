@@ -135,6 +135,20 @@ def delete_item_dataset_info(dataset_info_path, name):
         json.dump(data, outfile, indent=4)
 
 
+def jsonl_to_json(jsonl_file_path, output_json_file_path):
+    # Read JSONL file
+    with open(jsonl_file_path, 'r') as jsonl_file:
+        lines = jsonl_file.readlines()
+
+    # Parse each line as JSON and store in a list
+    json_data = [json.loads(line.strip()) for line in lines]
+
+    # Write the list of JSON objects to a JSON file
+    with open(output_json_file_path, 'w') as json_file:
+        json.dump(json_data, json_file, indent=4)
+
+
+
 
 def count_len_dataset(prediction_path):
     with open(prediction_path, 'r') as f:
