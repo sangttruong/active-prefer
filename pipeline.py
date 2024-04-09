@@ -146,10 +146,13 @@ def main(args):
     print("Prepare Dataset")
     run_cli_command(prepare_data)
 
+    num_sample_select = -1 
+
     model_name = args.model_name_or_path.split('/')[-1]
     reward_model_path = f"saves/{model_name}/{dataset}/{args.method}/reward"
     dpo_adapter_path = f"saves/{model_name}/{dataset}/{args.method}/dpo"
-    
+    oracle_adapter_path = f"saves/{model_name}/{dataset}/{args.method}/oracle"
+
     
     # Train an Oracle model O on 80% of the data
     ft_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
@@ -157,9 +160,8 @@ def main(args):
         --do_train \
         --flash_attn True\
         --model_name_or_path {args.model_name_or_path}\
-        --adapter_name_or_path {dpo_adapter_path}\
-        --output_dir {reward_model_path} \
-        --dataset {active_dataset} \
+        --output_dir {oracle_adapter_path} \
+        --dataset {dataset} \
         --dataset_dir {args.dataset_dir} \
         --template {args.template} \
         --finetuning_type {args.finetuning_type} \
@@ -188,7 +190,7 @@ def main(args):
         """
     run_cli_command(ft_oracle_command)
 
-    num_sample_select = -1 
+    # active pipeline     
     for iter in range(args.num_iters):
         print(f"ITERARION: {iter}")
         ##########################################################
@@ -379,7 +381,8 @@ def main(args):
                 --val_size {args.val_size} \
                 --ddp_timeout 1800000 \
                 --plot_loss \
-                --quantization_bit {args.quantization_bit}
+                --quantization_bit {args.quantization_bit}\
+                --only_training_vhead False
                 """
         else:
             rm_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
@@ -413,7 +416,8 @@ def main(args):
                 --val_size {args.val_size} \
                 --ddp_timeout 1800000 \
                 --plot_loss \
-                --quantization_bit {args.quantization_bit}
+                --quantization_bit {args.quantization_bit}\
+                --only_training_vhead False
                 """
 
         run_cli_command(rm_ft_command) 
