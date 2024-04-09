@@ -297,6 +297,7 @@ def main(args):
 
         # Update data training
         select_entries_by_ids(data_path, selected_questions, output_file)
+        breakpoint()
         with open(args.data_info_path, 'r') as file:
             data_info = json.load(file)
             
