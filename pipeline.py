@@ -306,9 +306,7 @@ def main(args):
         --max_samples {args.max_samples} \
         --val_size 0.8 \
         --ddp_timeout 1800000 \
-        --plot_loss \
-        --quantization_bit {args.quantization_bit}\
-        --only_training_vhead False
+        --plot_loss 
         """
     
     print(f"Training Oracle model ............................")
