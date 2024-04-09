@@ -232,6 +232,7 @@ def main(args):
     else:
         raise(f"Does not support {args.dataset_name} dataset yet")
 
+    testset = dataset.replace("train", "test")
     print("Prepare Dataset .....................")
     run_cli_command(prepare_data)
 
@@ -521,7 +522,7 @@ def main(args):
             --do_predict \
             --model_name_or_path {args.model_name_or_path} \
             --adapter_name_or_path {dpo_adapter_path} \
-            --dataset {dataset} \
+            --dataset {testset} \
             --dataset_dir {args.dataset_dir} \
             --template {args.template} \
             --finetuning_type {args.finetuning_type} \
