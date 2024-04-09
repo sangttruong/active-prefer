@@ -152,9 +152,7 @@ def main(args):
     
     
     # Train an Oracle model O on 80% of the data
-    rm_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port} \
-        --config_file examples/accelerate/default.yaml \
-        src/train_bash.py \
+    ft_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
         --stage rm \
         --do_train \
         --flash_attn True\
@@ -182,12 +180,13 @@ def main(args):
         --learning_rate {args.learning_rate} \
         --num_train_epochs {args.num_train_epochs} \
         --max_samples {args.max_samples} \
-        --val_size {args.val_size} \
+        --val_size 0.8 \
         --ddp_timeout 1800000 \
         --plot_loss \
-        --quantization_bit {args.quantization_bit}
+        --quantization_bit {args.quantization_bit}\
+        --only_training_vhead False
         """
-
+    run_cli_command(ft_oracle_command)
 
     num_sample_select = -1 
     for iter in range(args.num_iters):
@@ -273,7 +272,7 @@ def main(args):
 
         active_dataset = new_data_info # replace dataset by ACTIVE QUERIES
         
-        if len(args.gpu_ids) > 1: 
+        if args.use_accelerate: 
             dpo_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port}\
                 --config_file examples/accelerate/default.yaml \
                 src/train_bash.py \
@@ -346,7 +345,7 @@ def main(args):
         print(" Train Reward ")
         active_dataset = new_data_info # replace dataset by ACTIVE QUERIES
 
-        if len(args.gpu_ids) > 1: 
+        if args.use_accelerate:
             rm_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port} \
                 --config_file examples/accelerate/default.yaml \
                 src/train_bash.py \
@@ -485,8 +484,8 @@ def parse_arguments():
     parser.add_argument("--quantization_bit", type=int, default=4, help="Quantization bit")
     parser.add_argument("--dataset_dir", type=str, default="data", help="Directory containing the dataset")
     parser.add_argument("--data_info_path", type=str, default="data/dataset_info.json", help="Path to dataset info")
-
     parser.add_argument("--sanity_check", type=bool, default=True, help="Test")
+    parser.add_argument("--use_accelerate", type=bool, default=False, help="is using accelerate")
 
     #######################
     parser.add_argument("--dataset_name", type=str, default="arc", help="Dataset name")
