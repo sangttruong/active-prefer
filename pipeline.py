@@ -242,6 +242,41 @@ def main(args):
 
     
     # Train an Oracle model O on 80% of the data
+    # ft_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
+    #     --stage rm \
+    #     --do_train \
+    #     --do_eval \
+    #     --flash_attn True\
+    #     --model_name_or_path {args.model_name_or_path}\
+    #     --output_dir {oracle_adapter_path}\
+    #     --dataset {dataset} \
+    #     --dataset_dir {args.dataset_dir} \
+    #     --template {args.template} \
+    #     --finetuning_type {args.finetuning_type} \
+    #     --lora_target {args.lora_target} \
+    #     --overwrite_cache \
+    #     --overwrite_output_dir \
+    #     --cutoff_len {args.cutoff_len} \
+    #     --preprocessing_num_workers 16 \
+    #     --per_device_train_batch_size {args.per_device_train_batch_size} \
+    #     --per_device_eval_batch_size {args.per_device_eval_batch_size} \
+    #     --gradient_accumulation_steps {args.gradient_accumulation_steps} \
+    #     --lr_scheduler_type {args.lr_scheduler_type} \
+    #     --logging_steps {args.logging_steps} \
+    #     --warmup_steps {args.warmup_steps} \
+    #     --save_steps {args.save_steps} \
+    #     --eval_steps {args.save_steps} \
+    #     --evaluation_strategy {args.evaluation_strategy} \
+    #     --learning_rate {args.learning_rate} \
+    #     --num_train_epochs {args.num_train_epochs} \
+    #     --max_samples {args.max_samples} \
+    #     --val_size 0.8 \
+    #     --ddp_timeout 1800000 \
+    #     --plot_loss \
+    #     --quantization_bit {args.quantization_bit}\
+    #     --only_training_vhead False
+    #     """
+    
     ft_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
         --stage rm \
         --do_train \
@@ -252,8 +287,7 @@ def main(args):
         --dataset {dataset} \
         --dataset_dir {args.dataset_dir} \
         --template {args.template} \
-        --finetuning_type {args.finetuning_type} \
-        --lora_target {args.lora_target} \
+        --finetuning_type freeze \
         --overwrite_cache \
         --overwrite_output_dir \
         --cutoff_len {args.cutoff_len} \
@@ -276,6 +310,7 @@ def main(args):
         --quantization_bit {args.quantization_bit}\
         --only_training_vhead False
         """
+    
     print(f"Training Oracle model ............................")
     run_cli_command(ft_oracle_command)
 
