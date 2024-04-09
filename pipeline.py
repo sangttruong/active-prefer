@@ -532,7 +532,6 @@ def main(args):
             --cutoff_len {args.cutoff_len} \
             --preprocessing_num_workers 16 \
             --per_device_eval_batch_size {args.per_device_eval_batch_size} \
-            --max_samples 10 \
             --predict_with_generate \
             --fp16
         """
@@ -619,4 +618,4 @@ def parse_arguments():
 
 if __name__ == "__main__":
     args = parse_arguments()
-    main(args)
+    main(args)  
