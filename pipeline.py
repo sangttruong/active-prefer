@@ -5,6 +5,8 @@ import json
 import random
 import os
 import copy
+import json
+import math
 
 import numpy as np
 from scipy.stats import entropy
@@ -160,6 +162,49 @@ def run_cli_command(command):
     # Run the command
     os.system(command)
 
+
+
+def sigmoid(x):
+    return 1 / (1 + math.exp(-x))
+
+def calculate_accuracy(file_path):
+    total_samples = 0
+    correct_predictions = 0
+
+    with open(file_path, 'r') as file:
+        for line in file:
+            data = json.loads(line)
+            chosen_value = sigmoid(data['chosen'])
+            if chosen_value > 0.5:
+                prediction = 1
+            else:
+                prediction = 0
+            
+            if prediction == 1:
+                correct_predictions += 1
+            
+            total_samples += 1
+    
+    if total_samples == 0:
+        return 0.0
+    else:
+        accuracy = correct_predictions / total_samples
+        return accuracy
+
+def save_eval_metric(file_path, accuracy, iteration):
+    if os.path.exists(file_path):
+        with open(file_path, 'r') as file:
+            json_data = json.load(file)
+        
+        json_data.append({'iteration': iteration, 'accuracy': accuracy})
+        
+        with open(file_path, 'w') as file:
+            json.dump(json_data, file)
+    else:
+        with open(file_path, 'w') as file:
+            json.dump([{'iteration': iteration, 'accuracy': accuracy}], file)
+
+
 def main(args):
     # Prepare dataset
 
@@ -196,6 +241,7 @@ def main(args):
     reward_model_path = f"saves/{model_name}/{dataset}/{args.method}/reward"
     dpo_adapter_path = f"saves/{model_name}/{dataset}/{args.method}/dpo"
     oracle_adapter_path = f"saves/{model_name}/{dataset}/{args.method}/oracle"
+    eval_metric_path = os.path.join(oracle_adapter_path, "accuracy_results.json")
 
     
     # Train an Oracle model O on 80% of the data
@@ -494,12 +540,10 @@ def main(args):
         run_cli_command(generate_text_command)
 
         
-
         # add dataset_name_generated into dataset_info to inference oracle model
         jsonl_to_json(f"{args.dataset_dir}/generated_predictions.jsonl", f"{args.dataset_dir}/generated_predictions.json")
         add_new_dataset_info(args.data_info_path, dataset_name_generated, f"generated_predictions.json")
 
-        breakpoint()
 
         inference_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
                 --stage rm \
@@ -521,30 +565,13 @@ def main(args):
         print(f"Inference Oracle model ............................")
         run_cli_command(inference_oracle_command)
 
-        # add dataset_name_generated into dataset_info to inference oracle model
+        # del dataset_name_generated into dataset_info to inference oracle model
         delete_item_dataset_info(args.data_info_path, dataset_name_generated)
 
-        generate_text_command_1 = f"""CUDA_VISIBLE_DEVICES=0,1 python src/train_bash.py \
-            --stage sft \
-            --do_predict \
-            --model_name_or_path meta-llama/Llama-2-7b-hf \
-            --adapter_name_or_path saves/Llama-2-7b-hf/arc_challenge/random/dpo \
-            --dataset arc_challenge\
-            --dataset_dir data \
-            --template default \
-            --finetuning_type lora \
-            --output_dir saves/Llama-2-7b-hf/arc_challenge/random/dpo \
-            --overwrite_cache \
-            --overwrite_output_dir \
-            --cutoff_len 1024 \
-            --preprocessing_num_workers 16 \
-            --per_device_eval_batch_size 4 \
-            --max_samples 20 \
-            --predict_with_generate \
-            --fp16
-        """
-
-
+        # Get accuracy        
+        accuracy = calculate_accuracy(f"{oracle_adapter_path}/generated_predictions.jsonl")
+        print("Accuracy:", accuracy)
+        save_eval_metric(eval_metric_path, accuracy, iter)
 
         print("=========================================================")
         
