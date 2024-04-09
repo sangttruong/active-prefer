@@ -7,7 +7,6 @@ def read_jsonl(file_path):
         for line in file:
             data.append(json.loads(line))
 
-    breakpoint()
     return data
 
 def jsonl_to_json(jsonl_file_path, output_json_file_path):

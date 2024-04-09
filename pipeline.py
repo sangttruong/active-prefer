@@ -532,10 +532,11 @@ def main(args):
         print(f"Generating text from the new DPO model .....................")
         run_cli_command(generate_text_command)
 
-        breakpoint()
+        
 
         # add dataset_name_generated into dataset_info to inference oracle model
-        add_new_dataset_info(args.data_info_path, dataset_name_generated, f"generated_predictions.jsonl")
+        jsonl_to_json(f"{args.dataset_dir}/generated_predictions.jsonl", f"{args.dataset_dir}/generated_predictions.json")
+        add_new_dataset_info(args.data_info_path, dataset_name_generated, f"generated_predictions.json")
 
         inference_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
                 --stage rm \
@@ -559,8 +560,6 @@ def main(args):
 
         # add dataset_name_generated into dataset_info to inference oracle model
         delete_item_dataset_info(args.data_info_path, dataset_name_generated)
-
-        
 
         # generate_text_command_1 = f"""CUDA_VISIBLE_DEVICES=0,1 python src/train_bash.py \
         #     --stage sft \
