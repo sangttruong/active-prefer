@@ -209,20 +209,20 @@ def main(args):
     # Prepare dataset
 
     if args.dataset_name in ['allenai/ai2_arc', 'arc']:
-        dataset = 'arc_challenge'
+        dataset = 'arc_challenge_train'
         prepare_data = f"""python data/arc/arc.py --sanity_check {args.sanity_check}"""
     elif args.dataset_name in ['truthful_qa']:
-        dataset = 'truthful_qa'
+        dataset = 'truthful_qa_train'
         prepare_data = f"""python data/truthful_qa/truthful_qa.py --sanity_check {args.sanity_check}"""
     elif args.dataset_name in ['Rowan/hellaswag', 'hellaswag']:
         prepare_data = f"""python data/hellaswag/hellaswag.py --sanity_check {args.sanity_check}"""
-        dataset = 'hellaswag'
+        dataset = 'hellaswag_train'
     elif args.dataset_name in ['winogrande']:
         prepare_data = f"""python data/winogrande/winogrande.py --sanity_check {args.sanity_check}"""
-        dataset = 'winogrande'
+        dataset = 'winogrande_train'
     elif args.dataset_name in ['cais/mmlu', "mmlu"]:
         prepare_data = f"""python data/mmlu/mmlu.py --sanity_check {args.sanity_check}"""
-        dataset = 'mmlu'
+        dataset = 'mmlu_train'
     elif args.dataset_name in ['Anthropic/hh-rlhf', "hh-rlhf"]:
         prepare_data = f"""cd data/hh_rlhf/ && python hh_rlhf.py"""
         dataset = 'hh_rlhf'
