@@ -62,7 +62,7 @@ if __name__ == "__main__":
             dataset = load_dataset("Anthropic/hh-rlhf", split=f"{split}[:100]")
         else:
             dataset = load_dataset("Anthropic/hh-rlhf", split=f"{split}") 
-        output_dataset_path = f'data/hellaswag_{split}.json'
+        output_dataset_path = f'data/hh_rlhf_{split}.json'
         convert_multiple_choice_to_prompt(dataset, output_dataset_path)
 
 

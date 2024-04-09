@@ -220,11 +220,11 @@ def main(args):
         prepare_data = f"""python data/mmlu/mmlu.py --sanity_check {args.sanity_check}"""
         dataset = 'mmlu_train'
     elif args.dataset_name in ['Anthropic/hh-rlhf', "hh-rlhf"]:
-        prepare_data = f"""cd data/hh_rlhf/ && python hh_rlhf.py"""
-        dataset = 'hh_rlhf'
+        prepare_data = f"""python data/hh_rlhf/hh_rlhf.py"""
+        dataset = 'hh_rlhf_train'
     elif args.dataset_name in ['allenai/reward-bench', "reward-bench", "reward_bench"]:
-        prepare_data = f"""cd data/reward_bench/ && python reward_bench.py"""
-        dataset = 'reward_bench'
+        prepare_data = f"""python data/reward_bench/reward_bench.py"""
+        dataset = 'reward_bench_train'
     else:
         raise(f"Does not support {args.dataset_name} dataset yet")
 
