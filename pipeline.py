@@ -600,7 +600,7 @@ def parse_arguments():
     parser.add_argument("--dataset_dir", type=str, default="data", help="Directory containing the dataset")
     parser.add_argument("--data_info_path", type=str, default="data/dataset_info.json", help="Path to dataset info")
     # parser.add_argument("--sanity_check", type=bool, default=True, help="Test")
-    parser.add_argument("--sanity_check", action="store_false", default=True, help="Test")
+    parser.add_argument("--sanity_check", action="store_true", default=False, help="Test")
     parser.add_argument("--use_accelerate", type=bool, default=False, help="is using accelerate")
 
     #######################
