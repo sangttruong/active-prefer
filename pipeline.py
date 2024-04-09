@@ -411,7 +411,7 @@ def main(args):
                 --ddp_timeout 1800000 \
                 --plot_loss \
                 --quantization_bit {args.quantization_bit}\
-                --only_training_vhead False
+                --only_training_vhead True
                 """
         else:
             rm_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
@@ -446,7 +446,7 @@ def main(args):
                 --ddp_timeout 1800000 \
                 --plot_loss \
                 --quantization_bit {args.quantization_bit}\
-                --only_training_vhead False
+                --only_training_vhead True
                 """
 
         run_cli_command(rm_ft_command) 
@@ -504,7 +504,7 @@ def main(args):
             --dataset_dir {args.dataset_dir} \
             --template {args.template} \
             --finetuning_type {args.finetuning_type} \
-            --output_dir {dpo_adapter_path} \
+            --output_dir {args.dataset_dir} \
             --overwrite_cache \
             --overwrite_output_dir \
             --cutoff_len {args.cutoff_len} \
@@ -521,7 +521,7 @@ def main(args):
         breakpoint()
 
         # add dataset_name_generated into dataset_info to inference oracle model
-        add_new_dataset_info(args.data_info_path, dataset_name_generated, f"{dpo_adapter_path}/generated_predictions.jsonl")
+        add_new_dataset_info(args.data_info_path, dataset_name_generated, f"generated_predictions.jsonl")
 
         inference_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
                 --stage rm \
