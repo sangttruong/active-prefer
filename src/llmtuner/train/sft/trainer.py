@@ -150,6 +150,7 @@ class CustomSeq2SeqTrainer(Seq2SeqTrainer):
         with open(output_prediction_file, "w", encoding="utf-8") as writer:
             res: List[str] = []
             for example, pred  in zip(decoded_preds, dataset):
+                breakpoint()
                 id = example['id']
                 prompt = example['prompt']['content']
                 res.append(json.dumps({"id": id, 
