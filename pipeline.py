@@ -193,19 +193,11 @@ def calculate_accuracy(file_path):
 def save_eval_metric(file_path, accuracy, iteration):
     # Ensure the directory containing the file exists
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    breakpoint()
     
-    if os.path.exists(file_path):
-        with open(file_path, 'r') as file:
-            json_data = json.load(file)
-        
-        if json_data: 
-            json_data.append({'iteration': iteration, 'accuracy': accuracy})
-        else:
-            json_data = [{'iteration': iteration, 'accuracy': accuracy}]
+    json_data = [{'iteration': iteration, 'accuracy': accuracy}]
 
-        with open(file_path, 'w') as file:
-            json.dump(json_data, file)
+    with open(file_path, 'w') as file:
+        json.dump(json_data, file)
    
 
 
@@ -246,7 +238,7 @@ def main(args):
     reward_model_path = f"saves/{model_name}/{dataset}/{args.method}/reward"
     dpo_adapter_path = f"saves/{model_name}/{dataset}/{args.method}/dpo"
     oracle_adapter_path = f"saves/{model_name}/{dataset}/{args.method}/oracle"
-    eval_metric_path = f"saves/{model_name}/{dataset}/accuracy_results.json"
+    eval_metric_dir = f"saves/{model_name}/{dataset}"
 
     
     # Train an Oracle model O on 80% of the data
@@ -578,7 +570,9 @@ def main(args):
         # Get accuracy        
         accuracy = calculate_accuracy(f"{oracle_adapter_path}/generated_predictions.jsonl")
         print("Accuracy:", accuracy)
-        save_eval_metric(eval_metric_path, accuracy, iter)
+        
+        save_eval_metric_path = f"{eval_metric_dir}/accuracy_results_{iter}.json"
+        save_eval_metric(save_eval_metric_path, accuracy, iter)
 
         print("=========================================================")
         
