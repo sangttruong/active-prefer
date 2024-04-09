@@ -478,11 +478,15 @@ def main(args):
             --cutoff_len {args.cutoff_len} \
             --preprocessing_num_workers 16 \
             --per_device_eval_batch_size {args.per_device_eval_batch_size} \
+            --max_samples 20 \
             --predict_with_generate
         """
 
         print(f"Generating text from the new DPO model .....................")
         run_cli_command(generate_text_command)
+
+
+
 
         print("=========================================================")
         
@@ -495,8 +499,8 @@ def parse_arguments():
     parser.add_argument("--finetuning_type", type=str, default="lora", help="Fine-tuning type")
     parser.add_argument("--lora_target", type=str, default="q_proj,v_proj", help="LORA target")
     parser.add_argument("--cutoff_len", type=int, default=1024, help="Cutoff length")
-    parser.add_argument("--per_device_train_batch_size", type=int, default=1, help="Batch size for training")
-    parser.add_argument("--per_device_eval_batch_size", type=int, default=1, help="Batch size for evaluation")
+    parser.add_argument("--per_device_train_batch_size", type=int, default=4, help="Batch size for training")
+    parser.add_argument("--per_device_eval_batch_size", type=int, default=4, help="Batch size for evaluation")
     parser.add_argument("--gradient_accumulation_steps", type=int, default=8, help="Gradient accumulation steps")
     parser.add_argument("--lr_scheduler_type", type=str, default="cosine", help="Learning rate scheduler type")
     parser.add_argument("--logging_steps", type=int, default=10, help="Logging steps")
