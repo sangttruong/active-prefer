@@ -29,7 +29,7 @@ def convert_multiple_choice_to_prompt(dataset, json_file_path):
 def parse_arguments():
     import argparse
     parser = argparse.ArgumentParser(description="Iterative training and evaluation script")
-    parser.add_argument("--sanity_check", type=bool, default=False, help="Test")
+    parser.add_argument("--sanity_check", type=str, default="False", help="Test")
     return parser.parse_args()
 
 
@@ -39,7 +39,7 @@ if __name__ == "__main__":
 
     splits = ['train', 'test']
     for split in splits:
-        if args.sanity_check:
+        if args.sanity_check == 'True':
             dataset = load_dataset("allenai/ai2_arc", "ARC-Challenge", split=f'{split}[:50]')
         else:
             dataset = load_dataset("allenai/ai2_arc", "ARC-Challenge", split=f'{split}')

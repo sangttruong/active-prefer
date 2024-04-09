@@ -211,7 +211,6 @@ def main(args):
     if args.dataset_name in ['allenai/ai2_arc', 'arc']:
         dataset = 'arc_challenge_train'
         prepare_data = f"""python data/arc/arc.py --sanity_check {args.sanity_check}"""
-        
     elif args.dataset_name in ['truthful_qa']:
         dataset = 'truthful_qa_train'
         prepare_data = f"""python data/truthful_qa/truthful_qa.py --sanity_check {args.sanity_check}"""
@@ -599,7 +598,6 @@ def parse_arguments():
     parser.add_argument("--quantization_bit", type=int, default=4, help="Quantization bit")
     parser.add_argument("--dataset_dir", type=str, default="data", help="Directory containing the dataset")
     parser.add_argument("--data_info_path", type=str, default="data/dataset_info.json", help="Path to dataset info")
-    # parser.add_argument("--sanity_check", type=bool, default=True, help="Test")
     parser.add_argument("--sanity_check", action="store_false", default=False, help="Test")
     parser.add_argument("--use_accelerate", type=bool, default=False, help="is using accelerate")
 
