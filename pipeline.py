@@ -192,6 +192,9 @@ def calculate_accuracy(file_path):
         return accuracy
 
 def save_eval_metric(file_path, accuracy, iteration):
+    # Ensure the directory containing the file exists
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    
     if os.path.exists(file_path):
         with open(file_path, 'r') as file:
             json_data = json.load(file)
