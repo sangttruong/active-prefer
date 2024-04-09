@@ -510,13 +510,15 @@ def main(args):
             --cutoff_len {args.cutoff_len} \
             --preprocessing_num_workers 16 \
             --per_device_eval_batch_size {args.per_device_eval_batch_size} \
-            --max_samples 20 \
+            --max_samples 10 \
             --predict_with_generate \
             --fp16
         """
 
         print(f"Generating text from the new DPO model .....................")
         run_cli_command(generate_text_command)
+
+        breakpoint()
 
         # add dataset_name_generated into dataset_info to inference oracle model
         add_new_dataset_info(args.data_info_path, dataset_name_generated, f"{dpo_adapter_path}/generated_predictions.jsonl")
@@ -543,6 +545,8 @@ def main(args):
 
         # add dataset_name_generated into dataset_info to inference oracle model
         delete_item_dataset_info(args.data_info_path, dataset_name_generated)
+
+        
 
         # generate_text_command_1 = f"""CUDA_VISIBLE_DEVICES=0,1 python src/train_bash.py \
         #     --stage sft \

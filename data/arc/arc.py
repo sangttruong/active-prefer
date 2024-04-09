@@ -37,7 +37,7 @@ if __name__ == "__main__":
     # Load the original dataset
     args = parse_arguments()
     if args.sanity_check:
-        train_dataset = load_dataset("allenai/ai2_arc", "ARC-Challenge", split='train[:100]')
+        train_dataset = load_dataset("allenai/ai2_arc", "ARC-Challenge", split='train[:20]')
     else:
         train_dataset = load_dataset("allenai/ai2_arc", "ARC-Challenge", split='train')
     output_dataset_path = 'data/arc_challenge.json'
