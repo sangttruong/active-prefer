@@ -463,7 +463,7 @@ def main(args):
         ##########################################################
         #### New Eval
         ##########################################################
-        generate_text_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python ../../src/train_bash.py \
+        generate_text_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
             --stage sft \
             --do_predict \
             --model_name_or_path {args.model_name_or_path} \
