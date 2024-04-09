@@ -238,7 +238,7 @@ def main(args):
     reward_model_path = f"saves/{model_name}/{dataset}/{args.method}/reward"
     dpo_adapter_path = f"saves/{model_name}/{dataset}/{args.method}/dpo"
     oracle_adapter_path = f"saves/{model_name}/{dataset}/{args.method}/oracle"
-    eval_metric_dir = f"saves/{model_name}/{dataset}"
+    eval_metric_dir = f"saves/{model_name}/{dataset}/{args.method}"
 
     
     # Train an Oracle model O on 80% of the data
