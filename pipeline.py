@@ -160,7 +160,7 @@ def main(args):
         --do_train \
         --flash_attn True\
         --model_name_or_path {args.model_name_or_path}\
-        --output_dir {oracle_adapter_path} \
+        --output_dir {oracle_adapter_path}\
         --dataset {dataset} \
         --dataset_dir {args.dataset_dir} \
         --template {args.template} \
@@ -479,8 +479,30 @@ def main(args):
             --preprocessing_num_workers 16 \
             --per_device_eval_batch_size {args.per_device_eval_batch_size} \
             --max_samples 20 \
-            --predict_with_generate
+            --predict_with_generate \
+            --fp16
         """
+
+        generate_text_command_1 = f"""CUDA_VISIBLE_DEVICES=0,1 python src/train_bash.py \
+            --stage sft \
+            --do_predict \
+            --model_name_or_path meta-llama/Llama-2-7b-hf \
+            --adapter_name_or_path saves/Llama-2-7b-hf/arc_challenge/random/dpo \
+            --dataset arc_challenge\
+            --dataset_dir data \
+            --template default \
+            --finetuning_type lora \
+            --output_dir saves/Llama-2-7b-hf/arc_challenge/random/dpo \
+            --overwrite_cache \
+            --overwrite_output_dir \
+            --cutoff_len 1024 \
+            --preprocessing_num_workers 16 \
+            --per_device_eval_batch_size 4 \
+            --max_samples 20 \
+            --predict_with_generate \
+            --fp16
+        """
+
 
         print(f"Generating text from the new DPO model .....................")
         run_cli_command(generate_text_command)
