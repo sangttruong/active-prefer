@@ -538,6 +538,8 @@ def main(args):
         jsonl_to_json(f"{args.dataset_dir}/generated_predictions.jsonl", f"{args.dataset_dir}/generated_predictions.json")
         add_new_dataset_info(args.data_info_path, dataset_name_generated, f"generated_predictions.json")
 
+        breakpoint()
+
         inference_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
                 --stage rm \
                 --do_predict \
