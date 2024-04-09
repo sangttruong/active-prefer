@@ -249,6 +249,7 @@ def main(args):
     ft_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
         --stage rm \
         --do_train \
+        --do_eval
         --flash_attn True\
         --model_name_or_path {args.model_name_or_path}\
         --output_dir {oracle_adapter_path}\
@@ -308,6 +309,7 @@ def main(args):
             inference_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
                 --stage rm \
                 --do_predict \
+                --do_eval \
                 --model_name_or_path {args.model_name_or_path} \
                 --adapter_name_or_path {reward_model_path}\
                 --finetuning_type {args.finetuning_type} \
@@ -402,6 +404,7 @@ def main(args):
             dpo_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py\
                 --stage dpo \
                 --do_train \
+                --do_eval\
                 --model_name_or_path {args.model_name_or_path} \
                 --dataset_dir {args.dataset_dir} \
                 --dataset {active_dataset} \
@@ -478,6 +481,7 @@ def main(args):
             rm_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
                 --stage rm \
                 --do_train \
+                --do_eval \
                 --flash_attn True\
                 --model_name_or_path {args.model_name_or_path}\
                 --adapter_name_or_path {dpo_adapter_path}\
@@ -587,9 +591,9 @@ def parse_arguments():
     parser.add_argument("--per_device_eval_batch_size", type=int, default=4, help="Batch size for evaluation")
     parser.add_argument("--gradient_accumulation_steps", type=int, default=8, help="Gradient accumulation steps")
     parser.add_argument("--lr_scheduler_type", type=str, default="cosine", help="Learning rate scheduler type")
-    parser.add_argument("--logging_steps", type=int, default=10, help="Logging steps")
+    parser.add_argument("--logging_steps", type=int, default=100, help="Logging steps")
     parser.add_argument("--save_steps", type=int, default=100, help="Save steps")
-    parser.add_argument("--eval_steps", type=int, default=100, help="Evaluation steps")
+    parser.add_argument("--eval_steps", type=int, default=500, help="Evaluation steps")
     parser.add_argument("--warmup_steps", type=int, default=20, help="Warmup steps")
     parser.add_argument("--evaluation_strategy", type=str, default="steps", help="Evaluation strategy")
     parser.add_argument("--learning_rate", type=float, default=5e-5, help="Learning rate")
