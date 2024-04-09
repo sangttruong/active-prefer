@@ -92,9 +92,7 @@ def run_sft(
         trainer.log_metrics("predict", predict_results.metrics)
         trainer.save_metrics("predict", predict_results.metrics)
 
-        # get id question
-        # prompts = dataset['prompt']
-        breakpoint()
+      
         trainer.save_predictions_with_prompts(predict_results, dataset)
         # trainer.save_predictions(predict_results)
 
