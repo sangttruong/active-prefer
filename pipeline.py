@@ -464,48 +464,9 @@ def main(args):
                 """
 
         run_cli_command(rm_ft_command) 
-        ##########################################################
-        #### Eval
-        ########################################################## 
-        # if dataset == "arc_challenge":
-        #     task_eval = "arc_challenge"
-        # elif dataset == "truthful_qa":
-        #     task_eval = "truthfulqa_mc1"
-        # elif dataset == 'hellaswag':
-        #     task_eval = "hellaswag"
-        # elif dataset == 'winogrande':
-        #     task_eval = "winogrande"
-        # elif dataset == 'mmlu':
-        #     task_eval = "mmlu"
-        # else:
-        #     raise(f"Not support {dataset}")
    
-        # eval_output_path = f"../saves/{model_name}/{dataset}/output_eval/iter_{iter}"
-        # adapter_path = f"../{dpo_adapter_path}"
-        # device = args.gpu_ids.split(",")[0]
-        
-        # if args.sanity_check:
-        #     eval_command = f"""cd lm-evaluation-harness && lm_eval --model hf \
-        #         --model_args pretrained={args.model_name_or_path},parallelize=True,load_in_4bit=True,peft={adapter_path} \
-        #         --tasks {task_eval} \
-        #         --output_path {eval_output_path} \
-        #         --batch_size 16 \
-        #         --limit 100 \
-        #         --device cuda:{device}
-        #         """
-        # else:
-        #     eval_command = f"""cd lm-evaluation-harness && lm_eval --model hf \
-        #         --model_args pretrained={args.model_name_or_path},parallelize=True,load_in_4bit=True,peft={adapter_path} \
-        #         --tasks {task_eval} \
-        #         --output_path {eval_output_path} \
-        #         --batch_size 16 \
-        #         --device cuda:{device}
-        #         """
-        # run_cli_command(eval_command)  
-        
-         
         ##########################################################
-        #### New Eval
+        ####  Eval
         ##########################################################
         dataset_name_generated = f"{dataset}_generated"
 
