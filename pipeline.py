@@ -249,7 +249,7 @@ def main(args):
     ft_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
         --stage rm \
         --do_train \
-        --do_eval
+        --do_eval \
         --flash_attn True\
         --model_name_or_path {args.model_name_or_path}\
         --output_dir {oracle_adapter_path}\
