@@ -564,9 +564,7 @@ def main(args):
         
         print(f"Inference Oracle model ............................")
         run_cli_command(inference_oracle_command)
-
-        # del dataset_name_generated into dataset_info to inference oracle model
-        delete_item_dataset_info(args.data_info_path, dataset_name_generated)
+        delete_item_dataset_info(args.data_info_path, dataset_name_generated) # clean dataset_info
 
         # Get accuracy        
         accuracy = calculate_accuracy(f"{oracle_adapter_path}/generated_predictions.jsonl")
