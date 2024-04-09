@@ -242,7 +242,7 @@ def main(args):
     reward_model_path = f"saves/{model_name}/{dataset}/{args.method}/reward"
     dpo_adapter_path = f"saves/{model_name}/{dataset}/{args.method}/dpo"
     oracle_adapter_path = f"saves/{model_name}/{dataset}/{args.method}/oracle"
-    eval_metric_path = os.path.join(oracle_adapter_path, "accuracy_results.json")
+    eval_metric_path = f"saves/{model_name}/{dataset}/accuracy_results.json"
 
     
     # Train an Oracle model O on 80% of the data
