@@ -47,11 +47,23 @@ def convert_multiple_choice_to_prompt(dataset, json_file_path):
     with open(json_file_path, 'w') as json_file:
         json.dump(new_samples, json_file, indent=4)
 
+def parse_arguments():
+    import argparse
+    parser = argparse.ArgumentParser(description="Iterative training and evaluation script")
+    parser.add_argument("--sanity_check", type=str, default="False", help="Test")
+    return parser.parse_args()
 
 if __name__ == "__main__":
-    # Load the original dataset
-    dataset = load_dataset("Anthropic/hh-rlhf", split="train")
-    
-    output_dataset_path = '../hh_rlhf.json'
-    convert_multiple_choice_to_prompt(dataset, output_dataset_path)
+    args = parse_arguments()
+
+    splits = ['train', 'test']
+    for split in splits:
+        if args.sanity_check == 'True':
+            dataset = load_dataset("Anthropic/hh-rlhf", split=f"{split}[:100]")
+        else:
+            dataset = load_dataset("Anthropic/hh-rlhf", split=f"{split}") 
+        output_dataset_path = f'data/hellaswag_{split}.json'
+        convert_multiple_choice_to_prompt(dataset, output_dataset_path)
+
+
     
