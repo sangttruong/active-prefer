@@ -211,6 +211,7 @@ def main(args):
     if args.dataset_name in ['allenai/ai2_arc', 'arc']:
         dataset = 'arc_challenge_train'
         prepare_data = f"""python data/arc/arc.py --sanity_check {args.sanity_check}"""
+        
     elif args.dataset_name in ['truthful_qa']:
         dataset = 'truthful_qa_train'
         prepare_data = f"""python data/truthful_qa/truthful_qa.py --sanity_check {args.sanity_check}"""
@@ -233,7 +234,7 @@ def main(args):
         raise(f"Does not support {args.dataset_name} dataset yet")
 
     testset = dataset.replace("train", "test")
-    print("Prepare Dataset .....................")
+    print(f"Prepare Dataset: {prepare_data} .....................")
     run_cli_command(prepare_data)
 
     num_sample_select = -1 
