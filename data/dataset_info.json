@@ -5,8 +5,7 @@
             "id": "id",
             "prompt": "instruction",
             "query": "input",
-            "response": "output",
-            "choice_label": "choice_label"
+            "response": "output"
         }
     },
     "arc_challenge": {
