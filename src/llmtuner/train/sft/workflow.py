@@ -91,7 +91,12 @@ def run_sft(
             predict_results.metrics.pop("predict_loss", None)
         trainer.log_metrics("predict", predict_results.metrics)
         trainer.save_metrics("predict", predict_results.metrics)
-        trainer.save_predictions(predict_results)
+
+        # get id question
+        # question_id = dataset['id']
+        breakpoint()
+        trainer.save_predictions_with_prompts(predict_results, dataset)
+        # trainer.save_predictions(predict_results)
 
     # Create model card
     create_modelcard_and_push(trainer, model_args, data_args, training_args, finetuning_args)
