@@ -149,6 +149,12 @@ class CustomSeq2SeqTrainer(Seq2SeqTrainer):
 
         with open(output_prediction_file, "w", encoding="utf-8") as writer:
             res: List[str] = []
-            for label, pred, prompt in zip(decoded_labels, decoded_preds, dataset['prompt']):
-                res.append(json.dumps({"prompt": prompt['content'], "label": label, "predict": pred}, ensure_ascii=False))
+            for example, pred  in zip(decoded_preds, dataset):
+                id = example['id']
+                prompt = example['prompt']['content']
+                res.append(json.dumps({"id": id, 
+                                       "prompt":prompt, 
+                                       "query": "", 
+                                       "instruction": pred},
+                                        ensure_ascii=False))
             writer.write("\n".join(res))
