@@ -455,7 +455,7 @@ def main(args):
                 --batch_size 16 \
                 --device cuda:{device}
                 """
-        run_cli_command(eval_command)  
+        # run_cli_command(eval_command)  
         
         ########################################################## 
         print("=========================================================")
