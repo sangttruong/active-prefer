@@ -143,7 +143,7 @@ def main(args):
     else:
         raise(f"Does not support {args.dataset_name} dataset yet")
 
-    print("Prepare Dataset")
+    print("Prepare Dataset .....................")
     run_cli_command(prepare_data)
 
     num_sample_select = -1 
@@ -188,15 +188,16 @@ def main(args):
         --quantization_bit {args.quantization_bit}\
         --only_training_vhead False
         """
+    print(f"Training Oracle model ............................")
     run_cli_command(ft_oracle_command)
 
     # active pipeline     
     for iter in range(args.num_iters):
-        print(f"ITERARION: {iter}")
+        print(f"######### ITERARION: {iter} ############")
         ##########################################################
         #### Inference
         ##########################################################
-        print(f" Inference ")
+        print(f"Inference ..............")
         
         batch_size_for_inference = 4
         if iter == 0:
@@ -231,11 +232,11 @@ def main(args):
 
         run_cli_command(inference_command)
 
-        print("Done inference")
+        
         ##########################################################
         #### Selection
         ##########################################################
-        print(f" Selection ")
+        print(f"Selection ........................")
 
         prediction_path = f"{reward_model_path}/generated_predictions.jsonl"
         data_path = f"{args.dataset_dir}/{dataset}.json"
@@ -266,11 +267,10 @@ def main(args):
 
                 print("Updated dataset info has been stored in", args.data_info_path)
 
-        print("Done selection")
         ##########################################################
         #### Train DPO
         ##########################################################
-        print(f" Train DPO ")
+        print(f"Train DPO .................................")
 
         active_dataset = new_data_info # replace dataset by ACTIVE QUERIES
         
@@ -311,6 +311,7 @@ def main(args):
             dpo_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py\
                 --stage dpo \
                 --do_train \
+                --do_predict\
                 --model_name_or_path {args.model_name_or_path} \
                 --dataset_dir {args.dataset_dir} \
                 --dataset {active_dataset} \
@@ -340,11 +341,10 @@ def main(args):
                 """
 
         run_cli_command(dpo_ft_command) 
-        print("Done Train DPO")
         ##########################################################
         #### Train Reward
         ##########################################################    
-        print(" Train Reward ")
+        print("Train Reward ..................................")
         active_dataset = new_data_info # replace dataset by ACTIVE QUERIES
 
         if args.use_accelerate:
@@ -421,47 +421,68 @@ def main(args):
                 """
 
         run_cli_command(rm_ft_command) 
-        print("Done train Reward ")
         ##########################################################
         #### Eval
         ########################################################## 
-        if dataset == "arc_challenge":
-            task_eval = "arc_challenge"
-        elif dataset == "truthful_qa":
-            task_eval = "truthfulqa_mc1"
-        elif dataset == 'hellaswag':
-            task_eval = "hellaswag"
-        elif dataset == 'winogrande':
-            task_eval = "winogrande"
-        elif dataset == 'mmlu':
-            task_eval = "mmlu"
-        else:
-            raise(f"Not support {dataset}")
+        # if dataset == "arc_challenge":
+        #     task_eval = "arc_challenge"
+        # elif dataset == "truthful_qa":
+        #     task_eval = "truthfulqa_mc1"
+        # elif dataset == 'hellaswag':
+        #     task_eval = "hellaswag"
+        # elif dataset == 'winogrande':
+        #     task_eval = "winogrande"
+        # elif dataset == 'mmlu':
+        #     task_eval = "mmlu"
+        # else:
+        #     raise(f"Not support {dataset}")
    
-        eval_output_path = f"../saves/{model_name}/{dataset}/output_eval/iter_{iter}"
-        adapter_path = f"../{dpo_adapter_path}"
-        device = args.gpu_ids.split(",")[0]
+        # eval_output_path = f"../saves/{model_name}/{dataset}/output_eval/iter_{iter}"
+        # adapter_path = f"../{dpo_adapter_path}"
+        # device = args.gpu_ids.split(",")[0]
         
-        if args.sanity_check:
-            eval_command = f"""cd lm-evaluation-harness && lm_eval --model hf \
-                --model_args pretrained={args.model_name_or_path},parallelize=True,load_in_4bit=True,peft={adapter_path} \
-                --tasks {task_eval} \
-                --output_path {eval_output_path} \
-                --batch_size 16 \
-                --limit 100 \
-                --device cuda:{device}
-                """
-        else:
-            eval_command = f"""cd lm-evaluation-harness && lm_eval --model hf \
-                --model_args pretrained={args.model_name_or_path},parallelize=True,load_in_4bit=True,peft={adapter_path} \
-                --tasks {task_eval} \
-                --output_path {eval_output_path} \
-                --batch_size 16 \
-                --device cuda:{device}
-                """
+        # if args.sanity_check:
+        #     eval_command = f"""cd lm-evaluation-harness && lm_eval --model hf \
+        #         --model_args pretrained={args.model_name_or_path},parallelize=True,load_in_4bit=True,peft={adapter_path} \
+        #         --tasks {task_eval} \
+        #         --output_path {eval_output_path} \
+        #         --batch_size 16 \
+        #         --limit 100 \
+        #         --device cuda:{device}
+        #         """
+        # else:
+        #     eval_command = f"""cd lm-evaluation-harness && lm_eval --model hf \
+        #         --model_args pretrained={args.model_name_or_path},parallelize=True,load_in_4bit=True,peft={adapter_path} \
+        #         --tasks {task_eval} \
+        #         --output_path {eval_output_path} \
+        #         --batch_size 16 \
+        #         --device cuda:{device}
+        #         """
         # run_cli_command(eval_command)  
         
-        ########################################################## 
+         
+        ##########################################################
+        #### New Eval
+        ##########################################################
+        eval_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
+            --stage rm \
+            --do_predict \
+            --model_name_or_path {args.model_name_or_path} \
+            --adapter_name_or_path {oracle_adapter_path}\
+            --finetuning_type {args.finetuning_type} \
+            --lora_target {args.lora_target} \
+            --dataset_dir {args.dataset_dir} \
+            --dataset {dataset} \
+            --template {args.template} \
+            --output_dir {oracle_adapter_path} \
+            --per_device_eval_batch_size {batch_size_for_inference} \
+            --quantization_bit {args.quantization_bit} \
+            --fp16
+            """
+
+        run_cli_command(eval_command)
+
+
         print("=========================================================")
         
     print("DONE!!!")
