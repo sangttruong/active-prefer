@@ -311,7 +311,6 @@ def main(args):
             dpo_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py\
                 --stage dpo \
                 --do_train \
-                --do_predict\
                 --model_name_or_path {args.model_name_or_path} \
                 --dataset_dir {args.dataset_dir} \
                 --dataset {active_dataset} \
@@ -464,24 +463,26 @@ def main(args):
         ##########################################################
         #### New Eval
         ##########################################################
-        eval_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
-            --stage rm \
+        generate_text_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python ../../src/train_bash.py \
+            --stage sft \
             --do_predict \
             --model_name_or_path {args.model_name_or_path} \
-            --adapter_name_or_path {oracle_adapter_path}\
-            --finetuning_type {args.finetuning_type} \
-            --lora_target {args.lora_target} \
-            --dataset_dir {args.dataset_dir} \
+            --adapter_name_or_path {dpo_adapter_path} \
             --dataset {dataset} \
+            --dataset_dir {args.dataset_dir} \
             --template {args.template} \
-            --output_dir {oracle_adapter_path} \
-            --per_device_eval_batch_size {batch_size_for_inference} \
-            --quantization_bit {args.quantization_bit} \
-            --fp16
-            """
+            --finetuning_type {args.finetuning_type} \
+            --output_dir {dpo_adapter_path} \
+            --overwrite_cache \
+            --overwrite_output_dir \
+            --cutoff_len {args.cutoff_len} \
+            --preprocessing_num_workers 16 \
+            --per_device_eval_batch_size {args.per_device_eval_batch_size} \
+            --predict_with_generate
+        """
 
-        run_cli_command(eval_command)
-
+        print(f"Generating text from the new DPO model .....................")
+        run_cli_command(generate_text_command)
 
         print("=========================================================")
         
