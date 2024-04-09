@@ -1,15 +1,15 @@
 #!/bin/bash
 
-CUDA_VISIBLE_DEVICES=0,1 python ../../src/train_bash.py \
+CUDA_VISIBLE_DEVICES=0,1 python src/train_bash.py \
     --stage rm \
-    --do_train \
+    --do_predict \
     --model_name_or_path meta-llama/Llama-2-7b-hf \
-    --dataset arc_challenge \
-    --dataset_dir ../../data \
+    --dataset arc_challenge_generated \
+    --dataset_dir data \
     --template default \
     --finetuning_type lora \
     --lora_target q_proj,v_proj\
-    --output_dir ../../saves/LLaMA2-7B/lora/reward \
+    --output_dir saves/LLaMA2-7B/test/reward \
     --overwrite_output_dir \
     --cutoff_len 1024 \
     --preprocessing_num_workers 16 \
@@ -27,5 +27,4 @@ CUDA_VISIBLE_DEVICES=0,1 python ../../src/train_bash.py \
     --max_samples 2000 \
     --val_size 0.1 \
     --plot_loss \
-    --quantization_bit 4\
-    --only_training_vhead True
+    --quantization_bit 4

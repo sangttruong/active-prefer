@@ -156,6 +156,6 @@ class CustomSeq2SeqTrainer(Seq2SeqTrainer):
                 res.append(json.dumps({"id": id, 
                                        "instruction":prompt, 
                                        "input": "", 
-                                       "output": pred},
+                                       "output": [pred, pred]},
                                         ensure_ascii=False))
             writer.write("\n".join(res))

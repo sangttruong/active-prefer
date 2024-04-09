@@ -297,7 +297,6 @@ def main(args):
 
         # Update data training
         select_entries_by_ids(data_path, selected_questions, output_file)
-        breakpoint()
         with open(args.data_info_path, 'r') as file:
             data_info = json.load(file)
             
@@ -525,25 +524,25 @@ def main(args):
         # add dataset_name_generated into dataset_info to inference oracle model
         delete_item_dataset_info(args.data_info_path, dataset_name_generated)
 
-        # generate_text_command_1 = f"""CUDA_VISIBLE_DEVICES=0,1 python src/train_bash.py \
-        #     --stage sft \
-        #     --do_predict \
-        #     --model_name_or_path meta-llama/Llama-2-7b-hf \
-        #     --adapter_name_or_path saves/Llama-2-7b-hf/arc_challenge/random/dpo \
-        #     --dataset arc_challenge\
-        #     --dataset_dir data \
-        #     --template default \
-        #     --finetuning_type lora \
-        #     --output_dir saves/Llama-2-7b-hf/arc_challenge/random/dpo \
-        #     --overwrite_cache \
-        #     --overwrite_output_dir \
-        #     --cutoff_len 1024 \
-        #     --preprocessing_num_workers 16 \
-        #     --per_device_eval_batch_size 4 \
-        #     --max_samples 20 \
-        #     --predict_with_generate \
-        #     --fp16
-        # """
+        generate_text_command_1 = f"""CUDA_VISIBLE_DEVICES=0,1 python src/train_bash.py \
+            --stage sft \
+            --do_predict \
+            --model_name_or_path meta-llama/Llama-2-7b-hf \
+            --adapter_name_or_path saves/Llama-2-7b-hf/arc_challenge/random/dpo \
+            --dataset arc_challenge\
+            --dataset_dir data \
+            --template default \
+            --finetuning_type lora \
+            --output_dir saves/Llama-2-7b-hf/arc_challenge/random/dpo \
+            --overwrite_cache \
+            --overwrite_output_dir \
+            --cutoff_len 1024 \
+            --preprocessing_num_workers 16 \
+            --per_device_eval_batch_size 4 \
+            --max_samples 20 \
+            --predict_with_generate \
+            --fp16
+        """
 
 
 
