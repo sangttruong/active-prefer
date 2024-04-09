@@ -106,6 +106,36 @@ def delete_selected_info(data_info_path, pattern="iter"):
 
     print("New data info with selected entries removed has been saved.")
 
+
+def add_new_dataset_info(dataset_info_path, name, path):
+    # Read data from dataset_info.json
+    with open(dataset_info_path, 'r') as file:
+        data = json.load(file)
+
+    template = data['template']
+    data[name] = copy.deepcopy(template)
+    data[name]['file_name'] = path
+
+    # Save new data info
+    with open(dataset_info_path, 'w') as outfile:
+        json.dump(data, outfile, indent=4)
+
+
+def delete_item_dataset_info(dataset_info_path, name):
+    # Read data from dataset_info.json
+    with open(dataset_info_path, 'r') as file:
+        data = json.load(file)
+
+    if name in data:
+        # remove item in data
+        del data[name]
+
+    # Save new data info
+    with open(dataset_info_path, 'w') as outfile:
+        json.dump(data, outfile, indent=4)
+
+
+
 def count_len_dataset(prediction_path):
     with open(prediction_path, 'r') as f:
         data = json.load(f)
@@ -463,6 +493,8 @@ def main(args):
         ##########################################################
         #### New Eval
         ##########################################################
+        dataset_name_generated = f"{dataset}_generated"
+
         generate_text_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
             --stage sft \
             --do_predict \
@@ -483,30 +515,54 @@ def main(args):
             --fp16
         """
 
-        generate_text_command_1 = f"""CUDA_VISIBLE_DEVICES=0,1 python src/train_bash.py \
-            --stage sft \
-            --do_predict \
-            --model_name_or_path meta-llama/Llama-2-7b-hf \
-            --adapter_name_or_path saves/Llama-2-7b-hf/arc_challenge/random/dpo \
-            --dataset arc_challenge\
-            --dataset_dir data \
-            --template default \
-            --finetuning_type lora \
-            --output_dir saves/Llama-2-7b-hf/arc_challenge/random/dpo \
-            --overwrite_cache \
-            --overwrite_output_dir \
-            --cutoff_len 1024 \
-            --preprocessing_num_workers 16 \
-            --per_device_eval_batch_size 4 \
-            --max_samples 20 \
-            --predict_with_generate \
-            --fp16
-        """
-
-
         print(f"Generating text from the new DPO model .....................")
         run_cli_command(generate_text_command)
 
+        # add dataset_name_generated into dataset_info to inference oracle model
+        add_new_dataset_info(args.data_info_path, dataset_name_generated, f"{dpo_adapter_path}/generated_predictions.jsonl")
+
+        inference_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
+                --stage rm \
+                --do_predict \
+                --flash_attn True\
+                --model_name_or_path {args.model_name_or_path} \
+                --adapter_name_or_path {oracle_adapter_path}\
+                --finetuning_type {args.finetuning_type} \
+                --lora_target {args.lora_target} \
+                --dataset_dir {args.dataset_dir} \
+                --dataset {dataset_name_generated} \
+                --template {args.template} \
+                --output_dir {oracle_adapter_path} \
+                --per_device_eval_batch_size {batch_size_for_inference} \
+                --quantization_bit {args.quantization_bit} \
+                --fp16
+                """
+        
+        print(f"Inference Oracle model ............................")
+        run_cli_command(inference_oracle_command)
+
+        # add dataset_name_generated into dataset_info to inference oracle model
+        delete_item_dataset_info(args.data_info_path, dataset_name_generated)
+
+        # generate_text_command_1 = f"""CUDA_VISIBLE_DEVICES=0,1 python src/train_bash.py \
+        #     --stage sft \
+        #     --do_predict \
+        #     --model_name_or_path meta-llama/Llama-2-7b-hf \
+        #     --adapter_name_or_path saves/Llama-2-7b-hf/arc_challenge/random/dpo \
+        #     --dataset arc_challenge\
+        #     --dataset_dir data \
+        #     --template default \
+        #     --finetuning_type lora \
+        #     --output_dir saves/Llama-2-7b-hf/arc_challenge/random/dpo \
+        #     --overwrite_cache \
+        #     --overwrite_output_dir \
+        #     --cutoff_len 1024 \
+        #     --preprocessing_num_workers 16 \
+        #     --per_device_eval_batch_size 4 \
+        #     --max_samples 20 \
+        #     --predict_with_generate \
+        #     --fp16
+        # """
 
 
 

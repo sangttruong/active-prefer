@@ -1,4 +1,14 @@
 {
+    "template": {
+        "file_name": "path_to_json.json",
+        "columns": {
+            "id": "id",
+            "prompt": "instruction",
+            "query": "input",
+            "response": "output",
+            "choice_label": "choice_label"
+        }
+    },
     "arc_challenge": {
         "file_name": "arc_challenge.json",
         "columns": {
