@@ -163,7 +163,6 @@ def run_cli_command(command):
     os.system(command)
 
 
-
 def sigmoid(x):
     return 1 / (1 + math.exp(-x))
 
@@ -194,6 +193,7 @@ def calculate_accuracy(file_path):
 def save_eval_metric(file_path, accuracy, iteration):
     # Ensure the directory containing the file exists
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    breakpoint()
     
     if os.path.exists(file_path):
         with open(file_path, 'r') as file:
