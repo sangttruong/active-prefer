@@ -8,8 +8,8 @@
             "response": "output"
         }
     },
-    "arc_challenge": {
-        "file_name": "arc_challenge.json",
+    "arc_challenge_train": {
+        "file_name": "arc_challenge_train.json",
         "columns": {
             "id": "id",
             "prompt": "instruction",
@@ -18,8 +18,8 @@
             "choice_label": "choice_label"
         }
     },
-    "truthful_qa": {
-        "file_name": "truthful_qa.json",
+    "arc_challenge_test": {
+        "file_name": "arc_challenge_test.json",
         "columns": {
             "id": "id",
             "prompt": "instruction",
@@ -28,8 +28,8 @@
             "choice_label": "choice_label"
         }
     },
-    "hellaswag": {
-        "file_name": "hellaswag.json",
+    "truthful_qa_train": {
+        "file_name": "truthful_qa_train.json",
         "columns": {
             "id": "id",
             "prompt": "instruction",
@@ -38,8 +38,48 @@
             "choice_label": "choice_label"
         }
     },
-    "winogrande": {
-        "file_name": "winogrande.json",
+    "truthful_qa_test": {
+        "file_name": "truthful_qa_test.json",
+        "columns": {
+            "id": "id",
+            "prompt": "instruction",
+            "query": "input",
+            "response": "output",
+            "choice_label": "choice_label"
+        }
+    },
+    "hellaswag_train": {
+        "file_name": "hellaswag_train.json",
+        "columns": {
+            "id": "id",
+            "prompt": "instruction",
+            "query": "input",
+            "response": "output",
+            "choice_label": "choice_label"
+        }
+    },
+    "hellaswag_test": {
+        "file_name": "hellaswag_test.json",
+        "columns": {
+            "id": "id",
+            "prompt": "instruction",
+            "query": "input",
+            "response": "output",
+            "choice_label": "choice_label"
+        }
+    },
+    "winogrande_train": {
+        "file_name": "winogrande_train.json",
+        "columns": {
+            "id": "id",
+            "prompt": "instruction",
+            "query": "input",
+            "response": "output",
+            "choice_label": "choice_label"
+        }
+    },
+    "winogrande_test": {
+        "file_name": "winogrande_test.json",
         "columns": {
             "id": "id",
             "prompt": "instruction",

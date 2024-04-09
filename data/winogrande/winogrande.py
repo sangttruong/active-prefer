@@ -35,12 +35,17 @@ def parse_arguments():
 
 if __name__ == "__main__":
     args = parse_arguments()
-    # Load the original dataset
-    if args.sanity_check:
-        dataset = load_dataset("winogrande", "winogrande_debiased", split="train[:100]")
-    else:
-        dataset = load_dataset("winogrande", "winogrande_debiased", split="train")
-    
-    output_dataset_path = 'data/winogrande.json'
-    convert_multiple_choice_to_prompt(dataset, output_dataset_path)
+
+
+    splits = ['train', 'test']
+    for split in splits:
+        if args.sanity_check:
+            dataset = load_dataset("winogrande", "winogrande_debiased", split=f"{split}[:100]")
+        else:
+            dataset = load_dataset("winogrande", "winogrande_debiased", split=f"{split}")
+        output_dataset_path = f'data/winogrande_{split}.json'
+        convert_multiple_choice_to_prompt(dataset, output_dataset_path)
+
+
+
     

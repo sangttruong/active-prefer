@@ -34,11 +34,16 @@ def parse_arguments():
 if __name__ == "__main__":
     args = parse_arguments()
     # Load the original dataset
-    if args.sanity_check:
-        dataset = load_dataset("cais/mmlu", "all", split="auxiliary_train[:100]")
-    else:
-        dataset = load_dataset("cais/mmlu", "all", split="auxiliary_train")
+    splits = ["auxiliary_train", "test"]
+    for split in splits:
+        if args.sanity_check:
+            dataset = load_dataset("cais/mmlu", "all", split=f"{split}[:100]")
+        else:
+            dataset = load_dataset("cais/mmlu", "all", split=f"{split}")
 
-    output_dataset_path = 'data/mmlu.json'
-    convert_multiple_choice_to_prompt(dataset, output_dataset_path)
+        if split == 'test':        
+            output_dataset_path = f'data/mmlu_test.json'
+        else:
+            output_dataset_path = f'data/mmlu_train.json'
+        convert_multiple_choice_to_prompt(dataset, output_dataset_path)
     

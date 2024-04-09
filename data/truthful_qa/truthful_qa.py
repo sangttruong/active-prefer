@@ -33,10 +33,15 @@ def parse_arguments():
 
 if __name__ == "__main__":
     args = parse_arguments()
+
     if args.sanity_check:
         dataset = load_dataset("truthful_qa", "multiple_choice", split="validation[:100]")
     else:
         dataset = load_dataset("truthful_qa", "multiple_choice", split="validation")
-    output_dataset_path = 'data/truthful_qa.json'
-    convert_multiple_choice_to_prompt(dataset, output_dataset_path)
+    
+    dataset = dataset.train_test_split(test_size=0.2)
+    splits = ['train', 'test']
+    for split in splits:
+        output_dataset_path = f'data/truthful_qa_{split}.json'
+        convert_multiple_choice_to_prompt(dataset[split], output_dataset_path)
     
