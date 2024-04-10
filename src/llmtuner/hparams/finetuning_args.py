@@ -209,7 +209,7 @@ class FinetuningArguments(FreezeArguments, LoraArguments, RLHFArguments, GaloreA
         default=False,
         metadata={"help": "Whether or not to train model in purely bf16 precision (without AMP)."},
     )
-    stage: Literal["pt", "sft", "rm", "ppo", "dpo"] = field(
+    stage: Literal["pt", "sft", "rm", "ppo", "dpo", "oracle"] = field(
         default="sft",
         metadata={"help": "Which stage will be performed in training."},
     )
