@@ -45,6 +45,6 @@ if __name__ == "__main__":
     for split in splits:
         output_dataset_path = f'data/reward_bench_{split}.json'
         convert_multiple_choice_to_prompt(dataset[split], output_dataset_path)
-
+        print(len(dataset[split]))
     
     
