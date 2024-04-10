@@ -3,6 +3,7 @@
 from typing import TYPE_CHECKING, List, Optional
 
 import torch
+import torch.nn as nn
 import gc
 
 from ...data import get_dataset, split_dataset
@@ -13,7 +14,7 @@ from ...model import load_model, load_tokenizer
 from ..utils import create_modelcard_and_push
 from .collator import PairwiseDataCollatorWithPadding
 from .metric import compute_accuracy
-from .trainer import PairwiseTrainer
+from .trainer import PairwiseTrainer, OracleTrainer
 
 
 if TYPE_CHECKING:
@@ -35,7 +36,6 @@ def run_rm(
     data_collator = PairwiseDataCollatorWithPadding(tokenizer, pad_to_multiple_of=8)
 
     # only train v_head
-
     if training_args.do_train and finetuning_args.only_training_vhead:
         for name, param in model.named_parameters():
             if 'v_head' in name:
@@ -93,4 +93,88 @@ def run_rm(
     gc.collect()
     torch.cuda.empty_cache()
     
+class ValueHead(nn.Module):
+    r"""
+    The ValueHead class implements a head for GPT2 that returns a scalar for each output token.
+    """
+
+    def __init__(self, config, **kwargs):
+        super().__init__()
+        if not hasattr(config, "summary_dropout_prob"):
+            summary_dropout_prob = kwargs.pop("summary_dropout_prob", 0.1)
+        else:
+            summary_dropout_prob = config.summary_dropout_prob
+
+        self.dropout = nn.Dropout(summary_dropout_prob) if summary_dropout_prob else nn.Identity()
+
+        # some models such as OPT have a projection layer before the word embeddings - e.g. OPT-350m
+        if hasattr(config, "word_embed_proj_dim"):
+            hidden_size = config.word_embed_proj_dim
+        else:
+            hidden_size = config.hidden_size
+
+        self.summary = nn.Linear(hidden_size, 1)
+
+        self.flatten = nn.Flatten()
+
+    def forward(self, hidden_states):
+        output = self.dropout(hidden_states)
+
+        # For now force upcast in fp32 if needed. Let's keep the
+        # output in fp32 for numerical stability.
+        if output.dtype != self.summary.weight.dtype:
+            output = output.to(self.summary.weight.dtype)
+
+        output = self.summary(output)
+        return output
     
+def run_oracle_rm(
+    model_args: "ModelArguments",
+    data_args: "DataArguments",
+    training_args: "Seq2SeqTrainingArguments",
+    finetuning_args: "FinetuningArguments",
+    callbacks: Optional[List["TrainerCallback"]] = None,
+):
+    tokenizer = load_tokenizer(model_args)
+    dataset = get_dataset(tokenizer, model_args, data_args, training_args, stage="rm")
+    base_model = load_model(tokenizer, model_args, finetuning_args, is_trainable=False, add_valuehead=False)
+    data_collator = PairwiseDataCollatorWithPadding(tokenizer, pad_to_multiple_of=8)
+
+    # Update arguments
+    training_args.remove_unused_columns = False  # important for pairwise dataset
+
+    # Initialize our Trainer
+    trainer = OracleTrainer(
+        model=base_model,
+        args=training_args,
+        finetuning_args=finetuning_args,
+        tokenizer=tokenizer,
+        data_collator=data_collator,
+        callbacks=callbacks + [FixValueHeadModelCallback()],
+        compute_metrics=compute_accuracy,
+        **split_dataset(dataset, data_args, training_args),
+    )
+
+    # Predict to get last_hidden_state
+    if training_args.do_predict:
+        predict_results = trainer.predict(dataset, metric_key_prefix="predict")
+        trainer.log_metrics("predict", predict_results.metrics)
+        trainer.save_metrics("predict", predict_results.metrics)
+        
+        
+        trainer.save_last_hidden_state(predict_results, dataset)
+
+    ##########################
+    # Training
+    last_hidden_states = trainer.load_last_hidden_states("last_hidden_state.pt")
+    breakpoint()
+    # v_head = ValueHead()
+
+    # train_dataset = CustomDataset(last_hidden_states, labels)  # CustomDataset represents your dataset class
+
+
+
+    ##########################
+    del trainer, model
+    gc.collect()
+    torch.cuda.empty_cache()

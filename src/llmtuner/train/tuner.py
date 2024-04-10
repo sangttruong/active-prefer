@@ -11,7 +11,7 @@ from ..model import load_model_and_tokenizer
 from .dpo import run_dpo
 from .ppo import run_ppo
 from .pt import run_pt
-from .rm import run_rm
+from .rm import run_rm, run_oracle_rm
 from .sft import run_sft
 
 
@@ -35,6 +35,8 @@ def run_exp(args: Optional[Dict[str, Any]] = None, callbacks: Optional[List["Tra
     elif finetuning_args.stage == "ppo":
         run_ppo(model_args, data_args, training_args, finetuning_args, generating_args, callbacks)
     elif finetuning_args.stage == "dpo":
+        run_dpo(model_args, data_args, training_args, finetuning_args, callbacks)
+    elif finetuning_args.stage == "oracle":
         run_dpo(model_args, data_args, training_args, finetuning_args, callbacks)
     else:
         raise ValueError("Unknown task.")

@@ -287,7 +287,7 @@ def main(args):
         --dataset {dataset} \
         --dataset_dir {args.dataset_dir} \
         --template {args.template} \
-        --finetuning_type freeze \
+        --finetuning_type full \
         --overwrite_cache \
         --overwrite_output_dir \
         --cutoff_len {args.cutoff_len} \

@@ -106,7 +106,8 @@ def load_model(
         prev_vhead_path = None
         if model_args.adapter_name_or_path is not None:
             vhead_path = model_args.adapter_name_or_path[-1]
-            prev_vhead_path = vhead_path.replace("dpo", "reward")
+            if "dpo" in vhead_path:
+                prev_vhead_path = vhead_path.replace("dpo", "reward")
         else:
             vhead_path = model_args.model_name_or_path
 
