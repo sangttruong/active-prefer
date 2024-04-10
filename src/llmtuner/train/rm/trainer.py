@@ -208,7 +208,8 @@ class OracleTrainer(Trainer):
             breakpoint()
             res.append({"question": example['id'], 
                         "last_hidden_state": last_hidden_state,
-                        "label": example['output']
+                        'chosen_ids': example['chosen_ids'], 
+                        'rejected_ids': example['rejected_ids'],
                         })
 
         with open(output_prediction_file, "w", encoding="utf-8") as writer:

@@ -14,7 +14,7 @@ CUDA_VISIBLE_DEVICES=6,7 python src/train_bash.py \
     --cutoff_len 1024 \
     --preprocessing_num_workers 16 \
     --per_device_train_batch_size 1 \
-    --per_device_eval_batch_size 1 \
+    --per_device_eval_batch_size 4 \
     --gradient_accumulation_steps 2 \
     --lr_scheduler_type cosine \
     --logging_steps 10 \
