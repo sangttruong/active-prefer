@@ -156,13 +156,11 @@ def run_oracle_rm(
     )
 
     # Predict to get last_hidden_state
-    if training_args.do_predict:
-        predict_results = trainer.predict(dataset, metric_key_prefix="predict")
-        trainer.log_metrics("predict", predict_results.metrics)
-        trainer.save_metrics("predict", predict_results.metrics)
-        
-        
-        trainer.save_last_hidden_state(predict_results, dataset)
+    predict_results = trainer.predict(dataset, metric_key_prefix="predict")
+    trainer.log_metrics("predict", predict_results.metrics)
+    trainer.save_metrics("predict", predict_results.metrics)
+    
+    trainer.save_last_hidden_state(predict_results, dataset)
 
     ##########################
     # Training
