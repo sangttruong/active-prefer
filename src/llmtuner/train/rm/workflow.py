@@ -165,7 +165,6 @@ def run_oracle_rm(
     ##########################
     # Training
     last_hidden_states = trainer.load_last_hidden_states("last_hidden_state.pt")
-    breakpoint()
     # v_head = ValueHead()
 
     # train_dataset = CustomDataset(last_hidden_states, labels)  # CustomDataset represents your dataset class
