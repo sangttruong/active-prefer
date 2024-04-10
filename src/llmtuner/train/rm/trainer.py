@@ -205,7 +205,6 @@ class OracleTrainer(Trainer):
         res = []
         for i, last_hidden_state in enumerate(last_hidden_states):
             example = dataset[i] 
-            breakpoint()
             res.append({"question": example['id'], 
                         "last_hidden_state": last_hidden_state,
                         'chosen_ids': example['chosen_ids'], 
@@ -217,7 +216,7 @@ class OracleTrainer(Trainer):
                 writer.write(f"{entry}\n")
 
         print(f"Save last_hidden_state at {output_prediction_file}")
-        
+
     def load_last_hidden_states(self, file_path: str) -> List[dict]:
         """
         Load saved predictions from a file.
