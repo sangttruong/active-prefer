@@ -211,31 +211,18 @@ class OracleTrainer(Trainer):
                         'rejected_ids': example['rejected_ids'],
                         })
 
-        with open(output_prediction_file, "w", encoding="utf-8") as writer:
-            for entry in res:
-                writer.write(f"{entry}\n")
-
+        # Save the list of dictionaries to a file using torch.save
+        torch.save(res, output_prediction_file)
         print(f"Save last_hidden_state at {output_prediction_file}")
 
     def load_last_hidden_states(self, file_path: str) -> List[dict]:
-        """
-        Load saved predictions from a file.
-
-        Args:
-            file_path (str): Path to the file containing saved predictions.
-
-        Returns:
-            List[dict]: List of dictionaries containing loaded predictions.
-        """
         file_path = os.path.join(self.args.output_dir, file_path)
+
         if not os.path.exists(file_path):
             logger.error(f"File {file_path} does not exist.")
-            return []
+            return None
 
-        predictions = []
-        with open(file_path, "r", encoding="utf-8") as reader:
-            for line in reader:
-                entry = eval(line.strip())  # Convert string representation to dictionary
-                predictions.append(entry)
+        # Load the data from the file
+        loaded_data = torch.load(file_path)
 
-        return predictions
+        return loaded_data
