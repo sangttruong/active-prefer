@@ -1,15 +1,14 @@
 #!/bin/bash
 
-deepspeed --num_gpus 2 ../../src/train_bash.py \
-    --deepspeed ../deepspeed/ds_z3_config.json \
+CUDA_VISIBLE_DEVICES=0,1 python src/train_bash.py \
     --stage oracle \
     --do_train \
     --model_name_or_path meta-llama/Llama-2-7b-hf \
-    --dataset arc_challenge \
-    --dataset_dir ../../data \
+    --dataset arc_challenge_train \
+    --dataset_dir data \
     --template default \
     --finetuning_type full \
-    --output_dir ../../saves/LLaMA2-7B/full/sft \
+    --output_dir saves/LLaMA2-7B/oracle/sft \
     --overwrite_cache \
     --overwrite_output_dir \
     --cutoff_len 1024 \

@@ -37,7 +37,7 @@ def run_exp(args: Optional[Dict[str, Any]] = None, callbacks: Optional[List["Tra
     elif finetuning_args.stage == "dpo":
         run_dpo(model_args, data_args, training_args, finetuning_args, callbacks)
     elif finetuning_args.stage == "oracle":
-        run_dpo(model_args, data_args, training_args, finetuning_args, callbacks)
+        run_oracle_rm(model_args, data_args, training_args, finetuning_args, callbacks)
     else:
         raise ValueError("Unknown task.")
 
