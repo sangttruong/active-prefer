@@ -203,9 +203,11 @@ class OracleTrainer(Trainer):
         last_hidden_states = predict_results.predictions  # np.array
 
         res = []
+        
+        breakpoint()
         for i, last_hidden_state in enumerate(last_hidden_states):
             example = dataset[i]
-            breakpoint()
+            
             res.append({"question": example['id'], 
                         "last_hidden_state": last_hidden_state,
                         'chosen_ids': example['chosen_ids'], 
