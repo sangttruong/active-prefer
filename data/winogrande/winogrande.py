@@ -45,6 +45,7 @@ if __name__ == "__main__":
             dataset = load_dataset("winogrande", "winogrande_debiased", split=f"{split}")
         output_dataset_path = f'data/winogrande_{split}.json'
         convert_multiple_choice_to_prompt(dataset, output_dataset_path)
+        print(f"{split}: {len(dataset[split])}")
 
 
 

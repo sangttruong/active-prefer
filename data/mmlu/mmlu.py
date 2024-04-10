@@ -46,4 +46,5 @@ if __name__ == "__main__":
         else:
             output_dataset_path = f'data/mmlu_train.json'
         convert_multiple_choice_to_prompt(dataset, output_dataset_path)
+        print(f"{split}: {len(dataset[split])}")
     

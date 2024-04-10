@@ -205,6 +205,7 @@ class OracleTrainer(Trainer):
         res = []
         for i, last_hidden_state in enumerate(last_hidden_states):
             example = dataset[i] 
+            breakpoint()
             res.append({"question": example['id'], 
                         "last_hidden_state": last_hidden_state,
                         "label": example['output']

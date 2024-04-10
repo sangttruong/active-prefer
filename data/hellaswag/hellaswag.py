@@ -41,6 +41,7 @@ if __name__ == "__main__":
             dataset = load_dataset("Rowan/hellaswag", split=f"{split}") 
         output_dataset_path = f'data/hellaswag_{split}.json'
         convert_multiple_choice_to_prompt(dataset, output_dataset_path)
+        print(f"{split}: {len(dataset[split])}")
 
     
     

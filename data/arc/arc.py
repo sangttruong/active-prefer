@@ -45,3 +45,4 @@ if __name__ == "__main__":
             dataset = load_dataset("allenai/ai2_arc", "ARC-Challenge", split=f'{split}')
         output_dataset_path = f'data/arc_challenge_{split}.json'
         convert_multiple_choice_to_prompt(dataset, output_dataset_path)
+        print(f"{split}: {len(dataset[split])}")

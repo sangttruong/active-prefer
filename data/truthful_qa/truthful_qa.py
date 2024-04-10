@@ -45,4 +45,5 @@ if __name__ == "__main__":
     for split in splits:
         output_dataset_path = f'data/truthful_qa_{split}.json'
         convert_multiple_choice_to_prompt(dataset[split], output_dataset_path)
+        print(f"{split}: {len(dataset[split])}")
     
