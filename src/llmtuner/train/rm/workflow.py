@@ -162,8 +162,6 @@ def run_oracle_rm(
     trainer.save_metrics("predict", predict_results.metrics)
     
     
-    
-
     ##########################
     # Training
     last_hidden_states = trainer.calculate_last_hidden_state(predict_results, dataset)

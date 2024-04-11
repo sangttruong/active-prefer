@@ -191,7 +191,7 @@ class OracleTrainer(Trainer):
 
         return loss
 
-    def calculate_last_hidden_state(self, predict_results: "PredictionOutput", dataset) -> None:
+    def calculate_last_hidden_state(self, predict_results: "PredictionOutput", dataset =None):
         """
         Saves model predictions to `output_dir`.
 
@@ -202,20 +202,20 @@ class OracleTrainer(Trainer):
 
         last_hidden_states = predict_results.predictions  # np.array
 
-        res = []
+        # res = []
 
-        # Split the inputs and rewards into two parts, chosen and rejected
+        # # Split the inputs and rewards into two parts, chosen and rejected
         
-        for i in tqdm(range(len(dataset))):
-            example = dataset[i]
-            res.append({"question": example['id'], 
-                        "last_hidden_state_chosen": last_hidden_states[2*i],
-                        "last_hidden_state_rejected": last_hidden_states[2*i + 1],
-                        'chosen_ids': example['chosen_ids'], 
-                        'rejected_ids': example['rejected_ids'],
-                        })
+        # for i in tqdm(range(len(dataset))):
+        #     example = dataset[i]
+        #     res.append({"question": example['id'], 
+        #                 "last_hidden_state_chosen": last_hidden_states[2*i],
+        #                 "last_hidden_state_rejected": last_hidden_states[2*i + 1],
+        #                 'chosen_ids': example['chosen_ids'], 
+        #                 'rejected_ids': example['rejected_ids'],
+        #                 })
 
-        return res
+        return last_hidden_states
 
     def load_last_hidden_states(self, file_path: str) -> List[dict]:
         file_path = os.path.join(self.args.output_dir, file_path)
