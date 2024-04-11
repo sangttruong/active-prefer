@@ -143,10 +143,8 @@ def run_oracle_rm(
     data_collator = PairwiseDataCollatorWithPadding(tokenizer, pad_to_multiple_of=8)
 
     # Replace lm_head with identity
-    for name, _ in base_model.named_parameters():
-        if 'lm_head' in name:
-            setattr(base_model, name, nn.Identity())
-            break
+    if hasattr(base_model, "lm_head"):
+        base_model.lm_head = torch.nn.Identity()
 
     # Update arguments
     training_args.remove_unused_columns = False  # important for pairwise dataset
