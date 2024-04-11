@@ -78,7 +78,7 @@ def load_model(
             "dtype": model_args.compute_dtype,
             "load_in_4bit": model_args.quantization_bit == 4,
             "token": model_args.hf_hub_token,
-            "device_map": {"": get_current_device()},
+            # "device_map": {"": get_current_device()},
             "rope_scaling": getattr(config, "rope_scaling", None),
         }
         try:
