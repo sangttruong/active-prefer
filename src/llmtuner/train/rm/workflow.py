@@ -156,17 +156,31 @@ def run_oracle_rm(
         **split_dataset(dataset, data_args, training_args),
     )
 
-    # Predict to get last_hidden_state
+    # Prepare data
     predict_results = trainer.predict(dataset, metric_key_prefix="predict")
     trainer.log_metrics("predict", predict_results.metrics)
     trainer.save_metrics("predict", predict_results.metrics)
     
-    
+
     ##########################
     # Training
+
     last_hidden_states = trainer.calculate_last_hidden_state(predict_results, dataset)
+
+    # Model
+    # v_head = ValueHead(self.pretrained_model.config, **v_head_kwargs)
+    v_head = ValueHead(base_model.config)
     breakpoint()
-    # v_head = ValueHead()
+    # Dataloader
+    # for i in tqdm(range(len(dataset))):
+    #     example = dataset[i]
+    #     res.append({"question": example['id'], 
+    #                 "last_hidden_state_chosen": last_hidden_states[2*i],
+    #                 "last_hidden_state_rejected": last_hidden_states[2*i + 1],
+    #                 'chosen_ids': example['chosen_ids'], 
+    #                 'rejected_ids': example['rejected_ids'],
+    #                 })
+
 
     # train_dataset = CustomDataset(last_hidden_states, labels)  # CustomDataset represents your dataset class
 
