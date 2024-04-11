@@ -206,15 +206,7 @@ class OracleTrainer(Trainer):
 
         # # Split the inputs and rewards into two parts, chosen and rejected
         
-        # for i in tqdm(range(len(dataset))):
-        #     example = dataset[i]
-        #     res.append({"question": example['id'], 
-        #                 "last_hidden_state_chosen": last_hidden_states[2*i],
-        #                 "last_hidden_state_rejected": last_hidden_states[2*i + 1],
-        #                 'chosen_ids': example['chosen_ids'], 
-        #                 'rejected_ids': example['rejected_ids'],
-        #                 })
-
+ 
         return last_hidden_states
 
     def load_last_hidden_states(self, file_path: str) -> List[dict]:
