@@ -4,18 +4,18 @@
 # --overwrite_cache \
 
 CUDA_VISIBLE_DEVICES=0,1 accelerate launch \
-    --config_file ../accelerate/default.yaml \
-    ../../src/train_bash.py \
+    --config_file examples/accelerate/default.yaml \
+    src/train_bash.py \
     --stage rm \
     --do_train \
     --model_name_or_path meta-llama/Llama-2-7b-hf \
     --flash_attn True\
-    --dataset arc_challenge \
-    --dataset_dir ../../data \
+    --dataset arc_challenge_train \
+    --dataset_dir data \
     --template default \
     --finetuning_type lora \
     --lora_target q_proj,v_proj \
-    --output_dir ../../saves/LLaMA2-7B/lora/sft \
+    --output_dir saves/LLaMA2-7B/lora/sft \
     --overwrite_output_dir \
     --cutoff_len 1024 \
     --preprocessing_num_workers 16 \
@@ -34,5 +34,4 @@ CUDA_VISIBLE_DEVICES=0,1 accelerate launch \
     --val_size 0.1 \
     --ddp_timeout 1800000 \
     --plot_loss \
-    --quantization_bit 4 \
-    --only_training_vhead True
+    --quantization_bit 4 
