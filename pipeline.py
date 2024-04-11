@@ -277,7 +277,8 @@ def main(args):
     #     --only_training_vhead False
     #     """
     
-    ft_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
+    ft_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port}\
+        --config_file examples/accelerate/default.yaml \
         --stage rm \
         --do_train \
         --do_eval \
@@ -633,7 +634,7 @@ def parse_arguments():
     parser.add_argument("--dataset_dir", type=str, default="data", help="Directory containing the dataset")
     parser.add_argument("--data_info_path", type=str, default="data/dataset_info.json", help="Path to dataset info")
     parser.add_argument("--sanity_check", action="store_true", help="Test")
-    parser.add_argument("--use_accelerate", type=bool, default=False, help="is using accelerate")
+    parser.add_argument("--use_accelerate", type=bool, default=True, help="is using accelerate")
 
     #######################
     parser.add_argument("--dataset_name", type=str, default="arc", help="Dataset name")

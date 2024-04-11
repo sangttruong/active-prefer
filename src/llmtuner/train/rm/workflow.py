@@ -191,6 +191,7 @@ def run_oracle_rm(
     ##########################
     # Training
 
+    # Save and load
     np_last_hidden_states = predict_results.predictions
     last_hidden_states = torch.tensor(np_last_hidden_states)  # Using torch.tensor()
 
