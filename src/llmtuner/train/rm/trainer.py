@@ -115,6 +115,7 @@ class PairwiseTrainer(Trainer):
                 res.append(json.dumps({"question": id, "chosen": round(float(c_score), 2), "rejected": round(float(r_score), 2)}))
             writer.write("\n".join(res))
 
+    
 
 class OracleTrainer(Trainer):
     r"""
@@ -150,7 +151,7 @@ class OracleTrainer(Trainer):
         """
         # Compute rewards
         _, _, values = model(**inputs, output_hidden_states=True, return_dict=True)
-        breakpoint()
+        
         unwrapped_model: "PreTrainedModel" = self.accelerator.unwrap_model(self.model)
         if getattr(unwrapped_model.config, "model_type", None) == "chatglm":
             values = torch.transpose(values, 0, 1)
@@ -209,14 +210,4 @@ class OracleTrainer(Trainer):
  
         return last_hidden_states
 
-    def load_last_hidden_states(self, file_path: str) -> List[dict]:
-        file_path = os.path.join(self.args.output_dir, file_path)
-
-        if not os.path.exists(file_path):
-            logger.error(f"File {file_path} does not exist.")
-            return None
-
-        # Load the data from the file
-        loaded_data = torch.load(file_path)
-
-        return loaded_data
+    
