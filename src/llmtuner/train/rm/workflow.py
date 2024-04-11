@@ -166,7 +166,7 @@ def run_oracle_rm(
     # Training
 
     np_last_hidden_states = trainer.calculate_last_hidden_state(predict_results, dataset)
-    last_hidden_states = torch.tensor(last_hidden_states)  # Using torch.tensor()
+    last_hidden_states = torch.tensor(np_last_hidden_states)  # Using torch.tensor()
 
     # Model
     # v_head = ValueHead(self.pretrained_model.config, **v_head_kwargs)
