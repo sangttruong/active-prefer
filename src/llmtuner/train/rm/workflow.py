@@ -165,12 +165,15 @@ def run_oracle_rm(
     ##########################
     # Training
 
-    last_hidden_states = trainer.calculate_last_hidden_state(predict_results, dataset)
+    np_last_hidden_states = trainer.calculate_last_hidden_state(predict_results, dataset)
+    last_hidden_states = torch.tensor(last_hidden_states)  # Using torch.tensor()
 
     # Model
     # v_head = ValueHead(self.pretrained_model.config, **v_head_kwargs)
     v_head = ValueHead(base_model.config)
     breakpoint()
+
+
     # Dataloader
     # for i in tqdm(range(len(dataset))):
     #     example = dataset[i]
