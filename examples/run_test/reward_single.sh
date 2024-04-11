@@ -4,7 +4,7 @@ CUDA_VISIBLE_DEVICES=0,1 python src/train_bash.py \
     --stage rm \
     --do_predict \
     --model_name_or_path meta-llama/Llama-2-7b-hf \
-    --dataset arc_challenge_generated \
+    --dataset reward_bench_train \
     --dataset_dir data \
     --template default \
     --finetuning_type lora \
