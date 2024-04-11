@@ -17,7 +17,6 @@ from .collator import PairwiseDataCollatorWithPadding
 from .metric import compute_accuracy
 from .trainer import PairwiseTrainer, OracleTrainer
 
-from accelerate import Accelerator
 
 
 if TYPE_CHECKING:
@@ -26,22 +25,6 @@ if TYPE_CHECKING:
     from ...hparams import DataArguments, FinetuningArguments, ModelArguments
 
 
-class CustomDataset(Dataset):
-    def __init__(self, embeddings_feature, dataset):
-        self.embeddings_feature = embeddings_feature
-        self.dataset = dataset
-
-    def __len__(self):
-        return len(self.examples)
-
-    def __getitem__(self, i):
-        example = self.dataset[i]
-        return {"question": example['id'], 
-                "last_hidden_state_chosen": self.embeddings_feature[2*i],
-                "last_hidden_state_rejected": self.embeddings_feature[2*i + 1],
-                'chosen_ids': example['chosen_ids'], 
-                'rejected_ids': example['rejected_ids'],
-                }
 
 
 class ValueHead(nn.Module):
