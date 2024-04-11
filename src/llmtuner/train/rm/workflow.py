@@ -134,6 +134,7 @@ def run_oracle_rm(
     training_args: "Seq2SeqTrainingArguments",
     finetuning_args: "FinetuningArguments",
     callbacks: Optional[List["TrainerCallback"]] = None,
+    seed = 0,
 ):
     tokenizer = load_tokenizer(model_args)
     dataset = get_dataset(tokenizer, model_args, data_args, training_args, stage="rm")
@@ -155,6 +156,9 @@ def run_oracle_rm(
         **split_dataset(dataset, data_args, training_args),
     )
 
+    # Training
+    train_result = trainer.train(resume_from_checkpoint=training_args.resume_from_checkpoint)
+
     # Predict to get last_hidden_state
     predict_results = trainer.predict(dataset, metric_key_prefix="predict")
     trainer.log_metrics("predict", predict_results.metrics)
@@ -165,7 +169,7 @@ def run_oracle_rm(
     ##########################
     # Training
     last_hidden_states = trainer.load_last_hidden_states("last_hidden_state.pt")
-    breakpoint()
+    
     # v_head = ValueHead()
 
     # train_dataset = CustomDataset(last_hidden_states, labels)  # CustomDataset represents your dataset class

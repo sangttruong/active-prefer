@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CUDA_VISIBLE_DEVICES=6,7 python src/train_bash.py \
+CUDA_VISIBLE_DEVICES=4,5 python src/train_bash.py \
     --stage oracle \
     --do_train \
     --model_name_or_path meta-llama/Llama-2-7b-hf \

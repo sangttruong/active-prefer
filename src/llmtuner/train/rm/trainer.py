@@ -148,7 +148,7 @@ class OracleTrainer(Trainer):
         """
         # Compute rewards
         _, _, values = model(**inputs, output_hidden_states=True, return_dict=True)
-
+        breakpoint()
         unwrapped_model: "PreTrainedModel" = self.accelerator.unwrap_model(self.model)
         if getattr(unwrapped_model.config, "model_type", None) == "chatglm":
             values = torch.transpose(values, 0, 1)
@@ -204,10 +204,14 @@ class OracleTrainer(Trainer):
 
         res = []
         
+        # Split the inputs and rewards into two parts, chosen and rejected
+        batch_size = last_hidden_states.shape[0] / len(dataset)
+        # chosen_input_ids, rejected_input_ids = last_hidden_states["input_ids"][:batch_size], last_hidden_states["input_ids"][batch_size:]
+        chosen_rewards, rejected_rewards = last_hidden_states[:batch_size], last_hidden_states[batch_size:]
+
         breakpoint()
         for i, last_hidden_state in enumerate(last_hidden_states):
             example = dataset[i]
-            
             res.append({"question": example['id'], 
                         "last_hidden_state": last_hidden_state,
                         'chosen_ids': example['chosen_ids'], 
