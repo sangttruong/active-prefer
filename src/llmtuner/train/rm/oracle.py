@@ -126,7 +126,7 @@ def run_oracle_rm(
 
     # Model
     v_head = ValueHead(base_model.config).to(device) # v_head = ValueHead(self.pretrained_model.config, **v_head_kwargs)
-    optimizer = torch.optim.Adam(model.parameters())
+    optimizer = torch.optim.Adam(v_head.parameters())
 
     # Dataloader
     batch_size = 2
@@ -181,6 +181,6 @@ def run_oracle_rm(
 
 
     ##########################
-    del trainer, model
+    del trainer, base_model, v_head
     gc.collect()
     torch.cuda.empty_cache()
