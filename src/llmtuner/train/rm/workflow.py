@@ -139,7 +139,7 @@ class CustomDataset(Dataset):
         self.dataset = dataset
 
     def __len__(self):
-        return len(self.examples)
+        return len(self.dataset)
 
     def __getitem__(self, i):
         example = self.dataset[i]
