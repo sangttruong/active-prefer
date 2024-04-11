@@ -142,6 +142,12 @@ def run_oracle_rm(
     base_model = load_model(tokenizer, model_args, finetuning_args, is_trainable=False, add_valuehead=False)
     data_collator = PairwiseDataCollatorWithPadding(tokenizer, pad_to_multiple_of=8)
 
+    # Replace lm_head with identity
+    for name, _ in base_model.named_parameters():
+        if 'lm_head' in name:
+            setattr(base_model, name, nn.Identity())
+            break
+
     # Update arguments
     training_args.remove_unused_columns = False  # important for pairwise dataset
 
@@ -161,6 +167,7 @@ def run_oracle_rm(
     predict_results = trainer.predict(dataset, metric_key_prefix="predict")
     trainer.log_metrics("predict", predict_results.metrics)
     trainer.save_metrics("predict", predict_results.metrics)
+    
     
 
     ##########################

@@ -100,6 +100,8 @@ def load_model(
     model = init_adapter(model, model_args, finetuning_args, is_trainable)
 
     if add_valuehead:
+        
+        
         model: "AutoModelForCausalLMWithValueHead" = AutoModelForCausalLMWithValueHead.from_pretrained(model)
         patch_valuehead_model(model)
 
