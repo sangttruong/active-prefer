@@ -157,7 +157,7 @@ def run_oracle_rm(
     )
 
     # Training
-    train_result = trainer.train(resume_from_checkpoint=training_args.resume_from_checkpoint)
+    # train_result = trainer.train(resume_from_checkpoint=training_args.resume_from_checkpoint)
 
     # Predict to get last_hidden_state
     predict_results = trainer.predict(dataset, metric_key_prefix="predict")

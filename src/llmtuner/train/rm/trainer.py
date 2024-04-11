@@ -203,17 +203,14 @@ class OracleTrainer(Trainer):
         last_hidden_states = predict_results.predictions  # np.array
 
         res = []
-        
-        # Split the inputs and rewards into two parts, chosen and rejected
-        batch_size = last_hidden_states.shape[0] / len(dataset)
-        # chosen_input_ids, rejected_input_ids = last_hidden_states["input_ids"][:batch_size], last_hidden_states["input_ids"][batch_size:]
-        chosen_rewards, rejected_rewards = last_hidden_states[:batch_size], last_hidden_states[batch_size:]
 
-        breakpoint()
-        for i, last_hidden_state in enumerate(last_hidden_states):
+        # Split the inputs and rewards into two parts, chosen and rejected
+        
+        for i, last_hidden_state in enumerate(dataset):
             example = dataset[i]
             res.append({"question": example['id'], 
-                        "last_hidden_state": last_hidden_state,
+                        "last_hidden_state_chosen": last_hidden_state[2*i],
+                        "last_hidden_state_rejected": last_hidden_state[2*i + 1],
                         'chosen_ids': example['chosen_ids'], 
                         'rejected_ids': example['rejected_ids'],
                         })
