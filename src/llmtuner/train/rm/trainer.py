@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Union
 import torch
 from transformers import Trainer
 
+from tqdm import tqdm
+
 from ...extras.logging import get_logger
 from ..utils import create_custom_optimzer, create_custom_scheduler
 
@@ -189,7 +191,7 @@ class OracleTrainer(Trainer):
 
         return loss
 
-    def save_last_hidden_state(self, predict_results: "PredictionOutput", dataset) -> None:
+    def calculate_last_hidden_state(self, predict_results: "PredictionOutput", dataset) -> None:
         """
         Saves model predictions to `output_dir`.
 
@@ -198,15 +200,13 @@ class OracleTrainer(Trainer):
         if not self.is_world_process_zero():
             return
 
-        output_prediction_file = os.path.join(self.args.output_dir, "last_hidden_state.pt")
-        logger.info(f"Saving prediction results to {output_prediction_file}")
         last_hidden_states = predict_results.predictions  # np.array
 
         res = []
 
         # Split the inputs and rewards into two parts, chosen and rejected
         
-        for i in range(len(dataset)):
+        for i in tqdm(range(len(dataset))):
             example = dataset[i]
             res.append({"question": example['id'], 
                         "last_hidden_state_chosen": last_hidden_states[2*i],
@@ -215,9 +215,7 @@ class OracleTrainer(Trainer):
                         'rejected_ids': example['rejected_ids'],
                         })
 
-        # Save the list of dictionaries to a file using torch.save
-        torch.save(res, output_prediction_file)
-        print(f"Save last_hidden_state at {output_prediction_file}")
+        return res
 
     def load_last_hidden_states(self, file_path: str) -> List[dict]:
         file_path = os.path.join(self.args.output_dir, file_path)

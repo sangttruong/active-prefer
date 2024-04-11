@@ -162,17 +162,15 @@ def run_oracle_rm(
     trainer.save_metrics("predict", predict_results.metrics)
     
     
-    trainer.save_last_hidden_state(predict_results, dataset)
+    
 
     ##########################
     # Training
-    last_hidden_states = trainer.load_last_hidden_states("last_hidden_state.pt")
+    last_hidden_states = trainer.calculate_last_hidden_state(predict_results, dataset)
     breakpoint()
     # v_head = ValueHead()
 
     # train_dataset = CustomDataset(last_hidden_states, labels)  # CustomDataset represents your dataset class
-
-
 
     ##########################
     del trainer, model
