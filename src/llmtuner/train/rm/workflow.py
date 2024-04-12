@@ -231,7 +231,6 @@ def run_oracle_rm(
             rejected_input_ids = example['rejected_ids']
 
             optimizer.zero_grad()
-            breakpoint()
             chosen_rewards = v_head(last_hidden_state_chosen) # [1024, 1]
             rejected_rewards = v_head(last_hidden_state_rejected) # [1024, 1]
 
