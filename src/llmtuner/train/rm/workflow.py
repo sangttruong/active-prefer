@@ -162,7 +162,7 @@ def run_oracle_rm(
     training_args: "Seq2SeqTrainingArguments",
     finetuning_args: "FinetuningArguments",
     callbacks: Optional[List["TrainerCallback"]] = None,
-    seed = 0,
+    seed = 42,
 ):
     tokenizer = load_tokenizer(model_args)
     dataset = get_dataset(tokenizer, model_args, data_args, training_args, stage="rm")
@@ -241,8 +241,7 @@ def train_oracle_model(
         optimizer_params, 
         create_scheduler, 
         num_epochs, 
-        device, 
-        seed,
+        seed = 42,
     ):
     # Model
     accelerator = Accelerator()
