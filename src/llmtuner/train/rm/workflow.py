@@ -201,14 +201,16 @@ def run_oracle_rm(
 
     # Model
     v_head = ValueHead(base_model.config).to(device) # v_head = ValueHead(self.pretrained_model.config, **v_head_kwargs)
-    optimizer = torch.optim.Adam(v_head.parameters())
+    # optimizer = torch.optim.Adam(v_head.parameters())
+    optimizer = trainer.create_optimizer()(v_head.parameters())
+    scheduler = trainer.create_scheduler()(optimizer, step_size=1, gamma=0.9)
 
     # Dataloader
     batch_size = 2
     train_dataset = CustomDataset(last_hidden_states, dataset)  # CustomDataset represents your dataset class
     data_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
-    v_head, optimizer, data = accelerator.prepare(v_head, optimizer, data)
+    v_head, optimizer, data_loader = accelerator.prepare(v_head, optimizer, data_loader)
 
     v_head.train()
     for epoch in range(2):
@@ -253,6 +255,11 @@ def run_oracle_rm(
             accelerator.backward(loss)
 
             optimizer.step()
+
+        # Update the learning rate after each epoch
+        scheduler.step()
+
+        print(f"Epoch {epoch+1}, Learning Rate: {scheduler.get_last_lr()}")
 
 
     ##########################

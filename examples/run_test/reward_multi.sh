@@ -34,4 +34,6 @@ CUDA_VISIBLE_DEVICES=0,1 accelerate launch \
     --max_samples 3000 \
     --val_size 0.1 \
     --ddp_timeout 1800000 \
-    --plot_loss 
+    --plot_loss \
+    --report_to none\
+    --fp16
