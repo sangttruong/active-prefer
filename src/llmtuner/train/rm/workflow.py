@@ -143,11 +143,11 @@ class CustomDataset(Dataset):
 
     def __getitem__(self, i):
         example = self.dataset[i]
-        return {"question": example['id'], 
-                "last_hidden_state_chosen": self.embeddings_feature[2*i],
-                "last_hidden_state_rejected": self.embeddings_feature[2*i + 1],
-                'chosen_ids': example['chosen_ids'], 
-                'rejected_ids': example['rejected_ids'],
+        return {"question_id": example['id'], # string 
+                "last_hidden_state_chosen": self.embeddings_feature[2*i], # tensor (1024 x 4096)
+                "last_hidden_state_rejected": self.embeddings_feature[2*i + 1],  # tensor (1024 x 4096)
+                'chosen_ids': example['chosen_ids'], # list ids
+                'rejected_ids': example['rejected_ids'], # list ids
                 }
   
 def run_oracle_rm(
@@ -200,7 +200,7 @@ def run_oracle_rm(
     device = accelerator.device
 
     # Model
-    v_head = ValueHead(base_model.config).to(device) # v_head = ValueHead(self.pretrained_model.config, **v_head_kwargs)
+    v_head = ValueHead(base_model.config).to(device) 
     optimizer = torch.optim.Adam(v_head.parameters())
     # optimizer = trainer.optimizer(v_head.parameters())
     # scheduler = trainer.create_scheduler()(optimizer, step_size=1, gamma=0.9)
@@ -216,7 +216,7 @@ def run_oracle_rm(
 
     breakpoint()
     for epoch in range(2):
-        for question_id, last_hidden_state_chosen, last_hidden_state_rejected, chosen_ids, rejected_ids in data_loader:
+        for question_id, last_hidden_state_chosen, last_hidden_state_rejected, chosen_ids, rejected_ids in train_dataset:
             # Concate chosen + rejected
             inputs = torch.concat([last_hidden_state_chosen, last_hidden_state_rejected], 0)
 
