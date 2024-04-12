@@ -213,6 +213,8 @@ def run_oracle_rm(
     v_head, optimizer, data_loader = accelerator.prepare(v_head, optimizer, data_loader)
 
     v_head.train()
+
+    breakpoint()
     for epoch in range(2):
         for question_id, last_hidden_state_chosen, last_hidden_state_rejected, chosen_ids, rejected_ids in data_loader:
             # Concate chosen + rejected
@@ -221,7 +223,6 @@ def run_oracle_rm(
             optimizer.zero_grad()
 
             # Forward
-            breakpoint()
             values = v_head(inputs)
             
             # Split the inputs and rewards into two parts, chosen and rejected
