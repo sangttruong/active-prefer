@@ -216,9 +216,10 @@ def run_oracle_rm(
 
     breakpoint()
     for epoch in range(2):
-        
-        for i in range(len(train_dataset)):
-            example = train_dataset[i]
+        for example in data_loader:
+        # for i in range(len(train_dataset)):
+            # example = train_dataset[i]
+            # example = batch
             question_id = example['question_id']
             last_hidden_state_chosen = example['last_hidden_state_chosen']
             last_hidden_state_rejected = example['last_hidden_state_rejected']
