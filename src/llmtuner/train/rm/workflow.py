@@ -279,8 +279,8 @@ def train_oracle_model(
 
     for epoch in range(num_epochs):
         epoch_loss = 0.0  # Initialize epoch loss
-        
-        for example in sample_ids:
+        for idx in sample_ids:
+            example = train_datset[idx]
             last_hidden_state_chosen = example['last_hidden_state_chosen'].to(device)
             last_hidden_state_rejected = example['last_hidden_state_rejected'].to(device)
             chosen_input_ids = example['chosen_ids']
