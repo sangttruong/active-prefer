@@ -253,6 +253,7 @@ def train_oracle_model(
     optimizer_params.pop('params', None)     
     optimizer = torch.optim.AdamW(v_head.parameters(), **optimizer_params)
     
+    num_epochs = int(num_epochs)
     num_training_steps_per_epoch = len(train_dataset)  # Assuming train_dataset is your training dataset
     num_training_steps = num_epochs * num_training_steps_per_epoch
     scheduler = create_scheduler(num_training_steps, optimizer = optimizer)
