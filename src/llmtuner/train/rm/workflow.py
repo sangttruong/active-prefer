@@ -242,16 +242,16 @@ def set_seed(seed):
     torch.cuda.manual_seed_all(seed)
 
 def train_oracle_model(
-        train_dataset, 
-        cutoff_len, 
-        pad_token_id, 
-        base_model_config, 
-        optimizer_params, 
-        create_scheduler, 
-        num_epochs,
-        percentage=0.9, 
-        seed = 42,
-    ):
+    train_dataset, 
+    cutoff_len, 
+    pad_token_id, 
+    base_model_config, 
+    optimizer_params, 
+    create_scheduler, 
+    num_epochs,
+    percentage=0.9, 
+    seed = 42,
+):
 
     set_seed(seed)  # Set seed for reproducibility
 
@@ -268,7 +268,6 @@ def train_oracle_model(
     num_epochs = int(num_epochs)
     num_training_steps_per_epoch = int(len(train_dataset) * percentage) 
     num_training_steps = num_epochs * num_training_steps_per_epoch
-    breakpoint()
     sample_ids = random.sample(range(len(train_dataset)), num_training_steps_per_epoch)
     
     scheduler = create_scheduler(num_training_steps, optimizer = optimizer)
@@ -276,7 +275,6 @@ def train_oracle_model(
     v_head, optimizer, train_dataset = accelerator.prepare(v_head, optimizer, train_dataset)
 
     v_head.train()
-
     for epoch in range(num_epochs):
         epoch_loss = 0.0  # Initialize epoch loss
         for idx in sample_ids:
@@ -320,5 +318,5 @@ def train_oracle_model(
         # Update the learning rate after each epoch
         scheduler.step()
 
-        print(f"Epoch {epoch+1}, Loss: {loss}, Avg-Loss: {epoch_loss / len(train_dataset)}, Learning Rate: {scheduler.get_last_lr()}")
+        print(f"Epoch {epoch+1}, Loss: {epoch_loss / len(train_dataset)}, Learning Rate: {scheduler.get_last_lr()}")
     
