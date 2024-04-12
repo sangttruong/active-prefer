@@ -205,7 +205,7 @@ def run_oracle_rm(
     # Model
     indentity_mode = AutoModelForCausalLMWithValueHead
     v_head = ValueHead(base_model.config).to(device) 
-    optimizer = torch.optim.Adam(v_head.parameters())
+    optimizer = torch.optim.AdamW(v_head.parameters())
     # optimizer = trainer.optimizer(v_head.parameters())
     # scheduler = trainer.create_scheduler()(optimizer, step_size=1, gamma=0.9)
 
@@ -214,15 +214,13 @@ def run_oracle_rm(
     v_head, optimizer, train_dataset = accelerator.prepare(v_head, optimizer, train_dataset)
 
     v_head.train()
-
-   
     for epoch in range(2):
         for example in train_dataset:
-            question_id = example['question_id']
+            # question_id = example['question_id']
             last_hidden_state_chosen = example['last_hidden_state_chosen'].to(device)
             last_hidden_state_rejected = example['last_hidden_state_rejected'].to(device)
-            chosen_ids = example['chosen_ids']
-            rejected_ids = example['rejected_ids']
+            # chosen_ids = example['chosen_ids']
+            # rejected_ids = example['rejected_ids']
 
             # Concate chosen + rejected
             # inputs = torch.concat([last_hidden_state_chosen, last_hidden_state_rejected], 0).to(device)
@@ -233,35 +231,10 @@ def run_oracle_rm(
             breakpoint()
             chosen_rewards = v_head(last_hidden_state_chosen)
             rejected_rewards = v_head(last_hidden_state_rejected) 
-            
-
-            chosen_input_ids, rejected_input_ids = chosen_ids, rejected_ids
-
-            # Pad chosen_input_ids_tensor
-            padding_chosen = max(0, data_args.cutoff_len - len(chosen_input_ids))
-            padding_rejected = max(0, data_args.cutoff_len - len(rejected_input_ids))
-            chosen_input_ids = F.pad(chosen_input_ids, (0, padding_chosen), value=tokenizer.pad_token_id)
-            rejected_input_ids = F.pad(rejected_input_ids, (0, padding_rejected), value=tokenizer.pad_token_id)
-
+             
             # Loss
             loss = 0
-            chosen_length = (chosen_input_ids != tokenizer.pad_token_id).nonzero()[-1] + 1
-            rejected_length = (rejected_input_ids != tokenizer.pad_token_id).nonzero()[-1] + 1
-            check_divergence = (chosen_input_ids != rejected_input_ids).nonzero()
-
-            if len(check_divergence) == 0:
-                end_index = chosen_length
-                div_index = end_index - 1
-            else:
-                end_index = max(chosen_length, rejected_length)
-                div_index = check_divergence[0]
-
-            chosen_trunc_rewards = chosen_rewards[0, div_index:end_index]
-            rejected_trunc_rewards = rejected_rewards[0, div_index:end_index]
-            # if return_outputs:  # use the score on the last token except pad token for inference
-                # chosen_scores.append(chosen_rewards[i, chosen_length - 1])
-                # rejected_scores.append(rejected_rewards[i, rejected_length - 1])
-            loss += -torch.nn.functional.logsigmoid(chosen_trunc_rewards - rejected_trunc_rewards).mean()
+            loss += -torch.nn.functional.logsigmoid(chosen_rewards - rejected_rewards).mean()
 
             # Backward
             accelerator.backward(loss)
