@@ -216,8 +216,9 @@ def run_oracle_rm(
 
     breakpoint()
     for epoch in range(2):
-        for question_id, last_hidden_state_chosen, last_hidden_state_rejected, chosen_ids, rejected_ids in train_dataset:
+        for i in range(len(train_dataset)):
             # Concate chosen + rejected
+            question_id, last_hidden_state_chosen, last_hidden_state_rejected, chosen_ids, rejected_ids = train_dataset[i]
             inputs = torch.concat([last_hidden_state_chosen, last_hidden_state_rejected], 0)
 
             optimizer.zero_grad()
