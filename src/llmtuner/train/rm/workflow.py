@@ -195,7 +195,7 @@ def run_oracle_rm(
     # Training
 
     # Save and load
-    np_last_hidden_states = predict_results.predictions[:, -1, :]
+    np_last_hidden_states = predict_results.predictions
     last_hidden_states = torch.tensor(np_last_hidden_states)  # Using torch.tensor()
     train_dataset = CustomDataset(last_hidden_states, dataset)  # CustomDataset represents your dataset class
 
@@ -229,7 +229,7 @@ def run_oracle_rm(
             last_hidden_state_rejected = example['last_hidden_state_rejected'].to(device)
 
             optimizer.zero_grad()
-
+            breakpoint()
             chosen_rewards = v_head(last_hidden_state_chosen)
             rejected_rewards = v_head(last_hidden_state_rejected) 
 
