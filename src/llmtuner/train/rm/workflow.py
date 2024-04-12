@@ -207,10 +207,10 @@ def run_oracle_rm(
     
     # optimizer = torch.optim.AdamW(v_head.parameters(), lr = )
     optimizer_params = trainer.create_optimizer().param_groups[0]
-    optimizer_params.pop('params', None)     # Remove 'params' from optimizer parameters
+    optimizer_params.pop('params', None)     
     optimizer = torch.optim.AdamW(v_head.parameters(), **optimizer_params)
     
-    scheduler = trainer.create_scheduler(optimizer)
+    scheduler = trainer.create_scheduler(optimizer = optimizer)
 
     # Dataloader
     train_dataset = CustomDataset(last_hidden_states, dataset)  # CustomDataset represents your dataset class
