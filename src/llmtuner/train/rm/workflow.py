@@ -203,12 +203,12 @@ def run_oracle_rm(
     device = accelerator.device
 
     # Model
-    indentity_mode = AutoModelForCausalLMWithValueHead
     v_head = ValueHead(base_model.config).to(device) 
-    # optimizer = torch.optim.AdamW(v_head.parameters())
-    optimizer = trainer.create_optimizer()(v_head.parameters())
-    # scheduler = trainer.create_scheduler()(optimizer, step_size=1, gamma=0.9)
     breakpoint()
+    optimizer = torch.optim.AdamW(v_head.parameters())
+    optimizer2 = trainer.create_optimizer()(v_head.parameters())
+    # scheduler = trainer.create_scheduler()(optimizer, step_size=1, gamma=0.9)
+    
     # Dataloader
     train_dataset = CustomDataset(last_hidden_states, dataset)  # CustomDataset represents your dataset class
     v_head, optimizer, train_dataset = accelerator.prepare(v_head, optimizer, train_dataset)
