@@ -216,6 +216,7 @@ def run_oracle_rm(
     create_scheduler = trainer.create_scheduler
     cutoff_len = data_args.cutoff_len
     pad_token_id = tokenizer.pad_token_id
+    percentage = 0.9
 
     train_oracle_model(
         train_dataset, 
@@ -225,6 +226,7 @@ def run_oracle_rm(
         optimizer_params, 
         create_scheduler, 
         training_args.num_train_epochs, 
+        percentage,
         seed,
     )
     
