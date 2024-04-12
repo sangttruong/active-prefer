@@ -210,9 +210,8 @@ def run_oracle_rm(
     optimizer_params.pop('params', None)     # Remove 'params' from optimizer parameters
     optimizer = torch.optim.AdamW(v_head.parameters(), **optimizer_params)
     
-    breakpoint()
-    scheduler = trainer.create_scheduler()(optimizer, step_size=1, gamma=0.9)
-    
+    scheduler = trainer.create_scheduler(optimizer)
+
     # Dataloader
     train_dataset = CustomDataset(last_hidden_states, dataset)  # CustomDataset represents your dataset class
     v_head, optimizer, train_dataset = accelerator.prepare(v_head, optimizer, train_dataset)
@@ -245,9 +244,9 @@ def run_oracle_rm(
             optimizer.step()
 
         # Update the learning rate after each epoch
-        # scheduler.step()
+        scheduler.step()
 
-        # print(f"Epoch {epoch+1}, Learning Rate: {scheduler.get_last_lr()}")
+        print(f"Epoch {epoch+1}, Learning Rate: {scheduler.get_last_lr()}")
 
 
     ##########################
