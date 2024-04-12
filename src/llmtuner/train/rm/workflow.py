@@ -227,13 +227,35 @@ def run_oracle_rm(
         for example in train_dataset:
             last_hidden_state_chosen = example['last_hidden_state_chosen'].to(device)
             last_hidden_state_rejected = example['last_hidden_state_rejected'].to(device)
+            chosen_input_ids = example['chosen_ids']
+            rejected_input_ids = example['rejected_ids']
 
             optimizer.zero_grad()
             breakpoint()
-            chosen_rewards = v_head(last_hidden_state_chosen)
-            rejected_rewards = v_head(last_hidden_state_rejected) 
+            chosen_rewards = v_head(last_hidden_state_chosen) # [1024, 1]
+            rejected_rewards = v_head(last_hidden_state_rejected) # [1024, 1]
 
-            loss = -torch.nn.functional.logsigmoid(chosen_rewards - rejected_rewards).mean()
+            # Calculate loss
+            padding_chosen = max(0, data_args.cutoff_len - len(chosen_input_ids))
+            padding_rejected = max(0, data_args.cutoff_len - len(rejected_input_ids))
+            chosen_input_ids = F.pad(chosen_input_ids, (0, padding_chosen), value=tokenizer.pad_token_id)
+            rejected_input_ids = F.pad(rejected_input_ids, (0, padding_rejected), value=tokenizer.pad_token_id)
+
+
+            chosen_length = (chosen_input_ids !=tokenizer.pad_token_id).nonzero()[-1] + 1
+            rejected_length = (rejected_input_ids != tokenizer.pad_token_id).nonzero()[-1] + 1
+            check_divergence = (chosen_input_ids != rejected_input_ids).nonzero()
+
+            if len(check_divergence) == 0:
+                end_index = chosen_length
+                div_index = end_index - 1
+            else:
+                end_index = max(chosen_length, rejected_length)
+                div_index = check_divergence[0]
+
+            chosen_trunc_rewards = chosen_rewards[div_index:end_index]
+            rejected_trunc_rewards = rejected_rewards[div_index:end_index]
+            loss += -torch.nn.functional.logsigmoid(chosen_trunc_rewards - rejected_trunc_rewards).mean()
 
             loss.backward()
             optimizer.step()
