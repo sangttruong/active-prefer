@@ -227,7 +227,7 @@ def run_oracle_rm(
     )
     
     ##########################
-    del trainer, base_model, v_head
+    del trainer, base_model
     gc.collect()
     torch.cuda.empty_cache()
 
