@@ -206,7 +206,9 @@ def run_oracle_rm(
     v_head = ValueHead(base_model.config).to(device) 
     breakpoint()
     # optimizer = torch.optim.AdamW(v_head.parameters(), lr = )
-    optimizer = trainer.create_optimizer().param_groups[0](v_head.parameters())
+    optimizer_params = trainer.create_optimizer().param_groups[0]
+    optimizer = torch.optim.AdamW(optimizer_params)(v_head.parameters())
+
     # scheduler = trainer.create_scheduler()(optimizer, step_size=1, gamma=0.9)
     
     # Dataloader
