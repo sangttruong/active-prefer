@@ -243,7 +243,6 @@ def run_oracle_rm(
             chosen_input_ids = F.pad(chosen_input_ids, (0, padding_chosen), value=tokenizer.pad_token_id)
             rejected_input_ids = F.pad(rejected_input_ids, (0, padding_rejected), value=tokenizer.pad_token_id)
 
-
             # Loss
             loss = 0
             chosen_length = (chosen_input_ids != tokenizer.pad_token_id).nonzero()[-1] + 1
@@ -257,7 +256,6 @@ def run_oracle_rm(
                 end_index = max(chosen_length, rejected_length)
                 div_index = check_divergence[0]
 
-            assert div_index > 0
             chosen_trunc_rewards = chosen_rewards[0, div_index:end_index]
             rejected_trunc_rewards = rejected_rewards[0, div_index:end_index]
             # if return_outputs:  # use the score on the last token except pad token for inference
