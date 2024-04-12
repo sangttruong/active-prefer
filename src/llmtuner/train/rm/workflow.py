@@ -211,7 +211,6 @@ def run_oracle_rm(
     # Dataloader
     batch_size = 2
     train_dataset = CustomDataset(last_hidden_states, dataset)  # CustomDataset represents your dataset class
-
     v_head, optimizer, train_dataset = accelerator.prepare(v_head, optimizer, train_dataset)
 
     v_head.train()
@@ -226,17 +225,18 @@ def run_oracle_rm(
             rejected_ids = example['rejected_ids']
 
             # Concate chosen + rejected
-            inputs = torch.concat([last_hidden_state_chosen, last_hidden_state_rejected], 0).to(device)
+            # inputs = torch.concat([last_hidden_state_chosen, last_hidden_state_rejected], 0).to(device)
 
             optimizer.zero_grad()
 
             # Forward
-            values = v_head(inputs)
+            chosen_rewards = v_head(last_hidden_state_chosen)
+            rejected_rewards = v_head(last_hidden_state_rejected) 
             
             # Split the inputs and rewards into two parts, chosen and rejected
             chosen_input_ids, rejected_input_ids = chosen_ids, rejected_ids
-            chosen_rewards, rejected_rewards = values[:batch_size], values[batch_size:]
-            chosen_scores, rejected_scores = [], []
+            # chosen_rewards, rejected_rewards = values[:batch_size], values[batch_size:]
+            # chosen_scores, rejected_scores = [], []
 
             # Loss
             loss = 0
