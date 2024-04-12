@@ -215,7 +215,7 @@ def run_oracle_rm(
 
     v_head.train()
 
-    breakpoint()
+   
     for epoch in range(2):
         for example in train_dataset:
             question_id = example['question_id']
@@ -230,6 +230,7 @@ def run_oracle_rm(
             optimizer.zero_grad()
 
             # Forward
+            breakpoint()
             chosen_rewards = v_head(last_hidden_state_chosen)
             rejected_rewards = v_head(last_hidden_state_rejected) 
             
