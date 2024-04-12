@@ -255,7 +255,7 @@ def run_oracle_rm(
 
             chosen_trunc_rewards = chosen_rewards[div_index:end_index]
             rejected_trunc_rewards = rejected_rewards[div_index:end_index]
-            loss += -torch.nn.functional.logsigmoid(chosen_trunc_rewards - rejected_trunc_rewards).mean()
+            loss = -torch.nn.functional.logsigmoid(chosen_trunc_rewards - rejected_trunc_rewards).mean()
 
             loss.backward()
             optimizer.step()
