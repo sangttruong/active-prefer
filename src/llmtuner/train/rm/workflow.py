@@ -10,6 +10,7 @@ import gc
 
 import os 
 import numpy as np
+import random
 
 from ...data import get_dataset, split_dataset
 from ...extras.callbacks import FixValueHeadModelCallback
@@ -197,6 +198,7 @@ def run_oracle_rm(
     # Check if the file exists
     if os.path.isfile(filename):
         np_last_hidden_states = np.load(filename)
+        print(f"Loaded array from {filename}")
     else:
         predict_results = trainer.predict(dataset, metric_key_prefix="predict")
         np_last_hidden_states = predict_results.predictions
@@ -231,7 +233,11 @@ def run_oracle_rm(
     gc.collect()
     torch.cuda.empty_cache()
 
-
+def set_seed(seed):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
 
 def train_oracle_model(
         train_dataset, 
@@ -240,9 +246,13 @@ def train_oracle_model(
         base_model_config, 
         optimizer_params, 
         create_scheduler, 
-        num_epochs, 
+        num_epochs,
+        percentage=0.9, 
         seed = 42,
     ):
+
+    set_seed(seed)  # Set seed for reproducibility
+
     # Model
     accelerator = Accelerator()
     device = accelerator.device
@@ -254,10 +264,11 @@ def train_oracle_model(
     optimizer = torch.optim.AdamW(v_head.parameters(), **optimizer_params)
     
     num_epochs = int(num_epochs)
-    num_training_steps_per_epoch = len(train_dataset)  # Assuming train_dataset is your training dataset
+    num_training_steps_per_epoch = int(len(train_dataset) * percentage) 
     num_training_steps = num_epochs * num_training_steps_per_epoch
+    sample_ids = random.sample(range(len(train_dataset)), num_training_steps_per_epoch)
+    
     scheduler = create_scheduler(num_training_steps, optimizer = optimizer)
-
 
     v_head, optimizer, train_dataset = accelerator.prepare(v_head, optimizer, train_dataset)
 
@@ -266,7 +277,7 @@ def train_oracle_model(
     for epoch in range(num_epochs):
         epoch_loss = 0.0  # Initialize epoch loss
         
-        for example in train_dataset:
+        for example in sample_ids:
             last_hidden_state_chosen = example['last_hidden_state_chosen'].to(device)
             last_hidden_state_rejected = example['last_hidden_state_rejected'].to(device)
             chosen_input_ids = example['chosen_ids']
