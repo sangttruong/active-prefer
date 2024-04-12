@@ -239,7 +239,7 @@ def run_oracle_rm(
 
             # Pad chosen_input_ids_tensor
             padding_chosen = max(0, data_args.cutoff_len - len(chosen_input_ids))
-            padding_rejected = max(0, data_args.cutoff_len - len(chosen_input_ids))
+            padding_rejected = max(0, data_args.cutoff_len - len(rejected_input_ids))
             chosen_input_ids = F.pad(chosen_input_ids, (0, padding_chosen), value=tokenizer.pad_token_id)
             rejected_input_ids = F.pad(rejected_input_ids, (0, padding_rejected), value=tokenizer.pad_token_id)
 
