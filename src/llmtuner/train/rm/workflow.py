@@ -3,8 +3,9 @@
 from typing import TYPE_CHECKING, List, Optional
 
 import torch
-from torch.utils.data import Dataset, DataLoader
 import torch.nn as nn
+from torch.utils.data import Dataset, DataLoader
+from torch.nn import functional as F
 import gc
 
 from ...data import get_dataset, split_dataset
@@ -233,10 +234,15 @@ def run_oracle_rm(
             chosen_rewards = v_head(last_hidden_state_chosen)
             rejected_rewards = v_head(last_hidden_state_rejected) 
             
-            # Split the inputs and rewards into two parts, chosen and rejected
+
             chosen_input_ids, rejected_input_ids = chosen_ids, rejected_ids
-            # chosen_rewards, rejected_rewards = values[:batch_size], values[batch_size:]
-            # chosen_scores, rejected_scores = [], []
+
+            # Pad chosen_input_ids_tensor
+            padding_chosen = max(0, data_args.cutoff_len - len(chosen_input_ids))
+            padding_rejected = max(0, data_args.cutoff_len - len(chosen_input_ids))
+            chosen_input_ids = F.pad(chosen_input_ids, (0, padding_chosen), value=tokenizer.pad_token_id)
+            rejected_input_ids = F.pad(rejected_input_ids, (0, padding_rejected), value=tokenizer.pad_token_id)
+
 
             # Loss
             loss = 0
