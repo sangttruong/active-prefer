@@ -217,38 +217,31 @@ def run_oracle_rm(
     v_head, optimizer, train_dataset = accelerator.prepare(v_head, optimizer, train_dataset)
 
     v_head.train()
-    for epoch in range(2):
+
+    for epoch in range(10):
+        epoch_loss = 0.0  # Initialize epoch loss
+        
         for example in train_dataset:
-            # question_id = example['question_id']
             last_hidden_state_chosen = example['last_hidden_state_chosen'].to(device)
             last_hidden_state_rejected = example['last_hidden_state_rejected'].to(device)
-            # chosen_ids = example['chosen_ids']
-            # rejected_ids = example['rejected_ids']
-
-            # Concate chosen + rejected
-            # inputs = torch.concat([last_hidden_state_chosen, last_hidden_state_rejected], 0).to(device)
 
             optimizer.zero_grad()
 
-            # Forward
             chosen_rewards = v_head(last_hidden_state_chosen)
             rejected_rewards = v_head(last_hidden_state_rejected) 
-             
-            # Loss
-            loss = 0
-            loss += -torch.nn.functional.logsigmoid(chosen_rewards - rejected_rewards).mean()
 
-            # Backward
-            accelerator.backward(loss)
+            loss = -torch.nn.functional.logsigmoid(chosen_rewards - rejected_rewards).mean()
 
+            loss.backward()
             optimizer.step()
 
+            epoch_loss += loss.item()  # Accumulate the loss
+            
         # Update the learning rate after each epoch
         scheduler.step()
 
-        print(f"Epoch {epoch+1}, Learning Rate: {scheduler.get_last_lr()}")
-
-
+        print(f"Epoch {epoch+1}, Loss: {epoch_loss / len(train_dataset)}, Learning Rate: {scheduler.get_last_lr()}")
+    
     ##########################
     del trainer, base_model, v_head
     gc.collect()
