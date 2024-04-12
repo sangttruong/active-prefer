@@ -205,10 +205,10 @@ def run_oracle_rm(
     # Model
     indentity_mode = AutoModelForCausalLMWithValueHead
     v_head = ValueHead(base_model.config).to(device) 
-    optimizer = torch.optim.AdamW(v_head.parameters())
-    # optimizer = trainer.optimizer(v_head.parameters())
+    # optimizer = torch.optim.AdamW(v_head.parameters())
+    optimizer = trainer.create_optimizer()(v_head.parameters())
     # scheduler = trainer.create_scheduler()(optimizer, step_size=1, gamma=0.9)
-
+    breakpoint()
     # Dataloader
     train_dataset = CustomDataset(last_hidden_states, dataset)  # CustomDataset represents your dataset class
     v_head, optimizer, train_dataset = accelerator.prepare(v_head, optimizer, train_dataset)
@@ -228,7 +228,6 @@ def run_oracle_rm(
             optimizer.zero_grad()
 
             # Forward
-            breakpoint()
             chosen_rewards = v_head(last_hidden_state_chosen)
             rejected_rewards = v_head(last_hidden_state_rejected) 
              
