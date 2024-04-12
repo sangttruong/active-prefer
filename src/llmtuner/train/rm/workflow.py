@@ -243,7 +243,7 @@ def run_oracle_rm(
         # Update the learning rate after each epoch
         scheduler.step()
 
-        print(f"Epoch {epoch+1}, Loss: {epoch_loss / len(train_dataset)}, Learning Rate: {scheduler.get_last_lr()}")
+        print(f"Epoch {epoch+1}, Loss: {loss}, Avg-Loss: {epoch_loss / len(train_dataset)}, Learning Rate: {scheduler.get_last_lr()}")
     
     ##########################
     del trainer, base_model, v_head
