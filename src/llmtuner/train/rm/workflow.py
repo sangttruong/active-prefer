@@ -201,9 +201,9 @@ def run_oracle_rm(
 
     # Model
     v_head = ValueHead(base_model.config).to(device) # v_head = ValueHead(self.pretrained_model.config, **v_head_kwargs)
-    # optimizer = torch.optim.Adam(v_head.parameters())
-    optimizer = trainer.optimizer(v_head.parameters())
-    scheduler = trainer.create_scheduler()(optimizer, step_size=1, gamma=0.9)
+    optimizer = torch.optim.Adam(v_head.parameters())
+    # optimizer = trainer.optimizer(v_head.parameters())
+    # scheduler = trainer.create_scheduler()(optimizer, step_size=1, gamma=0.9)
 
     # Dataloader
     batch_size = 2
@@ -257,9 +257,9 @@ def run_oracle_rm(
             optimizer.step()
 
         # Update the learning rate after each epoch
-        scheduler.step()
+        # scheduler.step()
 
-        print(f"Epoch {epoch+1}, Learning Rate: {scheduler.get_last_lr()}")
+        # print(f"Epoch {epoch+1}, Learning Rate: {scheduler.get_last_lr()}")
 
 
     ##########################
