@@ -219,8 +219,8 @@ def run_oracle_rm(
     for epoch in range(2):
         for example in train_dataset:
             question_id = example['question_id']
-            last_hidden_state_chosen = example['last_hidden_state_chosen']
-            last_hidden_state_rejected = example['last_hidden_state_rejected']
+            last_hidden_state_chosen = example['last_hidden_state_chosen'].to(device)
+            last_hidden_state_rejected = example['last_hidden_state_rejected'].to(device)
             chosen_ids = example['chosen_ids']
             rejected_ids = example['rejected_ids']
 
