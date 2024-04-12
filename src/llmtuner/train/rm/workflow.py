@@ -202,7 +202,7 @@ def run_oracle_rm(
     # Model
     v_head = ValueHead(base_model.config).to(device) # v_head = ValueHead(self.pretrained_model.config, **v_head_kwargs)
     # optimizer = torch.optim.Adam(v_head.parameters())
-    optimizer = trainer.create_optimizer()(v_head.parameters())
+    optimizer = trainer.optimizer(v_head.parameters())
     scheduler = trainer.create_scheduler()(optimizer, step_size=1, gamma=0.9)
 
     # Dataloader
