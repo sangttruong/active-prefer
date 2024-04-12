@@ -148,8 +148,8 @@ class CustomDataset(Dataset):
         return {"question_id": example['id'], # string 
                 "last_hidden_state_chosen": self.embeddings_feature[2*i], # tensor (1024 x 4096)
                 "last_hidden_state_rejected": self.embeddings_feature[2*i + 1],  # tensor (1024 x 4096)
-                'chosen_ids': example['chosen_ids'], # list ids
-                'rejected_ids': example['rejected_ids'], # list ids
+                'chosen_ids': torch.tensor(example['chosen_ids']), # list ids
+                'rejected_ids': torch.tensor(example['rejected_ids']), # list ids
                 }
   
 def run_oracle_rm(
