@@ -55,6 +55,7 @@ class PairwiseTrainer(Trainer):
         """
         # Compute rewards
         _, _, values = model(**inputs, output_hidden_states=True, return_dict=True)
+        breakpoint()
 
         unwrapped_model: "PreTrainedModel" = self.accelerator.unwrap_model(self.model)
         if getattr(unwrapped_model.config, "model_type", None) == "chatglm":

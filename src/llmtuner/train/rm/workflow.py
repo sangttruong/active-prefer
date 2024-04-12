@@ -224,7 +224,7 @@ def run_oracle_rm(
             rejected_ids = example['rejected_ids']
 
             # Concate chosen + rejected
-            inputs = torch.concat([last_hidden_state_chosen, last_hidden_state_rejected], 0)
+            inputs = torch.concat([last_hidden_state_chosen, last_hidden_state_rejected], 0).to(device)
 
             optimizer.zero_grad()
 
