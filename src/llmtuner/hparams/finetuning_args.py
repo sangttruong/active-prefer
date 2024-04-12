@@ -227,7 +227,7 @@ class FinetuningArguments(FreezeArguments, LoraArguments, RLHFArguments, GaloreA
     )
     only_training_vhead: bool = field(
         default=False,
-        metadata={"help": "Whether or not to save the training loss curves."},
+        metadata={"help": "Freeze all except v_head"},
     )
 
     def __post_init__(self):

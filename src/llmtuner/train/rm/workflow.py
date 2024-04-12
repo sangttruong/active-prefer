@@ -8,6 +8,9 @@ from torch.utils.data import Dataset, DataLoader
 from torch.nn import functional as F
 import gc
 
+import os 
+import numpy as np
+
 from ...data import get_dataset, split_dataset
 from ...extras.callbacks import FixValueHeadModelCallback
 from ...extras.misc import fix_valuehead_checkpoint
@@ -185,43 +188,82 @@ def run_oracle_rm(
         **split_dataset(dataset, data_args, training_args),
     )
 
-    # Prepare data
-    predict_results = trainer.predict(dataset, metric_key_prefix="predict")
-    trainer.log_metrics("predict", predict_results.metrics)
-    trainer.save_metrics("predict", predict_results.metrics)
-    
-    
     ##########################
     # Training
 
     # Save and load
-    np_last_hidden_states = predict_results.predictions
-    last_hidden_states = torch.tensor(np_last_hidden_states)  # Using torch.tensor()
-    train_dataset = CustomDataset(last_hidden_states, dataset)  # CustomDataset represents your dataset class
+    filename = f"{training_args.output_dir}/last_hidden_states.npy"
 
+    # Check if the file exists
+    if not os.path.exists(filename):
+        np_last_hidden_states = np.load(filename)
+    else:
+        predict_results = trainer.predict(dataset, metric_key_prefix="predict")
+        np_last_hidden_states = predict_results.predictions
+
+        # Save the array into a file
+        np.save(filename, np_last_hidden_states)
+        print(f"Array saved to {filename}")
+    
+    # Training Oracle model
+    last_hidden_states = torch.tensor(np_last_hidden_states)  # Using torch.tensor()
+
+    train_dataset = CustomDataset(last_hidden_states, dataset)  # Only need change train_dataset for diff oracle model
+    optimizer_params = trainer.create_optimizer().param_groups[0]
+    base_model_config = base_model.config
+    create_scheduler = trainer.create_scheduler
+    cutoff_len = data_args.cutoff_len
+    pad_token_id = tokenizer.pad_token_id
+
+    train_oracle_model(
+        train_dataset, 
+        cutoff_len, 
+        pad_token_id, 
+        base_model_config, 
+        optimizer_params, 
+        create_scheduler, 
+        data_args.num_train_epochs, 
+        seed,
+    )
+    
+    ##########################
+    del trainer, base_model, v_head
+    gc.collect()
+    torch.cuda.empty_cache()
+
+
+
+def train_oracle_model(
+        train_dataset, 
+        cutoff_len, 
+        pad_token_id, 
+        base_model_config, 
+        optimizer_params, 
+        create_scheduler, 
+        num_epochs, 
+        device, 
+        seed,
+    ):
     # Model
     accelerator = Accelerator()
     device = accelerator.device
     
     # Model
-    v_head = ValueHead(base_model.config).to(device) 
+    v_head = ValueHead(base_model_config).to(device) 
     
-    # optimizer = torch.optim.AdamW(v_head.parameters(), lr = )
-    optimizer_params = trainer.create_optimizer().param_groups[0]
     optimizer_params.pop('params', None)     
     optimizer = torch.optim.AdamW(v_head.parameters(), **optimizer_params)
     
-    num_epochs = 10
     num_training_steps_per_epoch = len(train_dataset)  # Assuming train_dataset is your training dataset
     num_training_steps = num_epochs * num_training_steps_per_epoch
-    scheduler = trainer.create_scheduler(num_training_steps, optimizer = optimizer)
+    scheduler = create_scheduler(num_training_steps, optimizer = optimizer)
 
 
     v_head, optimizer, train_dataset = accelerator.prepare(v_head, optimizer, train_dataset)
 
     v_head.train()
 
-    for epoch in range(10):
+    for epoch in range(num_epochs):
         epoch_loss = 0.0  # Initialize epoch loss
         
         for example in train_dataset:
@@ -235,14 +277,14 @@ def run_oracle_rm(
             rejected_rewards = v_head(last_hidden_state_rejected) # [1024, 1]
 
             # Calculate loss
-            padding_chosen = max(0, data_args.cutoff_len - len(chosen_input_ids))
-            padding_rejected = max(0, data_args.cutoff_len - len(rejected_input_ids))
-            chosen_input_ids = F.pad(chosen_input_ids, (0, padding_chosen), value=tokenizer.pad_token_id)
-            rejected_input_ids = F.pad(rejected_input_ids, (0, padding_rejected), value=tokenizer.pad_token_id)
+            padding_chosen = max(0, cutoff_len - len(chosen_input_ids))
+            padding_rejected = max(0, cutoff_len - len(rejected_input_ids))
+            chosen_input_ids = F.pad(chosen_input_ids, (0, padding_chosen), value = pad_token_id)
+            rejected_input_ids = F.pad(rejected_input_ids, (0, padding_rejected), value = pad_token_id)
 
 
-            chosen_length = (chosen_input_ids !=tokenizer.pad_token_id).nonzero()[-1] + 1
-            rejected_length = (rejected_input_ids != tokenizer.pad_token_id).nonzero()[-1] + 1
+            chosen_length = (chosen_input_ids != pad_token_id).nonzero()[-1] + 1
+            rejected_length = (rejected_input_ids != pad_token_id).nonzero()[-1] + 1
             check_divergence = (chosen_input_ids != rejected_input_ids).nonzero()
 
             if len(check_divergence) == 0:
@@ -266,7 +308,3 @@ def run_oracle_rm(
 
         print(f"Epoch {epoch+1}, Loss: {loss}, Avg-Loss: {epoch_loss / len(train_dataset)}, Learning Rate: {scheduler.get_last_lr()}")
     
-    ##########################
-    del trainer, base_model, v_head
-    gc.collect()
-    torch.cuda.empty_cache()
