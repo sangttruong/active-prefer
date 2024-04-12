@@ -197,11 +197,12 @@ def run_oracle_rm(
     # Save and load
     np_last_hidden_states = predict_results.predictions[:, -1, :]
     last_hidden_states = torch.tensor(np_last_hidden_states)  # Using torch.tensor()
+    train_dataset = CustomDataset(last_hidden_states, dataset)  # CustomDataset represents your dataset class
 
     # Model
     accelerator = Accelerator()
     device = accelerator.device
-
+    
     # Model
     v_head = ValueHead(base_model.config).to(device) 
     
@@ -210,10 +211,12 @@ def run_oracle_rm(
     optimizer_params.pop('params', None)     
     optimizer = torch.optim.AdamW(v_head.parameters(), **optimizer_params)
     
-    scheduler = trainer.create_scheduler(optimizer = optimizer)
+    num_epochs = 10
+    num_training_steps_per_epoch = len(train_dataset)  # Assuming train_dataset is your training dataset
+    num_training_steps = num_epochs * num_training_steps_per_epoch
+    scheduler = trainer.create_scheduler(num_training_steps, optimizer = optimizer)
 
-    # Dataloader
-    train_dataset = CustomDataset(last_hidden_states, dataset)  # CustomDataset represents your dataset class
+
     v_head, optimizer, train_dataset = accelerator.prepare(v_head, optimizer, train_dataset)
 
     v_head.train()
