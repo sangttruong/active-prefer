@@ -78,7 +78,7 @@ def load_model(
             "dtype": model_args.compute_dtype,
             "load_in_4bit": model_args.quantization_bit == 4,
             "token": model_args.hf_hub_token,
-            # "device_map": {"": get_current_device()},
+            "device_map": {"": get_current_device()},
             "rope_scaling": getattr(config, "rope_scaling", None),
         }
         try:
@@ -92,9 +92,9 @@ def load_model(
             logger.warning("Unsloth does not support loading adapters.")
 
     if model is None:
-        print("############################################")
-        print(init_kwargs)
-        print(config)
+        # print("############################################")
+        # print(init_kwargs)
+        # print(config)
         model = AutoModelForCausalLM.from_pretrained(model_args.model_name_or_path, config=config, **init_kwargs)
         
     patch_model(model, tokenizer, model_args, is_trainable)
@@ -103,8 +103,6 @@ def load_model(
     model = init_adapter(model, model_args, finetuning_args, is_trainable)
 
     if add_valuehead:
-        
-        
         model: "AutoModelForCausalLMWithValueHead" = AutoModelForCausalLMWithValueHead.from_pretrained(model)
         patch_valuehead_model(model)
 

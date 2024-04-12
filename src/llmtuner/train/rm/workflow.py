@@ -18,6 +18,8 @@ from .metric import compute_accuracy
 from .trainer import PairwiseTrainer, OracleTrainer
 
 from accelerate import Accelerator
+from trl import AutoModelForCausalLMWithValueHead
+
 
 
 if TYPE_CHECKING:
@@ -192,7 +194,7 @@ def run_oracle_rm(
     # Training
 
     # Save and load
-    np_last_hidden_states = predict_results.predictions
+    np_last_hidden_states = predict_results.predictions[:, -1, :]
     last_hidden_states = torch.tensor(np_last_hidden_states)  # Using torch.tensor()
 
     # Model
@@ -200,6 +202,7 @@ def run_oracle_rm(
     device = accelerator.device
 
     # Model
+    indentity_mode = AutoModelForCausalLMWithValueHead
     v_head = ValueHead(base_model.config).to(device) 
     optimizer = torch.optim.Adam(v_head.parameters())
     # optimizer = trainer.optimizer(v_head.parameters())
@@ -208,9 +211,8 @@ def run_oracle_rm(
     # Dataloader
     batch_size = 2
     train_dataset = CustomDataset(last_hidden_states, dataset)  # CustomDataset represents your dataset class
-    data_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
-    v_head, optimizer, data_loader = accelerator.prepare(v_head, optimizer, data_loader)
+    v_head, optimizer, train_dataset = accelerator.prepare(v_head, optimizer, train_dataset)
 
     v_head.train()
 
