@@ -195,7 +195,7 @@ def run_oracle_rm(
     filename = f"{training_args.output_dir}/last_hidden_states.npy"
 
     # Check if the file exists
-    if not os.path.exists(filename):
+    if os.path.isfile(filename):
         np_last_hidden_states = np.load(filename)
     else:
         predict_results = trainer.predict(dataset, metric_key_prefix="predict")
