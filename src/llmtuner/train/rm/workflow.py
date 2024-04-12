@@ -209,7 +209,6 @@ def run_oracle_rm(
     # scheduler = trainer.create_scheduler()(optimizer, step_size=1, gamma=0.9)
 
     # Dataloader
-    batch_size = 2
     train_dataset = CustomDataset(last_hidden_states, dataset)  # CustomDataset represents your dataset class
     v_head, optimizer, train_dataset = accelerator.prepare(v_head, optimizer, train_dataset)
 
@@ -241,25 +240,24 @@ def run_oracle_rm(
 
             # Loss
             loss = 0
-            for i in range(batch_size):
-                chosen_length = (chosen_input_ids[i] != tokenizer.pad_token_id).nonzero()[-1] + 1
-                rejected_length = (rejected_input_ids[i] != tokenizer.pad_token_id).nonzero()[-1] + 1
-                check_divergence = (chosen_input_ids[i] != rejected_input_ids[i]).nonzero()
+            chosen_length = (chosen_input_ids != tokenizer.pad_token_id).nonzero()[-1] + 1
+            rejected_length = (rejected_input_ids != tokenizer.pad_token_id).nonzero()[-1] + 1
+            check_divergence = (chosen_input_ids != rejected_input_ids).nonzero()
 
-                if len(check_divergence) == 0:
-                    end_index = chosen_length
-                    div_index = end_index - 1
-                else:
-                    end_index = max(chosen_length, rejected_length)
-                    div_index = check_divergence[0]
+            if len(check_divergence) == 0:
+                end_index = chosen_length
+                div_index = end_index - 1
+            else:
+                end_index = max(chosen_length, rejected_length)
+                div_index = check_divergence[0]
 
-                assert div_index > 0
-                chosen_trunc_rewards = chosen_rewards[i, div_index:end_index]
-                rejected_trunc_rewards = rejected_rewards[i, div_index:end_index]
-                # if return_outputs:  # use the score on the last token except pad token for inference
-                    # chosen_scores.append(chosen_rewards[i, chosen_length - 1])
-                    # rejected_scores.append(rejected_rewards[i, rejected_length - 1])
-                loss += -torch.nn.functional.logsigmoid(chosen_trunc_rewards - rejected_trunc_rewards).mean()
+            assert div_index > 0
+            chosen_trunc_rewards = chosen_rewards[0, div_index:end_index]
+            rejected_trunc_rewards = rejected_rewards[0, div_index:end_index]
+            # if return_outputs:  # use the score on the last token except pad token for inference
+                # chosen_scores.append(chosen_rewards[i, chosen_length - 1])
+                # rejected_scores.append(rejected_rewards[i, rejected_length - 1])
+            loss += -torch.nn.functional.logsigmoid(chosen_trunc_rewards - rejected_trunc_rewards).mean()
 
             # Backward
             accelerator.backward(loss)
