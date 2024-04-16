@@ -377,6 +377,8 @@ def main(args):
 
         #         print("Updated dataset info has been stored in", args.data_info_path)
         # -----------------------------
+        active_dataset = f"{dataset}_iter_{iter}" # replace dataset by ACTIVE QUERIES
+
         selection_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py\
             --stage selection \
             --active_iter {iter}\
