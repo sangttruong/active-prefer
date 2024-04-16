@@ -386,12 +386,11 @@ def main(args):
             --dataset_dir {args.dataset_dir} \
             --dataset {dataset} \
             --template {args.template} \
-            --finetuning_type freeze \
+            --finetuning_type lora \
             --lora_target {args.lora_target} \
-            --output_dir {dpo_adapter_path} \
+            --output_dir {reward_model_path} \
             --overwrite_output_dir \
             --cutoff_len {args.cutoff_len} \
-            --preprocessing_num_workers 16 \
             --per_device_train_batch_size {args.per_device_train_batch_size} \
             --per_device_eval_batch_size {args.per_device_eval_batch_size} \
             --gradient_accumulation_steps {args.gradient_accumulation_steps} \
