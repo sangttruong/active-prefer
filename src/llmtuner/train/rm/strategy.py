@@ -34,7 +34,7 @@ from ..utils import create_modelcard_and_push
 from .collator import PairwiseDataCollatorWithPadding
 from .metric import compute_accuracy
 from .trainer import PairwiseTrainer, OracleTrainer
-from .workflow import CustomDataset, ValueHead, set_seed
+# from .workflow import CustomDataset, ValueHead, set_seed
 
 from accelerate import Accelerator
 from trl import AutoModelForCausalLMWithValueHead
@@ -44,6 +44,65 @@ if TYPE_CHECKING:
     from transformers import Seq2SeqTrainingArguments, TrainerCallback
 
     from ...hparams import DataArguments, FinetuningArguments, ModelArguments
+
+
+class ValueHead(nn.Module):
+    r"""
+    The ValueHead class implements a head for GPT2 that returns a scalar for each output token.
+    """
+
+    def __init__(self, config, **kwargs):
+        super().__init__()
+        if not hasattr(config, "summary_dropout_prob"):
+            summary_dropout_prob = kwargs.pop("summary_dropout_prob", 0.1)
+        else:
+            summary_dropout_prob = config.summary_dropout_prob
+
+        self.dropout = nn.Dropout(summary_dropout_prob) if summary_dropout_prob else nn.Identity()
+
+        # some models such as OPT have a projection layer before the word embeddings - e.g. OPT-350m
+        if hasattr(config, "word_embed_proj_dim"):
+            hidden_size = config.word_embed_proj_dim
+        else:
+            hidden_size = config.hidden_size
+
+        self.summary = nn.Linear(hidden_size, 1)
+
+        self.flatten = nn.Flatten()
+
+    def forward(self, hidden_states):
+        output = self.dropout(hidden_states)
+
+        # For now force upcast in fp32 if needed. Let's keep the
+        # output in fp32 for numerical stability.
+        if output.dtype != self.summary.weight.dtype:
+            output = output.to(self.summary.weight.dtype)
+
+        output = self.summary(output)
+        return output
+
+class CustomDataset(Dataset):
+    def __init__(self, embeddings_feature, dataset):
+        self.embeddings_feature = embeddings_feature
+        self.dataset = dataset
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, i):
+        example = self.dataset[i]
+        return {"question_id": example['id'], # string 
+                "last_hidden_state_chosen": self.embeddings_feature[2*i], # tensor (1024 x 4096)
+                "last_hidden_state_rejected": self.embeddings_feature[2*i + 1],  # tensor (1024 x 4096)
+                'chosen_ids': torch.tensor(example['chosen_ids']), # list ids
+                'rejected_ids': torch.tensor(example['rejected_ids']), # list ids
+                }
+
+def set_seed(seed):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
 
 class LLMStrategy:
     def __init__(
