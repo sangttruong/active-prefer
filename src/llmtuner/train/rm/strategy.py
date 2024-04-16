@@ -115,7 +115,7 @@ class LLMStrategy:
     ):
         self.tokenizer = load_tokenizer(model_args)
         self.pool_dataset = get_dataset(self.tokenizer, model_args, data_args, training_args, stage="rm")
-        self.base_model = load_model(self.tokenizer, model_args, finetuning_args, training_args.do_train, add_valuehead=True)
+        self.base_model = load_model(self.tokenizer, model_args, finetuning_args, False, add_valuehead=False)
         self.data_collator = PairwiseDataCollatorWithPadding(self.tokenizer, pad_to_multiple_of=8)
         self.callbacks = callbacks
 
