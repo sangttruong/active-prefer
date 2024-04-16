@@ -140,7 +140,8 @@ class LLMStrategy:
             data_collator=self.data_collator,
             # callbacks=callbacks + [FixValueHeadModelCallback()],
             compute_metrics=compute_accuracy,
-            **split_dataset(self.pool_dataset, self.data_args, self.training_args),
+            eval_dataset = self.pool_dataset
+            # **split_dataset(self.pool_dataset, self.data_args, self.training_args),
         )
 
         # Model
