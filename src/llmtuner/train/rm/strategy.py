@@ -144,7 +144,6 @@ class LLMStrategy:
         )
 
         # Model
-        
         self.v_head = ValueHead(self.base_model.config)
 
         if self.data_args.dataset in ['allenai/ai2_arc', 'arc', "arc_challenge_train"]:
@@ -477,7 +476,7 @@ class LLMStrategy:
         accelerator = Accelerator()
         device = accelerator.device
         
-        last_hidden_states = self.get_embedding()
+        last_hidden_states = self.get_embedding(True)
         train_dataset = CustomDataset(last_hidden_states, self.pool_dataset) 
 
         self.v_head.to(device)
@@ -550,12 +549,12 @@ class LLMStrategy:
         # Predict probabilities using dropout but return individual dropout iterations
         pass
     
-    def get_embedding(self):
+    def get_embedding(self, is_override = False):
         # Get embeddings from the penultimate layer of the network
 
         filename = f"{self.training_args.output_dir}/last_hidden_states.npy"
         # Check if the file exists
-        if os.path.isfile(filename):
+        if is_override == False and os.path.isfile(filename):
             np_last_hidden_states = np.load(filename)
             print(f"Loaded array from {filename}")
         else:
@@ -566,7 +565,6 @@ class LLMStrategy:
             np.save(filename, np_last_hidden_states)
             print(f"Array saved to {filename}")
         
-        # Training Oracle model
         last_hidden_states = torch.tensor(np_last_hidden_states)  # Using torch.tensor()
 
         return last_hidden_states
