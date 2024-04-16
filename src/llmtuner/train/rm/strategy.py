@@ -124,7 +124,6 @@ class LLMStrategy:
         self.model_args = model_args
         self.finetuning_args = finetuning_args
 
-
         # Replace lm_head with identity
         if hasattr(self.base_model, "lm_head"):
             self.base_model.lm_head = torch.nn.Identity()
@@ -148,19 +147,19 @@ class LLMStrategy:
         
         self.v_head = ValueHead(self.base_model.config)
 
-        if self.data_args.dataset in ['allenai/ai2_arc', 'arc']:
+        if self.data_args.dataset in ['allenai/ai2_arc', 'arc', "arc_challenge_train"]:
             self.dataset = 'arc_challenge_train'
-        elif self.data_args.dataset in ['truthful_qa']:
+        elif self.data_args.dataset in ['truthful_qa', "truthful_qa_train"]:
             self.dataset = 'truthful_qa_train'
-        elif self.data_args.dataset in ['Rowan/hellaswag', 'hellaswag']:
+        elif self.data_args.dataset in ['Rowan/hellaswag', 'hellaswag', "hellaswag_train"]:
             self.dataset = 'hellaswag_train'
-        elif self.data_args.dataset in ['winogrande']:
+        elif self.data_args.dataset in ['winogrande', "winogrande_train"]:
             self.dataset = 'winogrande_train'
-        elif self.data_args.dataset in ['cais/mmlu', "mmlu"]:
+        elif self.data_args.dataset in ['cais/mmlu', "mmlu", "mmlu_train"]:
             self.dataset = 'mmlu_train'
-        elif self.data_args.dataset in ['Anthropic/hh-rlhf', "hh-rlhf"]:
+        elif self.data_args.dataset in ['Anthropic/hh-rlhf', "hh-rlhf", "hh_rlhf_train"]:
             self.dataset = 'hh_rlhf_train'
-        elif self.data_args.dataset in ['allenai/reward-bench', "reward-bench", "reward_bench"]:
+        elif self.data_args.dataset in ['allenai/reward-bench', "reward-bench", "reward_bench", "reward_bench_train"]:
             self.dataset = 'reward_bench_train'
         else:
             raise(f"Does not support {self.data_args.dataset} dataset yet")

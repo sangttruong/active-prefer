@@ -341,7 +341,7 @@ def main(args):
                 --fp16
                 """
 
-        run_cli_command(inference_command)
+        # run_cli_command(inference_command)
 
         ##########################################################
         #### SELECTION
