@@ -115,7 +115,7 @@ class LLMStrategy:
     ):
         self.tokenizer = load_tokenizer(model_args)
         self.pool_dataset = get_dataset(self.tokenizer, model_args, data_args, training_args, stage="rm")
-        self.base_model = load_model(self.tokenizer, model_args, finetuning_args, False, add_valuehead=True)
+        self.base_model = load_model(self.tokenizer, model_args, finetuning_args, False, add_valuehead=False)
         self.data_collator = PairwiseDataCollatorWithPadding(self.tokenizer, pad_to_multiple_of=8)
         self.callbacks = callbacks
 
@@ -127,9 +127,7 @@ class LLMStrategy:
         # Replace lm_head with identity
         if hasattr(self.base_model, "lm_head"):
             self.base_model.lm_head = torch.nn.Identity()
-        if hasattr(self.base_model, "v_head"):
-            self.base_model.v_head.summary = torch.nn.Identity()
-
+    
         # Update arguments
         training_args.remove_unused_columns = False  # important for pairwise dataset
 
@@ -143,7 +141,7 @@ class LLMStrategy:
             # callbacks=callbacks + [FixValueHeadModelCallback()],
             compute_metrics=compute_accuracy,
             eval_dataset = self.pool_dataset
-            # **split_dataset(self.pool_dataset, self.data_args, self.training_args),
+            **split_dataset(self.pool_dataset, self.data_args, self.training_args),
         )
 
         # Model
@@ -560,7 +558,7 @@ class LLMStrategy:
             np_last_hidden_states = np.load(filename)
             print(f"Loaded array from {filename}")
         else:
-            predict_results = self.trainer.predict(self.pool_dataset, metric_key_prefix="predict")
+            predict_results = self.trainer.predict(self.pool_dataset, metric_key_prefix="test")
             np_last_hidden_states = predict_results.predictions
             breakpoint()
             # Save the array into a file
