@@ -34,7 +34,7 @@ from ..utils import create_modelcard_and_push
 from .collator import PairwiseDataCollatorWithPadding
 from .metric import compute_accuracy
 from .trainer import PairwiseTrainer, OracleTrainer
-from workflow import CustomDataset, ValueHead, set_seed, train_oracle_model
+from .workflow import *
 
 from accelerate import Accelerator
 from trl import AutoModelForCausalLMWithValueHead

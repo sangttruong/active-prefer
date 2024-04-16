@@ -411,7 +411,7 @@ def main(args):
         ##########################################################
         print(f"Train DPO .................................")
 
-        active_dataset = new_data_info # replace dataset by ACTIVE QUERIES
+        active_dataset = f"{dataset}_iter_{iter}" # replace dataset by ACTIVE QUERIES
         
         if args.use_accelerate: 
             dpo_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port}\
@@ -482,7 +482,7 @@ def main(args):
         #### Train Reward
         ##########################################################    
         print("Train Reward ..................................")
-        active_dataset = new_data_info # replace dataset by ACTIVE QUERIES
+        # active_dataset = new_data_info # replace dataset by ACTIVE QUERIES
 
         if args.use_accelerate:
             rm_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port} \
