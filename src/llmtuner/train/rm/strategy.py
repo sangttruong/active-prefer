@@ -486,7 +486,6 @@ class LLMStrategy:
             for idx in range(len(train_dataset)):
                 example = train_dataset[idx]
 
-                breakpoint()
                 last_hidden_state_chosen = example['last_hidden_state_chosen'][-1].to(device)
                 last_hidden_state_rejected = example['last_hidden_state_rejected'][-1].to(device)
 
