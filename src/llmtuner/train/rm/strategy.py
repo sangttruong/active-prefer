@@ -138,7 +138,7 @@ class LLMStrategy:
             finetuning_args=self.finetuning_args,
             tokenizer=self.tokenizer,
             data_collator=self.data_collator,
-            callbacks=callbacks + [FixValueHeadModelCallback()],
+            # callbacks=callbacks + [FixValueHeadModelCallback()],
             compute_metrics=compute_accuracy,
             **split_dataset(self.pool_dataset, self.data_args, self.training_args),
         )
