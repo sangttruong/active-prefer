@@ -377,14 +377,14 @@ def main(args):
 
         #         print("Updated dataset info has been stored in", args.data_info_path)
         # -----------------------------
-        active_dataset = f"{dataset}_iter_{iter}" # replace dataset by ACTIVE QUERIES
+        # active_dataset = f"{dataset}_iter_{iter}" # replace dataset by ACTIVE QUERIES
 
         selection_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py\
             --stage selection \
             --active_iter {iter}\
             --model_name_or_path {args.model_name_or_path} \
             --dataset_dir {args.dataset_dir} \
-            --dataset {active_dataset} \
+            --dataset {dataset} \
             --template {args.template} \
             --finetuning_type freeze \
             --lora_target {args.lora_target} \
