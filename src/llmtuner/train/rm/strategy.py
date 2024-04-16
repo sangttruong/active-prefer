@@ -559,7 +559,7 @@ class LLMStrategy:
         else:
             predict_results = self.trainer.predict(self.pool_dataset, metric_key_prefix="predict")
             np_last_hidden_states = predict_results.predictions
-
+            breakpoint()
             # Save the array into a file
             np.save(filename, np_last_hidden_states)
             print(f"Array saved to {filename}")
