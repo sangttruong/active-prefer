@@ -480,6 +480,7 @@ class LLMStrategy:
         last_hidden_states = self.get_embedding()
         train_dataset = CustomDataset(last_hidden_states, self.pool_dataset) 
 
+        self.v_head.to(device)
         self.v_head.eval()
         predictions = []
         with torch.no_grad():
