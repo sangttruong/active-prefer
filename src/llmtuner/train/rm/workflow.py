@@ -33,6 +33,8 @@ if TYPE_CHECKING:
     from ...hparams import DataArguments, FinetuningArguments, ModelArguments
 
 
+from .entropy_sampling import EntropySampling
+
 def run_rm(
     model_args: "ModelArguments",
     data_args: "DataArguments",
@@ -138,7 +140,6 @@ class ValueHead(nn.Module):
 
         output = self.summary(output)
         return output
-
 
 class CustomDataset(Dataset):
     def __init__(self, embeddings_feature, dataset):
@@ -319,4 +320,17 @@ def train_oracle_model(
         scheduler.step()
 
         print(f"Epoch {epoch+1}, Loss: {epoch_loss / len(train_dataset)}, Learning Rate: {scheduler.get_last_lr()}")
+
+def run_selection(
+    model_args: "ModelArguments",
+    data_args: "DataArguments",
+    training_args: "Seq2SeqTrainingArguments",
+    finetuning_args: "FinetuningArguments",
+    callbacks: Optional[List["TrainerCallback"]] = None,
+):
+    
+    if finetuning_args.acquisition == 'max_entropy':
+        straytegy = EntropySampling(model_args, data_args, training_args,  finetuning_args, callbacks)
+    
+    straytegy.query(n = 100, iteration = finetuning_args.active_iter)
     

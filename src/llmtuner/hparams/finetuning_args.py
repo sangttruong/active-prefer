@@ -209,7 +209,7 @@ class FinetuningArguments(FreezeArguments, LoraArguments, RLHFArguments, GaloreA
         default=False,
         metadata={"help": "Whether or not to train model in purely bf16 precision (without AMP)."},
     )
-    stage: Literal["pt", "sft", "rm", "ppo", "dpo", "oracle"] = field(
+    stage: Literal["pt", "sft", "rm", "ppo", "dpo", "oracle", "selection"] = field(
         default="sft",
         metadata={"help": "Which stage will be performed in training."},
     )
@@ -228,6 +228,21 @@ class FinetuningArguments(FreezeArguments, LoraArguments, RLHFArguments, GaloreA
     only_training_vhead: bool = field(
         default=False,
         metadata={"help": "Freeze all except v_head"},
+    )
+    
+    only_training_vhead: bool = field(
+        default=False,
+        metadata={"help": "Freeze all except v_head"},
+    )
+    
+    acquisition: Literal["random", "max_entropy", "least_confident"] = field(
+        default="max_entropy",
+        metadata={"help": "Acquisition functions"},
+    )
+
+    active_iter: int = field(
+        default=0,
+        metadata={"help": "Iteration ith"},
     )
 
     def __post_init__(self):

@@ -108,7 +108,6 @@ def delete_selected_info(data_info_path, pattern="iter"):
 
     print("New data info with selected entries removed has been saved.")
 
-
 def add_new_dataset_info(dataset_info_path, name, path):
     # Read data from dataset_info.json
     with open(dataset_info_path, 'r') as file:
@@ -121,7 +120,6 @@ def add_new_dataset_info(dataset_info_path, name, path):
     # Save new data info
     with open(dataset_info_path, 'w') as outfile:
         json.dump(data, outfile, indent=4)
-
 
 def delete_item_dataset_info(dataset_info_path, name):
     # Read data from dataset_info.json
@@ -136,7 +134,6 @@ def delete_item_dataset_info(dataset_info_path, name):
     with open(dataset_info_path, 'w') as outfile:
         json.dump(data, outfile, indent=4)
 
-
 def jsonl_to_json(jsonl_file_path, output_json_file_path):
     # Read JSONL file
     with open(jsonl_file_path, 'r') as jsonl_file:
@@ -149,9 +146,6 @@ def jsonl_to_json(jsonl_file_path, output_json_file_path):
     with open(output_json_file_path, 'w') as json_file:
         json.dump(json_data, json_file, indent=4)
 
-
-
-
 def count_len_dataset(prediction_path):
     with open(prediction_path, 'r') as f:
         data = json.load(f)
@@ -161,7 +155,6 @@ def count_len_dataset(prediction_path):
 def run_cli_command(command):
     # Run the command
     os.system(command)
-
 
 def sigmoid(x):
     return 1 / (1 + math.exp(-x))
@@ -199,8 +192,6 @@ def save_eval_metric(file_path, accuracy, iteration):
     with open(file_path, 'w') as file:
         json.dump(json_data, file)
    
-
-
 def main(args):
     # Prepare dataset
 
@@ -273,7 +264,6 @@ def main(args):
     #     --val_size 0.8 \
     #     --ddp_timeout 1800000 \
     #     --plot_loss \
-    #     --quantization_bit {args.quantization_bit}\
     #     --only_training_vhead False
     #     """
     
@@ -311,7 +301,7 @@ def main(args):
         """
     
     print(f"Training Oracle model ............................")
-    run_cli_command(ft_oracle_command)
+    # run_cli_command(ft_oracle_command)
 
     # active pipeline     
     for iter in range(args.num_iters):
@@ -332,7 +322,6 @@ def main(args):
                 --template {args.template} \
                 --output_dir {reward_model_path} \
                 --per_device_eval_batch_size {batch_size_for_inference} \
-                --quantization_bit {args.quantization_bit} \
                 --fp16
                 """
         else:
@@ -349,49 +338,76 @@ def main(args):
                 --template {args.template} \
                 --output_dir {reward_model_path} \
                 --per_device_eval_batch_size {batch_size_for_inference} \
-                --quantization_bit {args.quantization_bit} \
                 --fp16
                 """
 
         run_cli_command(inference_command)
 
-        
         ##########################################################
-        #### Selection
+        #### SELECTION
         ##########################################################
         print(f"Selection ........................")
 
-        prediction_path = f"{reward_model_path}/generated_predictions.jsonl"
-        data_path = f"{args.dataset_dir}/{dataset}.json"
-        output_file = f"{args.dataset_dir}/selected_entries.json"  # Name of the output file
+        # prediction_path = f"{reward_model_path}/generated_predictions.jsonl"
+        # data_path = f"{args.dataset_dir}/{dataset}.json"
+        # output_file = f"{args.dataset_dir}/selected_entries.json"  
 
-        if num_sample_select == -1:
-            num_sample_select = int(count_len_dataset(data_path) * args.percentage)
+        # if num_sample_select == -1:
+        #     num_sample_select = int(count_len_dataset(data_path) * args.percentage)
 
-        # SELECTION METHOD
-        if args.method == "max_entropy":
-            selected_questions = select_by_max_entropy(prediction_path, num_sample_select)  
-        elif args.method == "random":
-            selected_questions = select_by_random(prediction_path, num_sample_select)  
+        # # SELECTION METHOD
+        # if args.method == "max_entropy":
+        #     selected_questions = select_by_max_entropy(prediction_path, num_sample_select)  
+        # elif args.method == "random":
+        #     selected_questions = select_by_random(prediction_path, num_sample_select)
 
-        # Update data training
-        select_entries_by_ids(data_path, selected_questions, output_file)
-        with open(args.data_info_path, 'r') as file:
-            data_info = json.load(file)
+        # # Update data training
+        # select_entries_by_ids(data_path, selected_questions, output_file)
+        # with open(args.data_info_path, 'r') as file:
+        #     data_info = json.load(file)
             
-            if dataset in data_info:
-                # append new info to data_infor and store result in json file
-                new_data_info = f"{dataset}_{model_name}_iter_{iter}"
-                data_info[new_data_info] = copy.deepcopy(data_info[dataset])
-                data_info[new_data_info]["file_name"] = "selected_entries.json"
+        #     if dataset in data_info:
+        #         # append new info to data_infor and store result in json file
+        #         new_data_info = f"{dataset}_{model_name}_iter_{iter}"
+        #         data_info[new_data_info] = copy.deepcopy(data_info[dataset])
+        #         data_info[new_data_info]["file_name"] = "selected_entries.json"
 
-                with open(args.data_info_path, 'w') as outfile:
-                    json.dump(data_info, outfile, indent=4)
+        #         with open(args.data_info_path, 'w') as outfile:
+        #             json.dump(data_info, outfile, indent=4)
 
-                print("Updated dataset info has been stored in", args.data_info_path)
+        #         print("Updated dataset info has been stored in", args.data_info_path)
+        # -----------------------------
+        selection_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py\
+            --stage selection \
+            --active_iter {iter}\
+            --model_name_or_path {args.model_name_or_path} \
+            --dataset_dir {args.dataset_dir} \
+            --dataset {active_dataset} \
+            --template {args.template} \
+            --finetuning_type freeze \
+            --lora_target {args.lora_target} \
+            --output_dir {dpo_adapter_path} \
+            --overwrite_output_dir \
+            --cutoff_len {args.cutoff_len} \
+            --preprocessing_num_workers 16 \
+            --per_device_train_batch_size {args.per_device_train_batch_size} \
+            --per_device_eval_batch_size {args.per_device_eval_batch_size} \
+            --gradient_accumulation_steps {args.gradient_accumulation_steps} \
+            --lr_scheduler_type {args.lr_scheduler_type} \
+            --logging_steps {args.logging_steps} \
+            --warmup_steps {args.warmup_steps} \
+            --save_steps {args.save_steps} \
+            --eval_steps {args.eval_steps} \
+            --evaluation_strategy {args.evaluation_strategy} \
+            --learning_rate {args.learning_rate} \
+            --num_train_epochs {args.num_train_epochs} 
+
+        """
+
+        run_cli_command(selection_command) 
 
         ##########################################################
-        #### Train DPO
+        #### TRAIN DPO
         ##########################################################
         print(f"Train DPO .................................")
 
@@ -427,8 +443,7 @@ def main(args):
                 --max_samples {args.max_samples} \
                 --val_size {args.val_size} \
                 --plot_loss \
-                --dpo_ftx 1.0\
-                --quantization_bit {args.quantization_bit}
+                --dpo_ftx 1.0
                 """
         else:
             dpo_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py\
@@ -459,9 +474,8 @@ def main(args):
                 --max_samples {args.max_samples} \
                 --val_size {args.val_size} \
                 --plot_loss \
-                --dpo_ftx 1.0\
-                --quantization_bit {args.quantization_bit}
-                """
+                --dpo_ftx 1.0
+            """
 
         run_cli_command(dpo_ft_command) 
         ##########################################################
@@ -592,7 +606,6 @@ def main(args):
                 --template {args.template} \
                 --output_dir {oracle_adapter_path} \
                 --per_device_eval_batch_size {batch_size_for_inference} \
-                --quantization_bit {args.quantization_bit} \
                 --fp16
                 """
         
