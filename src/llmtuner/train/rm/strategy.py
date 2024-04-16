@@ -128,7 +128,7 @@ class LLMStrategy:
         if hasattr(self.base_model, "lm_head"):
             self.base_model.lm_head = torch.nn.Identity()
         if hasattr(self.base_model, "v_head"):
-            self.base_model.v_head = torch.nn.Identity()
+            self.base_model.v_head.summary = torch.nn.Identity()
 
         # Update arguments
         training_args.remove_unused_columns = False  # important for pairwise dataset
