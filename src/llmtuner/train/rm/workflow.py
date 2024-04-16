@@ -95,6 +95,7 @@ def run_rm(
         trainer.save_metrics("predict", predict_results.metrics)
         
         # get id question
+        breakpoint()
         question_id = dataset['id']
         trainer.save_predictions(predict_results, question_id)
 
