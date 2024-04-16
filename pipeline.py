@@ -341,7 +341,7 @@ def main(args):
                 --fp16
                 """
 
-        run_cli_command(inference_command)
+        # run_cli_command(inference_command)
 
         ##########################################################
         #### SELECTION
@@ -381,6 +381,7 @@ def main(args):
 # --lora_target {args.lora_target} \
         selection_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py\
             --stage selection \
+            --do_predict \
             --active_iter {iter}\
             --model_name_or_path {args.model_name_or_path} \
             --dataset_dir {args.dataset_dir} \
