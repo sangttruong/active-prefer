@@ -146,8 +146,7 @@ class LLMStrategy:
 
         # Model
         
-        self.v_head = ValueHead(self.base_model.config).to(self.device) 
-
+        self.v_head = ValueHead(self.base_model.config)
 
         if self.data_args.dataset in ['allenai/ai2_arc', 'arc']:
             self.dataset = 'arc_challenge_train'
