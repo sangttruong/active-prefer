@@ -169,6 +169,7 @@ def run_oracle_rm(
     base_model = load_model(tokenizer, model_args, finetuning_args, is_trainable=False, add_valuehead=False)
     data_collator = PairwiseDataCollatorWithPadding(tokenizer, pad_to_multiple_of=8)
 
+    breakpoint()
     nearest_multiple = round(len(dataset) / 8) * 8
     dataset = dataset.select(list(range(nearest_multiple)))
 
@@ -215,6 +216,8 @@ def run_oracle_rm(
     # Training Oracle model
     last_hidden_states = torch.tensor(np_last_hidden_states)  # Using torch.tensor()
     train_dataset = CustomDataset(last_hidden_states, dataset)  # Only need change train_dataset for diff oracle model
+
+    
     
     optimizer_params = trainer.create_optimizer().param_groups[0]
     base_model_config = base_model.config
