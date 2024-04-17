@@ -410,7 +410,8 @@ def main(args):
                 --val_size {args.val_size} \
                 --plot_loss \
                 --dpo_ftx 1.0 \
-                --report_to none
+                --report_to none \
+                --fp16
                 """
         else:
             dpo_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py\
@@ -486,7 +487,7 @@ def main(args):
                 --ddp_timeout 1800000 \
                 --plot_loss \
                 --only_training_vhead True \
-                --report_to none\
+                --report_to none \
                 --fp16
                 """
         else:
@@ -553,6 +554,7 @@ def main(args):
                 --preprocessing_num_workers 16 \
                 --per_device_eval_batch_size {args.per_device_eval_batch_size} \
                 --predict_with_generate \
+                --report_to none \
                 --fp16
             """
         else:
