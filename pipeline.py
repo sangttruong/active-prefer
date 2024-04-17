@@ -274,43 +274,6 @@ def main(args):
     for iter in range(args.num_iters):
         print(f"######### ITERARION: {iter} ############")
         ##########################################################
-        #### Inference
-        ##########################################################
-        print(f"Inference ..............")
-        
-        batch_size_for_inference = 4
-        if iter == 0:
-            inference_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
-                --stage rm \
-                --do_predict \
-                --model_name_or_path {args.model_name_or_path} \
-                --dataset_dir {args.dataset_dir} \
-                --dataset {dataset} \
-                --template {args.template} \
-                --output_dir {reward_model_path} \
-                --per_device_eval_batch_size {batch_size_for_inference} \
-                --fp16
-                """
-        else:
-            inference_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
-                --stage rm \
-                --do_predict \
-                --do_eval \
-                --model_name_or_path {args.model_name_or_path} \
-                --adapter_name_or_path {reward_model_path}\
-                --finetuning_type {args.finetuning_type} \
-                --lora_target {args.lora_target} \
-                --dataset_dir {args.dataset_dir} \
-                --dataset {dataset} \
-                --template {args.template} \
-                --output_dir {reward_model_path} \
-                --per_device_eval_batch_size {batch_size_for_inference} \
-                --fp16
-                """
-
-        # run_cli_command(inference_command)
-
-        ##########################################################
         #### SELECTION
         ##########################################################
         print(f"Selection ........................")
@@ -462,7 +425,6 @@ def main(args):
                 --finetuning_type {args.finetuning_type} \
                 --lora_target {args.lora_target} \
                 --output_dir {eval_dpo_ft_output_path} \
-                --overwrite_output_dir \
                 --cutoff_len {args.cutoff_len} \
                 --per_device_train_batch_size {args.per_device_train_batch_size} \
                 --per_device_eval_batch_size {args.per_device_eval_batch_size} \
@@ -494,9 +456,7 @@ def main(args):
                 --finetuning_type {args.finetuning_type} \
                 --lora_target {args.lora_target} \
                 --output_dir {eval_dpo_ft_output_path} \
-                --overwrite_output_dir \
                 --cutoff_len {args.cutoff_len} \
-                --preprocessing_num_workers 16 \
                 --per_device_train_batch_size {args.per_device_train_batch_size} \
                 --per_device_eval_batch_size {args.per_device_eval_batch_size} \
                 --gradient_accumulation_steps {args.gradient_accumulation_steps} \
@@ -516,6 +476,7 @@ def main(args):
 
         run_cli_command(eval_dpo_ft_command)
 
+        breakpoint()
         ##########################################################
         #### Train Reward
         ##########################################################    
@@ -744,7 +705,7 @@ def main(args):
                 --dataset {dataset_name_generated} \
                 --template {args.template} \
                 --output_dir {oracle_adapter_path} \
-                --per_device_eval_batch_size {batch_size_for_inference} \
+                --per_device_eval_batch_size {args.per_device_eval_batch_size} \
                 --fp16
                 """
         else:
@@ -760,7 +721,7 @@ def main(args):
                 --dataset {dataset_name_generated} \
                 --template {args.template} \
                 --output_dir {oracle_adapter_path} \
-                --per_device_eval_batch_size {batch_size_for_inference} \
+                --per_device_eval_batch_size {args.per_device_eval_batch_size} \
                 --fp16
                 """
             
