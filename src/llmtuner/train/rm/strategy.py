@@ -590,7 +590,7 @@ class LLMStrategy:
             
             if self.dataset in data_info:
                 # append new info to data_infor and store result in json file
-                new_data_info = f"{self.dataset}__iter_{iteration}"
+                new_data_info = f"{self.dataset}_iter_{iteration}"
                 data_info[new_data_info] = copy.deepcopy(data_info[self.dataset])
                 data_info[new_data_info]["file_name"] = "selected_entries.json"
 

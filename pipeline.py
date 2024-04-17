@@ -627,7 +627,7 @@ def parse_arguments():
     parser.add_argument("--method", type=str, default="max_entropy", help="Selection method")
     parser.add_argument("--dataset", type=str, default="arc_sample", help="Dataset name")
     parser.add_argument("--gpu_ids", type=str, default="0,1", help="")
-    parser.add_argument("--main_process_port", type=int, default=29500, help="Port")
+    parser.add_argument("--main_process_port", type=int, default=29505, help="Port")
     return parser.parse_args()
 
 if __name__ == "__main__":
