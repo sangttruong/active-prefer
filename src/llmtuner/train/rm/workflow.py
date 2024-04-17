@@ -192,7 +192,9 @@ def run_oracle_rm(
     # Training
 
     # Save and load
-    filename = f"{training_args.output_dir}/last_hidden_states.npy"
+    model_name = model_args.model_name_or_path.split('/')[-1]
+    dataset_name = data_args.dataset
+    filename = f"{training_args.output_dir}/{model_name}/{dataset_name}/last_hidden_states.npy"
 
     # Check if the file exists
     if os.path.isfile(filename):
