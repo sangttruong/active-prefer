@@ -395,7 +395,6 @@ def main(args):
                 --output_dir {dpo_adapter_path} \
                 --overwrite_output_dir \
                 --cutoff_len {args.cutoff_len} \
-                --preprocessing_num_workers 16 \
                 --per_device_train_batch_size {args.per_device_train_batch_size} \
                 --per_device_eval_batch_size {args.per_device_eval_batch_size} \
                 --gradient_accumulation_steps {args.gradient_accumulation_steps} \
@@ -410,7 +409,8 @@ def main(args):
                 --max_samples {args.max_samples} \
                 --val_size {args.val_size} \
                 --plot_loss \
-                --dpo_ftx 1.0
+                --dpo_ftx 1.0 \
+                --report_to none
                 """
         else:
             dpo_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py\
@@ -485,8 +485,9 @@ def main(args):
                 --val_size {args.val_size} \
                 --ddp_timeout 1800000 \
                 --plot_loss \
-                --quantization_bit {args.quantization_bit}\
-                --only_training_vhead True
+                --only_training_vhead True \
+                --report_to none\
+                --fp16
                 """
         else:
             rm_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
@@ -521,8 +522,9 @@ def main(args):
                 --val_size {args.val_size} \
                 --ddp_timeout 1800000 \
                 --plot_loss \
-                --quantization_bit {args.quantization_bit}\
-                --only_training_vhead True
+                --only_training_vhead True\
+                --report_to none\
+                --fp16
                 """
 
         run_cli_command(rm_ft_command) 
@@ -532,24 +534,46 @@ def main(args):
         ##########################################################
         dataset_name_generated = f"{dataset}_generated"
 
-        generate_text_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
-            --stage sft \
-            --do_predict \
-            --model_name_or_path {args.model_name_or_path} \
-            --adapter_name_or_path {dpo_adapter_path} \
-            --dataset {testset} \
-            --dataset_dir {args.dataset_dir} \
-            --template {args.template} \
-            --finetuning_type {args.finetuning_type} \
-            --output_dir {args.dataset_dir} \
-            --overwrite_cache \
-            --overwrite_output_dir \
-            --cutoff_len {args.cutoff_len} \
-            --preprocessing_num_workers 16 \
-            --per_device_eval_batch_size {args.per_device_eval_batch_size} \
-            --predict_with_generate \
-            --fp16
-        """
+        if args.use_accelerate:
+            generate_text_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port} \
+                --config_file examples/accelerate/default.yaml \
+                src/train_bash.py \
+                --stage sft \
+                --do_predict \
+                --model_name_or_path {args.model_name_or_path} \
+                --adapter_name_or_path {dpo_adapter_path} \
+                --dataset {testset} \
+                --dataset_dir {args.dataset_dir} \
+                --template {args.template} \
+                --finetuning_type {args.finetuning_type} \
+                --output_dir {args.dataset_dir} \
+                --overwrite_cache \
+                --overwrite_output_dir \
+                --cutoff_len {args.cutoff_len} \
+                --preprocessing_num_workers 16 \
+                --per_device_eval_batch_size {args.per_device_eval_batch_size} \
+                --predict_with_generate \
+                --fp16
+            """
+        else:
+            generate_text_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
+                --stage sft \
+                --do_predict \
+                --model_name_or_path {args.model_name_or_path} \
+                --adapter_name_or_path {dpo_adapter_path} \
+                --dataset {testset} \
+                --dataset_dir {args.dataset_dir} \
+                --template {args.template} \
+                --finetuning_type {args.finetuning_type} \
+                --output_dir {args.dataset_dir} \
+                --overwrite_cache \
+                --overwrite_output_dir \
+                --cutoff_len {args.cutoff_len} \
+                --preprocessing_num_workers 16 \
+                --per_device_eval_batch_size {args.per_device_eval_batch_size} \
+                --predict_with_generate \
+                --fp16
+            """
 
         print(f"Generating text from the new DPO model .....................")
         run_cli_command(generate_text_command)
