@@ -594,8 +594,8 @@ class LLMStrategy:
                 new_data_info = f"{self.dataset}__iter_{iteration}"
                 data_info[new_data_info] = copy.deepcopy(data_info[self.dataset])
                 data_info[new_data_info]["file_name"] = "selected_entries.json"
-    
-                with open(dataset_info_path, 'a') as outfile:
+
+                with open(dataset_info_path, 'w') as outfile:
                     json.dump(data_info, outfile, indent=4)
 
                 print("Updated dataset info has been stored in", dataset_info_path)
