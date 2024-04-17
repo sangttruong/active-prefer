@@ -246,7 +246,6 @@ def main(args):
         --dataset_dir {args.dataset_dir} \
         --template {args.template} \
         --finetuning_type full \
-        --overwrite_cache \
         --overwrite_output_dir \
         --cutoff_len {args.cutoff_len} \
         --per_device_train_batch_size {args.per_device_train_batch_size} \
@@ -263,8 +262,10 @@ def main(args):
         --max_samples {args.max_samples} \
         --val_size 0.9 \
         --ddp_timeout 1800000 \
+        --only_training_vhead True \
         --plot_loss \
         --report_to none\
+        --fp16
         """
     
     print(f"Training Oracle model ............................")
