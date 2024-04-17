@@ -147,5 +147,15 @@
             "response": "output",
             "choice_label": "choice_label"
         }
+    },
+    "debug": {
+        "file_name": "hh_rlhf_test.json",
+        "columns": {
+            "id": "id",
+            "prompt": "instruction",
+            "query": "input",
+            "response": "output",
+            "choice_label": "choice_label"
+        }
     }
 }
