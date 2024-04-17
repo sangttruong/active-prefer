@@ -236,6 +236,7 @@ def main(args):
     # Train an Oracle model O 
     ft_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port}\
         --config_file examples/accelerate/default.yaml \
+        src/train_bash.py \
         --stage rm \
         --do_train \
         --flash_attn True\
