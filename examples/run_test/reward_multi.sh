@@ -1,13 +1,11 @@
 #!/bin/bash
 
-# 
-# --overwrite_cache \
 
 CUDA_VISIBLE_DEVICES=0,1 accelerate launch --main_process_port=29505\
     --config_file examples/accelerate/default.yaml \
     src/train_bash.py \
     --stage rm \
-    --do_train \
+    --do_eval \
     --model_name_or_path meta-llama/Llama-2-7b-hf \
     --flash_attn True\
     --dataset reward_bench_train \
