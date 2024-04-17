@@ -314,61 +314,60 @@ def main(args):
         #### SELECTION
         ##########################################################
         print(f"Selection ........................")
-
-        # prediction_path = f"{reward_model_path}/generated_predictions.jsonl"
-        # data_path = f"{args.dataset_dir}/{dataset}.json"
-        # output_file = f"{args.dataset_dir}/selected_entries.json"  
-
-        # if num_sample_select == -1:
-        #     num_sample_select = int(count_len_dataset(data_path) * args.percentage)
-
-        # # SELECTION METHOD
-        # if args.method == "max_entropy":
-        #     selected_questions = select_by_max_entropy(prediction_path, num_sample_select)  
-        # elif args.method == "random":
-        #     selected_questions = select_by_random(prediction_path, num_sample_select)
-
-        # # Update data training
-        # select_entries_by_ids(data_path, selected_questions, output_file)
-        # with open(args.data_info_path, 'r') as file:
-        #     data_info = json.load(file)
-            
-        #     if dataset in data_info:
-        #         # append new info to data_infor and store result in json file
-        #         new_data_info = f"{dataset}_{model_name}_iter_{iter}"
-        #         data_info[new_data_info] = copy.deepcopy(data_info[dataset])
-        #         data_info[new_data_info]["file_name"] = "selected_entries.json"
-
-        #         with open(args.data_info_path, 'w') as outfile:
-        #             json.dump(data_info, outfile, indent=4)
-
-        #         print("Updated dataset info has been stored in", args.data_info_path)
-        # -----------------------------
         # active_dataset = f"{dataset}_iter_{iter}" # replace dataset by ACTIVE QUERIES
-        selection_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py\
-            --stage selection \
-            --do_predict \
-            --active_iter {iter}\
-            --model_name_or_path {args.model_name_or_path} \
-            --dataset_dir {args.dataset_dir} \
-            --dataset {dataset} \
-            --template {args.template} \
-            --finetuning_type full \
-            --output_dir {reward_model_path} \
-            --overwrite_output_dir \
-            --cutoff_len {args.cutoff_len} \
-            --per_device_train_batch_size {args.per_device_train_batch_size} \
-            --per_device_eval_batch_size {args.per_device_eval_batch_size} \
-            --gradient_accumulation_steps {args.gradient_accumulation_steps} \
-            --lr_scheduler_type {args.lr_scheduler_type} \
-            --logging_steps {args.logging_steps} \
-            --warmup_steps {args.warmup_steps} \
-            --save_steps {args.save_steps} \
-            --eval_steps {args.eval_steps} \
-            --evaluation_strategy {args.evaluation_strategy} \
-            --learning_rate {args.learning_rate} \
-            --num_train_epochs {args.num_train_epochs} 
-        """
+
+        if args.use_accelerate_eval:
+            selection_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port}\
+                --config_file examples/accelerate/default.yaml \
+                src/train_bash.py \
+                --stage selection \
+                --do_predict \
+                --active_iter {iter}\
+                --model_name_or_path {args.model_name_or_path} \
+                --dataset_dir {args.dataset_dir} \
+                --dataset {dataset} \
+                --template {args.template} \
+                --finetuning_type full \
+                --output_dir {reward_model_path} \
+                --overwrite_output_dir \
+                --cutoff_len {args.cutoff_len} \
+                --per_device_train_batch_size {args.per_device_train_batch_size} \
+                --per_device_eval_batch_size {args.per_device_eval_batch_size} \
+                --gradient_accumulation_steps {args.gradient_accumulation_steps} \
+                --lr_scheduler_type {args.lr_scheduler_type} \
+                --logging_steps {args.logging_steps} \
+                --warmup_steps {args.warmup_steps} \
+                --save_steps {args.save_steps} \
+                --eval_steps {args.eval_steps} \
+                --evaluation_strategy {args.evaluation_strategy} \
+                --learning_rate {args.learning_rate} \
+                --num_train_epochs {args.num_train_epochs} 
+            """
+        else: 
+            selection_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py\
+                --stage selection \
+                --do_predict \
+                --active_iter {iter}\
+                --model_name_or_path {args.model_name_or_path} \
+                --dataset_dir {args.dataset_dir} \
+                --dataset {dataset} \
+                --template {args.template} \
+                --finetuning_type full \
+                --output_dir {reward_model_path} \
+                --overwrite_output_dir \
+                --cutoff_len {args.cutoff_len} \
+                --per_device_train_batch_size {args.per_device_train_batch_size} \
+                --per_device_eval_batch_size {args.per_device_eval_batch_size} \
+                --gradient_accumulation_steps {args.gradient_accumulation_steps} \
+                --lr_scheduler_type {args.lr_scheduler_type} \
+                --logging_steps {args.logging_steps} \
+                --warmup_steps {args.warmup_steps} \
+                --save_steps {args.save_steps} \
+                --eval_steps {args.eval_steps} \
+                --evaluation_strategy {args.evaluation_strategy} \
+                --learning_rate {args.learning_rate} \
+                --num_train_epochs {args.num_train_epochs} 
+            """
 
         run_cli_command(selection_command) 
 
@@ -445,6 +444,75 @@ def main(args):
             """
 
         run_cli_command(dpo_ft_command) 
+
+        if args.use_accelerate_eval: 
+            eval_dpo_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port}\
+                --config_file examples/accelerate/default.yaml \
+                src/train_bash.py \
+                --stage dpo \
+                --do_eval \
+                --model_name_or_path {args.model_name_or_path} \
+                --adapter_name_or_path {dpo_adapter_path}
+                --dataset_dir {args.dataset_dir} \
+                --dataset {active_dataset} \
+                --template {args.template} \
+                --finetuning_type {args.finetuning_type} \
+                --lora_target {args.lora_target} \
+                --output_dir {dpo_adapter_path} \
+                --overwrite_output_dir \
+                --cutoff_len {args.cutoff_len} \
+                --per_device_train_batch_size {args.per_device_train_batch_size} \
+                --per_device_eval_batch_size {args.per_device_eval_batch_size} \
+                --gradient_accumulation_steps {args.gradient_accumulation_steps} \
+                --lr_scheduler_type {args.lr_scheduler_type} \
+                --logging_steps {args.logging_steps} \
+                --warmup_steps {args.warmup_steps} \
+                --save_steps {args.save_steps} \
+                --eval_steps {args.eval_steps} \
+                --evaluation_strategy {args.evaluation_strategy} \
+                --learning_rate {args.learning_rate} \
+                --num_train_epochs {args.num_train_epochs} \
+                --max_samples {args.max_samples} \
+                --val_size {args.val_size} \
+                --plot_loss \
+                --dpo_ftx 1.0 \
+                --report_to none \
+                --fp16
+                """
+        else:
+            eval_dpo_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py\
+                --stage dpo \
+                --do_eval\
+                --model_name_or_path {args.model_name_or_path} \
+                --adapter_name_or_path {dpo_adapter_path}
+                --dataset_dir {args.dataset_dir} \
+                --dataset {active_dataset} \
+                --template {args.template} \
+                --finetuning_type {args.finetuning_type} \
+                --lora_target {args.lora_target} \
+                --output_dir {dpo_adapter_path} \
+                --overwrite_output_dir \
+                --cutoff_len {args.cutoff_len} \
+                --preprocessing_num_workers 16 \
+                --per_device_train_batch_size {args.per_device_train_batch_size} \
+                --per_device_eval_batch_size {args.per_device_eval_batch_size} \
+                --gradient_accumulation_steps {args.gradient_accumulation_steps} \
+                --lr_scheduler_type {args.lr_scheduler_type} \
+                --logging_steps {args.logging_steps} \
+                --warmup_steps {args.warmup_steps} \
+                --save_steps {args.save_steps} \
+                --eval_steps {args.eval_steps} \
+                --evaluation_strategy {args.evaluation_strategy} \
+                --learning_rate {args.learning_rate} \
+                --num_train_epochs {args.num_train_epochs} \
+                --max_samples {args.max_samples} \
+                --val_size {args.val_size} \
+                --plot_loss \
+                --dpo_ftx 1.0
+            """
+
+        run_cli_command(eval_dpo_ft_command)
+
         ##########################################################
         #### Train Reward
         ##########################################################    
@@ -482,7 +550,6 @@ def main(args):
                 --learning_rate {args.learning_rate} \
                 --num_train_epochs {args.num_train_epochs} \
                 --max_samples {args.max_samples} \
-                --val_size {args.val_size} \
                 --ddp_timeout 1800000 \
                 --plot_loss \
                 --only_training_vhead True \
@@ -519,7 +586,6 @@ def main(args):
                 --learning_rate {args.learning_rate} \
                 --num_train_epochs {args.num_train_epochs} \
                 --max_samples {args.max_samples} \
-                --val_size {args.val_size} \
                 --ddp_timeout 1800000 \
                 --plot_loss \
                 --only_training_vhead True\
@@ -528,13 +594,87 @@ def main(args):
                 """
 
         run_cli_command(rm_ft_command) 
+
+        if args.use_accelerate_eval:
+            eval_rm_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port} \
+                --config_file examples/accelerate/default.yaml \
+                src/train_bash.py \
+                --stage rm \
+                --flash_attn True\
+                --model_name_or_path {args.model_name_or_path}\
+                --adapter_name_or_path {reward_model_path}\
+                --output_dir {reward_model_path} \
+                --dataset {active_dataset} \
+                --dataset_dir {args.dataset_dir} \
+                --template {args.template} \
+                --finetuning_type {args.finetuning_type} \
+                --lora_target {args.lora_target} \
+                --overwrite_cache \
+                --overwrite_output_dir \
+                --cutoff_len {args.cutoff_len} \
+                --preprocessing_num_workers 16 \
+                --per_device_train_batch_size {args.per_device_train_batch_size} \
+                --per_device_eval_batch_size {args.per_device_eval_batch_size} \
+                --gradient_accumulation_steps {args.gradient_accumulation_steps} \
+                --lr_scheduler_type {args.lr_scheduler_type} \
+                --logging_steps {args.logging_steps} \
+                --warmup_steps {args.warmup_steps} \
+                --save_steps {args.save_steps} \
+                --eval_steps {args.save_steps} \
+                --evaluation_strategy {args.evaluation_strategy} \
+                --learning_rate {args.learning_rate} \
+                --num_train_epochs {args.num_train_epochs} \
+                --max_samples {args.max_samples} \
+                --ddp_timeout 1800000 \
+                --plot_loss \
+                --only_training_vhead True \
+                --report_to none \
+                --fp16
+                """
+        else:
+            eval_rm_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
+                --stage rm \
+                --do_eval \
+                --flash_attn True\
+                --model_name_or_path {args.model_name_or_path}\
+                --adapter_name_or_path {reward_model_path}\
+                --output_dir {reward_model_path} \
+                --dataset {active_dataset} \
+                --dataset_dir {args.dataset_dir} \
+                --template {args.template} \
+                --finetuning_type {args.finetuning_type} \
+                --lora_target {args.lora_target} \
+                --overwrite_cache \
+                --overwrite_output_dir \
+                --cutoff_len {args.cutoff_len} \
+                --preprocessing_num_workers 16 \
+                --per_device_train_batch_size {args.per_device_train_batch_size} \
+                --per_device_eval_batch_size {args.per_device_eval_batch_size} \
+                --gradient_accumulation_steps {args.gradient_accumulation_steps} \
+                --lr_scheduler_type {args.lr_scheduler_type} \
+                --logging_steps {args.logging_steps} \
+                --warmup_steps {args.warmup_steps} \
+                --save_steps {args.save_steps} \
+                --eval_steps {args.save_steps} \
+                --evaluation_strategy {args.evaluation_strategy} \
+                --learning_rate {args.learning_rate} \
+                --num_train_epochs {args.num_train_epochs} \
+                --max_samples {args.max_samples} \
+                --ddp_timeout 1800000 \
+                --plot_loss \
+                --only_training_vhead True\
+                --report_to none\
+                --fp16
+                """
+
+        run_cli_command(eval_rm_command) 
    
         ##########################################################
         ####  Eval
         ##########################################################
         dataset_name_generated = f"{dataset}_generated"
 
-        if args.use_accelerate:
+        if args.use_accelerate_eval:
             generate_text_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port} \
                 --config_file examples/accelerate/default.yaml \
                 src/train_bash.py \
@@ -578,14 +718,15 @@ def main(args):
 
         print(f"Generating text from the new DPO model .....................")
         run_cli_command(generate_text_command)
-
         
         # add dataset_name_generated into dataset_info to inference oracle model
         jsonl_to_json(f"{args.dataset_dir}/generated_predictions.jsonl", f"{args.dataset_dir}/generated_predictions.json")
         add_new_dataset_info(args.data_info_path, dataset_name_generated, f"generated_predictions.json")
 
-
-        inference_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
+        if args.use_accelerate_eval:
+            inference_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port} \
+                --config_file examples/accelerate/default.yaml \
+                src/train_bash.py \
                 --stage rm \
                 --do_predict \
                 --flash_attn True\
@@ -600,7 +741,23 @@ def main(args):
                 --per_device_eval_batch_size {batch_size_for_inference} \
                 --fp16
                 """
-        
+        else:
+            inference_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
+                --stage rm \
+                --do_predict \
+                --flash_attn True\
+                --model_name_or_path {args.model_name_or_path} \
+                --adapter_name_or_path {oracle_adapter_path}\
+                --finetuning_type {args.finetuning_type} \
+                --lora_target {args.lora_target} \
+                --dataset_dir {args.dataset_dir} \
+                --dataset {dataset_name_generated} \
+                --template {args.template} \
+                --output_dir {oracle_adapter_path} \
+                --per_device_eval_batch_size {batch_size_for_inference} \
+                --fp16
+                """
+            
         print(f"Inference Oracle model ............................")
         run_cli_command(inference_oracle_command)
         delete_item_dataset_info(args.data_info_path, dataset_name_generated) # clean dataset_info
@@ -640,6 +797,7 @@ def parse_arguments():
     parser.add_argument("--data_info_path", type=str, default="data/dataset_info.json", help="Path to dataset info")
     parser.add_argument("--sanity_check", action="store_true", help="Test")
     parser.add_argument("--use_accelerate", action="store_true", help="is using accelerate")
+    parser.add_argument("--use_accelerate_eval", action="store_true", help="is using accelerate")
 
     #######################
     parser.add_argument("--dataset_name", type=str, default="arc", help="Dataset name")
