@@ -261,13 +261,13 @@ def main(args):
         --learning_rate {args.learning_rate} \
         --num_train_epochs {args.num_train_epochs} \
         --max_samples {args.max_samples} \
-        --val_size 0.8 \
+        --val_size 0.9 \
         --ddp_timeout 1800000 \
         --plot_loss 
         """
     
     print(f"Training Oracle model ............................")
-    # run_cli_command(ft_oracle_command)
+    run_cli_command(ft_oracle_command)
 
     # active pipeline     
     for iter in range(args.num_iters):
@@ -367,7 +367,6 @@ def main(args):
                 --learning_rate {args.learning_rate} \
                 --num_train_epochs {args.num_train_epochs} \
                 --max_samples {args.max_samples} \
-                --val_size {args.val_size} \
                 --plot_loss \
                 --dpo_ftx 1.0 \
                 --report_to none \
@@ -399,13 +398,11 @@ def main(args):
                 --learning_rate {args.learning_rate} \
                 --num_train_epochs {args.num_train_epochs} \
                 --max_samples {args.max_samples} \
-                --val_size {args.val_size} \
                 --plot_loss \
                 --dpo_ftx 1.0
             """
 
         run_cli_command(dpo_ft_command) 
-
 
         eval_dpo_ft_output_path = f"{dpo_adapter_path}/iter_{iter}"
 
@@ -748,9 +745,9 @@ def parse_arguments():
     parser.add_argument("--per_device_eval_batch_size", type=int, default=4, help="Batch size for evaluation")
     parser.add_argument("--gradient_accumulation_steps", type=int, default=8, help="Gradient accumulation steps")
     parser.add_argument("--lr_scheduler_type", type=str, default="cosine", help="Learning rate scheduler type")
-    parser.add_argument("--logging_steps", type=int, default=100, help="Logging steps")
-    parser.add_argument("--save_steps", type=int, default=100, help="Save steps")
-    parser.add_argument("--eval_steps", type=int, default=500, help="Evaluation steps")
+    parser.add_argument("--logging_steps", type=int, default=400, help="Logging steps")
+    parser.add_argument("--save_steps", type=int, default=400, help="Save steps")
+    parser.add_argument("--eval_steps", type=int, default=2000, help="Evaluation steps")
     parser.add_argument("--warmup_steps", type=int, default=20, help="Warmup steps")
     parser.add_argument("--evaluation_strategy", type=str, default="steps", help="Evaluation strategy")
     parser.add_argument("--learning_rate", type=float, default=5e-5, help="Learning rate")
