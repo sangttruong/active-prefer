@@ -559,7 +559,6 @@ def main(args):
 
         run_cli_command(rm_ft_command) 
 
-
         eval_rm_command_output_path = f"{reward_model_path}/iter_{iter}"
 
         if args.use_accelerate_eval:
@@ -634,8 +633,8 @@ def main(args):
                 --fp16
                 """
 
-        print("Eval Reward ..................................")
-        run_cli_command(eval_rm_command) 
+        # print("Eval Reward ..................................")
+        # run_cli_command(eval_rm_command) 
    
         ##########################################################
         ####  Eval
