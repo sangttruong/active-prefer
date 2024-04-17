@@ -249,7 +249,6 @@ def main(args):
         --overwrite_cache \
         --overwrite_output_dir \
         --cutoff_len {args.cutoff_len} \
-        --preprocessing_num_workers 16 \
         --per_device_train_batch_size {args.per_device_train_batch_size} \
         --per_device_eval_batch_size {args.per_device_eval_batch_size} \
         --gradient_accumulation_steps {args.gradient_accumulation_steps} \
@@ -264,7 +263,8 @@ def main(args):
         --max_samples {args.max_samples} \
         --val_size 0.9 \
         --ddp_timeout 1800000 \
-        --plot_loss 
+        --plot_loss \
+        --report_to none\
         """
     
     print(f"Training Oracle model ............................")
