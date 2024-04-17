@@ -83,6 +83,7 @@ def run_rm(
 
     # Evaluation
     if training_args.do_eval:
+        breakpoint()
         metrics = trainer.evaluate(dataset, metric_key_prefix="eval")
         trainer.log_metrics("eval", metrics)
         trainer.save_metrics("eval", metrics)
