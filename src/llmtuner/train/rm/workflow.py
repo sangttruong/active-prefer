@@ -208,8 +208,10 @@ def run_oracle_rm(
     
     # Training Oracle model
     last_hidden_states = torch.tensor(np_last_hidden_states)  # Using torch.tensor()
-
     train_dataset = CustomDataset(last_hidden_states, dataset)  # Only need change train_dataset for diff oracle model
+    
+    breakpoint()
+
     optimizer_params = trainer.create_optimizer().param_groups[0]
     base_model_config = base_model.config
     create_scheduler = trainer.create_scheduler
@@ -274,7 +276,6 @@ def train_oracle_model(
     v_head, optimizer, train_dataset = accelerator.prepare(v_head, optimizer, train_dataset)
 
     v_head.train()
-    breakpoint()
     for epoch in range(num_epochs):
         epoch_loss = 0.0  # Initialize epoch loss
         for idx in sample_ids:
