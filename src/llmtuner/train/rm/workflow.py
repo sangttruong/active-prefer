@@ -46,7 +46,6 @@ def run_rm(
     model = load_model(tokenizer, model_args, finetuning_args, training_args.do_train, add_valuehead=True)
     data_collator = PairwiseDataCollatorWithPadding(tokenizer, pad_to_multiple_of=8)
 
-    # breakpoint()
     # only train v_head
     if training_args.do_train and finetuning_args.only_training_vhead:
         for name, param in model.named_parameters():

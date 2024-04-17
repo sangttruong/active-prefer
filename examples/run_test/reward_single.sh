@@ -2,7 +2,7 @@
 
 CUDA_VISIBLE_DEVICES=0,1 python src/train_bash.py \
     --stage rm \
-    --do_train \
+    --do_eval \
     --do_predict \
     --model_name_or_path meta-llama/Llama-2-7b-hf \
     --flash_attn True\
@@ -21,8 +21,8 @@ CUDA_VISIBLE_DEVICES=0,1 python src/train_bash.py \
     --lr_scheduler_type cosine \
     --logging_steps 10 \
     --warmup_steps 20 \
-    --save_steps 100 \
-    --eval_steps 100 \
+    --save_steps 1000 \
+    --eval_steps 1000 \
     --evaluation_strategy steps \
     --learning_rate 5e-5 \
     --num_train_epochs 3.0 \

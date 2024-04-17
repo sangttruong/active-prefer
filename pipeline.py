@@ -368,7 +368,6 @@ def main(args):
             --evaluation_strategy {args.evaluation_strategy} \
             --learning_rate {args.learning_rate} \
             --num_train_epochs {args.num_train_epochs} 
-
         """
 
         run_cli_command(selection_command) 
