@@ -224,7 +224,6 @@ def main(args):
     print(f"Prepare Dataset: {prepare_data} .....................")
     run_cli_command(prepare_data)
 
-    num_sample_select = -1 
 
     model_name = args.model_name_or_path.split('/')[-1]
     reward_model_path = f"saves/{model_name}/{dataset}/{args.method}/reward"
@@ -263,7 +262,6 @@ def main(args):
         --max_samples {args.max_samples} \
         --val_size 0.1 \
         --ddp_timeout 1800000 \
-        --only_training_vhead True \
         --plot_loss \
         --report_to none\
         --fp16

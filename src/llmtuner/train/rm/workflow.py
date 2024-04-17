@@ -274,6 +274,7 @@ def train_oracle_model(
     v_head, optimizer, train_dataset = accelerator.prepare(v_head, optimizer, train_dataset)
 
     v_head.train()
+    breakpoint()
     for epoch in range(num_epochs):
         epoch_loss = 0.0  # Initialize epoch loss
         for idx in sample_ids:

@@ -5,10 +5,10 @@ CUDA_VISIBLE_DEVICES=0,1 accelerate launch --main_process_port=29505\
     --config_file examples/accelerate/default.yaml \
     src/train_bash.py \
     --stage rm \
-    --do_eval \
+    --do_train \
     --model_name_or_path meta-llama/Llama-2-7b-hf \
     --flash_attn True\
-    --dataset reward_bench_train \
+    --dataset truthful_qa_train \
     --dataset_dir data \
     --template default \
     --finetuning_type lora \
