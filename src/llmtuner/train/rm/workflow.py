@@ -169,7 +169,6 @@ def run_oracle_rm(
     base_model = load_model(tokenizer, model_args, finetuning_args, is_trainable=False, add_valuehead=False)
     data_collator = PairwiseDataCollatorWithPadding(tokenizer, pad_to_multiple_of=8)
 
-    breakpoint()
     nearest_multiple = len(dataset) // 8 * 8
     dataset = dataset.select(list(range(nearest_multiple)))
 

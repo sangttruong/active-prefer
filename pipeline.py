@@ -236,9 +236,8 @@ def main(args):
     ft_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port}\
         --config_file examples/accelerate/default.yaml \
         src/train_bash.py \
-        --stage rm \
+        --stage rw \
         --do_train \
-        --do_eval \
         --flash_attn True\
         --model_name_or_path {args.model_name_or_path}\
         --output_dir {oracle_adapter_path}\
@@ -263,6 +262,7 @@ def main(args):
         --val_size 0.1 \
         --ddp_timeout 1800000 \
         --plot_loss \
+        --only_training_vhead True \
         --report_to none\
         --fp16
         """
