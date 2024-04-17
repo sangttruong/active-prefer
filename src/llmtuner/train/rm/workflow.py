@@ -200,7 +200,8 @@ def run_oracle_rm(
     filename = f"{training_args.output_dir}/{model_name}/{dataset_name}/last_hidden_states.npy"
 
     # Check if the file exists
-    if os.path.isfile(filename):
+    debug = True
+    if not debug and os.path.isfile(filename):
         np_last_hidden_states = np.load(filename)
         print(f"Loaded array from {filename}")
     else:
