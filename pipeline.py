@@ -1,3 +1,5 @@
+import numpy as np
+
 from src.llmtuner import run_exp
 
 import argparse
@@ -8,7 +10,6 @@ import copy
 import json
 import math
 
-import numpy as np
 from scipy.stats import entropy
 
 def read_inference_results(prediction_path):
