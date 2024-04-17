@@ -239,6 +239,7 @@ def main(args):
         src/train_bash.py \
         --stage rm \
         --do_train \
+        --do_eval
         --flash_attn True\
         --model_name_or_path {args.model_name_or_path}\
         --output_dir {oracle_adapter_path}\
@@ -260,7 +261,7 @@ def main(args):
         --learning_rate {args.learning_rate} \
         --num_train_epochs {args.num_train_epochs} \
         --max_samples {args.max_samples} \
-        --val_size 0.9 \
+        --val_size 0.1 \
         --ddp_timeout 1800000 \
         --only_training_vhead True \
         --plot_loss \
@@ -270,6 +271,7 @@ def main(args):
     
     print(f"Training Oracle model ............................")
     run_cli_command(ft_oracle_command)
+
 
     # active pipeline     
     for iter in range(args.num_iters):
