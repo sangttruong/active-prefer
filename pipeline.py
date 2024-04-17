@@ -239,7 +239,7 @@ def main(args):
         src/train_bash.py \
         --stage rm \
         --do_train \
-        --do_eval
+        --do_eval \
         --flash_attn True\
         --model_name_or_path {args.model_name_or_path}\
         --output_dir {oracle_adapter_path}\
