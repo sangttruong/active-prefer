@@ -129,7 +129,7 @@ class LLMStrategy:
             self.base_model.lm_head = torch.nn.Identity()
     
         # Update arguments
-        training_args.remove_unused_columns = False  # important for pairwise dataset
+        # training_args.remove_unused_columns = False  
 
         # Initialize our Trainer
         self.trainer = PairwiseTrainer(
@@ -166,10 +166,6 @@ class LLMStrategy:
     def query(self, n):
         # Select instances from the pool for labeling
         pass
-
-    def update(self, idxs_lb):
-        # Update the labeled indices with newly labeled data
-        self.idxs_lb = idxs_lb
 
     def _train_model(
         self,
@@ -557,9 +553,11 @@ class LLMStrategy:
             np_last_hidden_states = np.load(filename)
             print(f"Loaded array from {filename}")
         else:
-            predict_results = self.trainer.predict(self.pool_dataset, metric_key_prefix="test")
-            np_last_hidden_states = predict_results.predictions
+            predict_results = self.base_model.forward(self.pool_dataset)
+            # predict_results = self.trainer.predict(self.pool_dataset, metric_key_prefix="test")
             breakpoint()
+            # np_last_hidden_states = predict_results.predictions
+            
             # Save the array into a file
             np.save(filename, np_last_hidden_states)
             print(f"Array saved to {filename}")
