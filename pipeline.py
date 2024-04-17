@@ -474,9 +474,9 @@ def main(args):
                 --dpo_ftx 1.0
             """
 
-        run_cli_command(eval_dpo_ft_command)
-
-        breakpoint()
+        # print("Eval DPO  ..................................")
+        # run_cli_command(eval_dpo_ft_command)
+        # breakpoint()
         ##########################################################
         #### Train Reward
         ##########################################################    
