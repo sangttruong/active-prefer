@@ -200,12 +200,19 @@ def run_oracle_rm(
     dataset_name = data_args.dataset
     filename = f"{training_args.output_dir}/{model_name}/{dataset_name}/last_hidden_states.npy"
 
+
+
     # Check if the file exists
     debug = True
     if not debug and os.path.isfile(filename):
         np_last_hidden_states = np.load(filename)
         print(f"Loaded array from {filename}")
     else:
+        # Ensure directory exists or create it
+        directory = os.path.dirname(filename)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
         predict_results = trainer.predict(dataset, metric_key_prefix="predict")
         np_last_hidden_states = predict_results.predictions
 
@@ -217,7 +224,6 @@ def run_oracle_rm(
     last_hidden_states = torch.tensor(np_last_hidden_states)  # Using torch.tensor()
     train_dataset = CustomDataset(last_hidden_states, dataset)  # Only need change train_dataset for diff oracle model
 
-    
     
     optimizer_params = trainer.create_optimizer().param_groups[0]
     base_model_config = base_model.config
