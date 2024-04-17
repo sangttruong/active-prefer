@@ -414,6 +414,7 @@ def main(args):
                 --config_file examples/accelerate/default.yaml \
                 src/train_bash.py \
                 --stage dpo \
+                --do_eval \
                 --model_name_or_path {args.model_name_or_path} \
                 --adapter_name_or_path {dpo_adapter_path}
                 --dataset_dir {args.dataset_dir} \

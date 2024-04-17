@@ -82,10 +82,10 @@ def run_rm(
             plot_loss(training_args.output_dir, keys=["loss", "eval_loss"])
 
     # Evaluation
-    if training_args.do_eval:
-        metrics = trainer.evaluate(dataset, metric_key_prefix="eval")
-        trainer.log_metrics("eval", metrics)
-        trainer.save_metrics("eval", metrics)
+    # if training_args.do_eval:
+    #     metrics = trainer.evaluate(dataset, metric_key_prefix="eval")
+    #     trainer.log_metrics("eval", metrics)
+    #     trainer.save_metrics("eval", metrics)
 
     # Predict
     if training_args.do_predict:
