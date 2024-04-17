@@ -345,7 +345,6 @@ def main(args):
         #         print("Updated dataset info has been stored in", args.data_info_path)
         # -----------------------------
         # active_dataset = f"{dataset}_iter_{iter}" # replace dataset by ACTIVE QUERIES
-        # --lora_target {args.lora_target} \
         selection_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py\
             --stage selection \
             --do_predict \
@@ -615,7 +614,7 @@ def parse_arguments():
     parser.add_argument("--dataset_dir", type=str, default="data", help="Directory containing the dataset")
     parser.add_argument("--data_info_path", type=str, default="data/dataset_info.json", help="Path to dataset info")
     parser.add_argument("--sanity_check", action="store_true", help="Test")
-    parser.add_argument("--use_accelerate", type=bool, default=True, help="is using accelerate")
+    parser.add_argument("--use_accelerate", action="store_true", help="is using accelerate")
 
     #######################
     parser.add_argument("--dataset_name", type=str, default="arc", help="Dataset name")

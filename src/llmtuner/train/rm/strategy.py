@@ -556,7 +556,6 @@ class LLMStrategy:
             np_last_hidden_states = np.load(filename)
             print(f"Loaded array from {filename}")
         else:
-            breakpoint()
             predict_results = self.trainer.predict(self.pool_dataset, metric_key_prefix="test")
             np_last_hidden_states = predict_results.predictions
             
