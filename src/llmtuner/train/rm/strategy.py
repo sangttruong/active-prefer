@@ -580,7 +580,7 @@ class LLMStrategy:
 
     def update(self, question_ids, iteration = 0):
         output_selected_path = f"{self.data_args.dataset_dir}/selected_entries.json"  
-        dataset_info_path = f"{self.data_args.dataset_dir}/datset_info.json"
+        dataset_info_path = f"{self.data_args.dataset_dir}/dataset_info.json"
         ori_dataset_path = f"{self.data_args.dataset_dir}/{self.dataset}.json"
 
         # Update data training
