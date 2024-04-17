@@ -554,8 +554,8 @@ class LLMStrategy:
             print(f"Loaded array from {filename}")
         else:
             # predict_results = self.base_model.forward(self.pool_dataset)
-            predict_results = self.trainer.predict(self.pool_dataset, metric_key_prefix="test")
             breakpoint()
+            predict_results = self.trainer.predict(self.pool_dataset, metric_key_prefix="test")
             np_last_hidden_states = predict_results.predictions
             
             # Save the array into a file
