@@ -124,7 +124,7 @@ class LLMStrategy:
         self.model_args = model_args
         self.finetuning_args = finetuning_args
 
-        nearest_multiple = round(len(self.pool_dataset) / 8) * 8
+        nearest_multiple = len(self.pool_dataset) // 8 * 8
         self.pool_dataset = self.pool_dataset.select(list(range(nearest_multiple)))
 
         # Replace lm_head with identity

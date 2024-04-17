@@ -170,7 +170,7 @@ def run_oracle_rm(
     data_collator = PairwiseDataCollatorWithPadding(tokenizer, pad_to_multiple_of=8)
 
     breakpoint()
-    nearest_multiple = round(len(dataset) / 8) * 8
+    nearest_multiple = len(dataset) // 8 * 8
     dataset = dataset.select(list(range(nearest_multiple)))
 
     # Replace lm_head with identity
