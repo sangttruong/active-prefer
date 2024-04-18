@@ -196,25 +196,25 @@ def save_eval_metric(file_path, accuracy, iteration):
 def main(args):
     # Prepare dataset
 
-    if args.dataset_name in ['allenai/ai2_arc', 'arc']:
+    if args.dataset_name in ['allenai/ai2_arc', 'arc', "arc_challenge_train"]:
         dataset = 'arc_challenge_train'
         prepare_data = f"""python data/arc/arc.py --sanity_check {args.sanity_check}"""
-    elif args.dataset_name in ['truthful_qa']:
+    elif args.dataset_name in ['truthful_qa', "truthful_qa_train"]:
         dataset = 'truthful_qa_train'
         prepare_data = f"""python data/truthful_qa/truthful_qa.py --sanity_check {args.sanity_check}"""
-    elif args.dataset_name in ['Rowan/hellaswag', 'hellaswag']:
+    elif args.dataset_name in ['Rowan/hellaswag', 'hellaswag', "hellaswag_train"]:
         prepare_data = f"""python data/hellaswag/hellaswag.py --sanity_check {args.sanity_check}"""
         dataset = 'hellaswag_train'
-    elif args.dataset_name in ['winogrande']:
+    elif args.dataset_name in ['winogrande', "winogrande_train"]:
         prepare_data = f"""python data/winogrande/winogrande.py --sanity_check {args.sanity_check}"""
         dataset = 'winogrande_train'
-    elif args.dataset_name in ['cais/mmlu', "mmlu"]:
+    elif args.dataset_name in ['cais/mmlu', "mmlu", "mmlu_train"]:
         prepare_data = f"""python data/mmlu/mmlu.py --sanity_check {args.sanity_check}"""
         dataset = 'mmlu_train'
-    elif args.dataset_name in ['Anthropic/hh-rlhf', "hh-rlhf"]:
+    elif args.dataset_name in ['Anthropic/hh-rlhf', "hh-rlhf", "hh_rlhf" "hh_rlhf_train"]:
         prepare_data = f"""python data/hh_rlhf/hh_rlhf.py"""
         dataset = 'hh_rlhf_train'
-    elif args.dataset_name in ['allenai/reward-bench', "reward-bench", "reward_bench"]:
+    elif args.dataset_name in ['allenai/reward-bench', "reward-bench", "reward_bench", "reward_bench_train"]:
         prepare_data = f"""python data/reward_bench/reward_bench.py"""
         dataset = 'reward_bench_train'
     else:
