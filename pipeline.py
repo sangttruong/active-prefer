@@ -268,9 +268,7 @@ def main(args):
     #     """
 
 
-    ft_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port}\
-        --config_file examples/accelerate/default.yaml \
-        src/train_bash.py \
+    ft_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
         --stage oracle \
         --do_train \
         --flash_attn True\
@@ -279,7 +277,7 @@ def main(args):
         --dataset {dataset} \
         --dataset_dir {args.dataset_dir} \
         --template {args.template} \
-        --finetuning_type freeze \
+        --finetuning_type full \
         --overwrite_output_dir \
         --cutoff_len {args.cutoff_len} \
         --per_device_train_batch_size {args.per_device_train_batch_size} \
@@ -296,10 +294,7 @@ def main(args):
         --max_samples {args.max_samples} \
         --val_size 0.1 \
         --ddp_timeout 1800000 \
-        --plot_loss \
-        --only_training_vhead True \
-        --report_to none\
-        --fp16
+        --plot_loss 
         """
     
     print(f"Training Oracle model ............................")
