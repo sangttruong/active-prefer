@@ -60,8 +60,8 @@ def _set_transformers_logging(log_level: Optional[int] = logging.INFO) -> None:
 
 
 def _verify_model_args(model_args: "ModelArguments", finetuning_args: "FinetuningArguments") -> None:
-    if model_args.adapter_name_or_path is not None and finetuning_args.finetuning_type != "lora":
-        raise ValueError("Adapter is only valid for the LoRA method.")
+    # if model_args.adapter_name_or_path is not None and finetuning_args.finetuning_type != "lora":
+    #     raise ValueError("Adapter is only valid for the LoRA method.")
 
     # if model_args.quantization_bit is not None:
     #     if finetuning_args.finetuning_type != "lora":
