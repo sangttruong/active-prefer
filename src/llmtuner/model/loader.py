@@ -104,8 +104,12 @@ def load_model(
         model: "AutoModelForCausalLMWithValueHead" = AutoModelForCausalLMWithValueHead.from_pretrained(model)
         patch_valuehead_model(model)
 
+
+
         prev_vhead_path = None
-        if model_args.adapter_name_or_path is not None:
+        if finetuning_args.vhead_oracle_path != "":
+            vhead_path = finetuning_args.vhead_oracle_path
+        elif model_args.adapter_name_or_path is not None:
             vhead_path = model_args.adapter_name_or_path[-1]
             if "dpo" in vhead_path:
                 prev_vhead_path = vhead_path.replace("dpo", "reward")

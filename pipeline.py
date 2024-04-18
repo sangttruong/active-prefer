@@ -715,7 +715,7 @@ def main(args):
                 --do_predict \
                 --flash_attn True\
                 --model_name_or_path {args.model_name_or_path} \
-                --adapter_name_or_path {oracle_adapter_path}\
+                --vhead_oracle_path {oracle_adapter_path}\
                 --finetuning_type full \
                 --dataset_dir {args.dataset_dir} \
                 --dataset {dataset_name_generated} \
@@ -730,7 +730,7 @@ def main(args):
                 --do_predict \
                 --flash_attn True\
                 --model_name_or_path {args.model_name_or_path} \
-                --adapter_name_or_path {oracle_adapter_path}\
+                --vhead_oracle_path {oracle_adapter_path}\
                 --finetuning_type full \
                 --dataset_dir {args.dataset_dir} \
                 --dataset {dataset_name_generated} \

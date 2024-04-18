@@ -240,6 +240,11 @@ class FinetuningArguments(FreezeArguments, LoraArguments, RLHFArguments, GaloreA
         metadata={"help": "Acquisition functions"},
     )
 
+    vhead_oracle_path: str = field(
+        default="",
+        metadata={"help": "Path to v_head of oracle model"},
+    )
+
     active_iter: int = field(
         default=0,
         metadata={"help": "Iteration ith"},
