@@ -239,7 +239,7 @@ class FinetuningArguments(FreezeArguments, LoraArguments, RLHFArguments, GaloreA
         default="max_entropy",
         metadata={"help": "Acquisition functions"},
     )
-    
+
     vhead_oracle_path: str = field(
         default="",
         metadata={"help": "Path to v_head of oracle model"},
@@ -251,7 +251,7 @@ class FinetuningArguments(FreezeArguments, LoraArguments, RLHFArguments, GaloreA
     )
 
     num_sample_selected: int = field(
-        default=100,
+        default=1000,
         metadata={"help": "num_sample_selected each iter"},
     )    
 

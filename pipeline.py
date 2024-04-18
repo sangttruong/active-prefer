@@ -267,6 +267,7 @@ def main(args):
     eval_metric_dir = f"saves/{model_name}/{dataset}/{args.method}"
     num_sample_selected = int(count_len_dataset(f"{args.dataset_dir}/{dataset}.json") * args.percentage)
 
+    breakpoint()
     # Train an Oracle model O 
     # ft_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port}\
     #     --config_file examples/accelerate/default.yaml \
