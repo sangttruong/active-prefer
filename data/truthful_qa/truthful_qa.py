@@ -36,7 +36,7 @@ if __name__ == "__main__":
     args = parse_arguments()
 
     if args.sanity_check == 'True':
-        dataset = load_dataset("truthful_qa", "multiple_choice", split="validation[:100]")
+        dataset = load_dataset("truthful_qa", "multiple_choice", split="validation[:20]")
     else:
         dataset = load_dataset("truthful_qa", "multiple_choice", split="validation")
     
