@@ -193,8 +193,30 @@ def save_eval_metric(file_path, accuracy, iteration):
     with open(file_path, 'w') as file:
         json.dump(json_data, file)
    
+
+def copy_json_file(source_path, destination_path):
+    try:
+        # Open the JSON file from the source path
+        with open(source_path, 'r') as source_file:
+            # Load JSON data
+            data = json.load(source_file)
+        
+        # Write the JSON data to the destination path
+        with open(destination_path, 'w') as dest_file:
+            json.dump(data, dest_file, indent=4)
+        
+        print(f"JSON file copied from '{source_path}' to '{destination_path}' successfully.")
+    except FileNotFoundError:
+        print("One or both paths are invalid.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+
 def main(args):
     # Prepare dataset
+    source_path = f"{args.dataset_dir}/backup_dataset_info.json"
+    destination_path = f"{args.dataset_dir}/dataset_info.json"
+    copy_json_file(source_path, destination_path)
 
     if args.dataset_name in ['allenai/ai2_arc', 'arc', "arc_challenge_train"]:
         dataset = 'arc_challenge_train'
