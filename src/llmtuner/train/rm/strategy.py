@@ -119,6 +119,8 @@ class LLMStrategy:
         self.data_collator = PairwiseDataCollatorWithPadding(self.tokenizer, pad_to_multiple_of=8)
         self.callbacks = callbacks
 
+        
+
         self.training_args = training_args
         self.data_args = data_args
         self.model_args = model_args
@@ -549,7 +551,7 @@ class LLMStrategy:
     
     def get_embedding(self, is_override = False):
         # Get embeddings from the penultimate layer of the network
-
+        self.base_model.eval()
         filename = f"{self.training_args.output_dir}/last_hidden_states.npy"
         # Check if the file exists
         if is_override == False and os.path.isfile(filename):
