@@ -215,7 +215,7 @@ def main(args):
         prepare_data = f"""python data/hh_rlhf/hh_rlhf.py"""
         dataset = 'hh_rlhf_train'
     elif args.dataset_name in ['allenai/reward-bench', "reward-bench", "reward_bench", "reward_bench_train"]:
-        prepare_data = f"""python data/reward_bench/reward_bench.py"""
+        prepare_data = f"""python data/reward_bench/reward_bench.py --sanity_check {args.sanity_check}"""
         dataset = 'reward_bench_train'
     else:
         raise(f"Does not support {args.dataset_name} dataset yet")
