@@ -358,7 +358,7 @@ def main(args):
                 --evaluation_strategy {args.evaluation_strategy} \
                 --learning_rate {args.learning_rate} \
                 --num_train_epochs {args.num_train_epochs}\
-                --num_samples_selected {num_sample_selected}
+                --num_sample_selected {num_sample_selected}
             """
         else: 
             selection_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py\
@@ -387,6 +387,7 @@ def main(args):
                 --num_sample_selected {num_sample_selected}
             """
 
+        breakpoint()
         run_cli_command(selection_command) 
         ##########################################################
         #### TRAIN DPO
