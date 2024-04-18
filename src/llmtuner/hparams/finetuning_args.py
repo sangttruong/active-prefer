@@ -239,7 +239,7 @@ class FinetuningArguments(FreezeArguments, LoraArguments, RLHFArguments, GaloreA
         default="max_entropy",
         metadata={"help": "Acquisition functions"},
     )
-
+    
     vhead_oracle_path: str = field(
         default="",
         metadata={"help": "Path to v_head of oracle model"},

@@ -400,6 +400,7 @@ def main(args):
                 --num_sample_selected {num_sample_selected}
             """
 
+        breakpoint()
         run_cli_command(selection_command) 
         ##########################################################
         #### TRAIN DPO
