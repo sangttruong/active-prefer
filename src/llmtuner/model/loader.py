@@ -124,7 +124,6 @@ def load_model(
             vhead_params = load_valuehead_params(vhead_path, model_args)
             logger.info("Loaded valuehead from checkpoint: {}".format(vhead_path))
         
-        breakpoint()
         if vhead_params is not None:
             model.load_state_dict(vhead_params, strict=False)
     
