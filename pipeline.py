@@ -230,7 +230,7 @@ def main(args):
     dpo_adapter_path = f"saves/{model_name}/{dataset}/{args.method}/dpo"
     oracle_adapter_path = f"saves/{model_name}/{dataset}/{args.method}/oracle"
     eval_metric_dir = f"saves/{model_name}/{dataset}/{args.method}"
-    num_samples_selected = int(count_len_dataset(f"{args.data_dir}/{dataset}") * args.percentage)
+    num_sample_selected = int(count_len_dataset(f"{args.data_dir}/{dataset}") * args.percentage)
     breakpoint()
 
     # Train an Oracle model O 
@@ -364,7 +364,7 @@ def main(args):
                 --evaluation_strategy {args.evaluation_strategy} \
                 --learning_rate {args.learning_rate} \
                 --num_train_epochs {args.num_train_epochs}\ 
-                --num_samples_selected {num_samples_selected}
+                --num_sample_selected {num_sample_selected}
             """
 
         run_cli_command(selection_command) 
