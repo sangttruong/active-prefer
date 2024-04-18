@@ -556,7 +556,8 @@ class LLMStrategy:
             np_last_hidden_states = np.load(filename)
             print(f"Loaded array from {filename}")
         else:
-            predict_results = self.trainer.predict(self.pool_dataset, metric_key_prefix="predict")
+            with torch.no_grad():
+                predict_results = self.trainer.predict(self.pool_dataset, metric_key_prefix="predict")
             np_last_hidden_states = predict_results.predictions
             
             # Save the array into a file
