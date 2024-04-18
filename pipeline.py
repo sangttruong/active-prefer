@@ -365,8 +365,7 @@ def main(args):
                 --num_sample_selected {num_sample_selected}
             """
 
-        # run_cli_command(selection_command) 
-
+        run_cli_command(selection_command) 
         ##########################################################
         #### TRAIN DPO
         ##########################################################
@@ -430,7 +429,8 @@ def main(args):
                 --dpo_ftx 1.0
             """
 
-        # run_cli_command(dpo_ft_command) 
+        run_cli_command(dpo_ft_command) 
+        # ----------------------------------------------------------------
 
         eval_dpo_ft_output_path = f"{dpo_adapter_path}/iter_{iter}"
 
@@ -504,7 +504,6 @@ def main(args):
         #### Train Reward
         ##########################################################    
         print("Train Reward ..................................")
-        # active_dataset = new_data_info # replace dataset by ACTIVE QUERIES
 
         if args.use_accelerate:
             rm_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port} \
@@ -576,8 +575,8 @@ def main(args):
                 --fp16
                 """
 
-        # run_cli_command(rm_ft_command) 
-
+        run_cli_command(rm_ft_command) 
+        # ----------------------------------------------------------------
         eval_rm_command_output_path = f"{reward_model_path}/iter_{iter}"
 
         if args.use_accelerate_eval:
