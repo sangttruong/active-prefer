@@ -342,7 +342,8 @@ def train_oracle_model(
         print(f"Epoch {epoch+1}, Loss: {epoch_loss / len(train_dataset)}, Learning Rate: {scheduler.get_last_lr()}")
 
     save_file(v_head.state_dict(), output_vhead, metadata={"format": "pt"}) # save model
-        
+    print(f"Model v_head saved to {output_vhead}")
+
 
 def run_selection(
     model_args: "ModelArguments",
