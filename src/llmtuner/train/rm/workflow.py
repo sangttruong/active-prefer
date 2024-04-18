@@ -359,5 +359,5 @@ def run_selection(
     if finetuning_args.acquisition == 'max_entropy':
         straytegy = EntropySampling(model_args, data_args, training_args,  finetuning_args, callbacks)
     
-    straytegy.query(n = 100, iteration = finetuning_args.active_iter)
+    straytegy.query(n = finetuning_args.num_sample_selected, iteration = finetuning_args.active_iter)
     

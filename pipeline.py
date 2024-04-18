@@ -147,8 +147,8 @@ def jsonl_to_json(jsonl_file_path, output_json_file_path):
     with open(output_json_file_path, 'w') as json_file:
         json.dump(json_data, json_file, indent=4)
 
-def count_len_dataset(prediction_path):
-    with open(prediction_path, 'r') as f:
+def count_len_dataset(path):
+    with open(path, 'r') as f:
         data = json.load(f)
         ids = set(item['id'] for item in data)
     return len(ids)
@@ -230,8 +230,9 @@ def main(args):
     dpo_adapter_path = f"saves/{model_name}/{dataset}/{args.method}/dpo"
     oracle_adapter_path = f"saves/{model_name}/{dataset}/{args.method}/oracle"
     eval_metric_dir = f"saves/{model_name}/{dataset}/{args.method}"
+    num_samples_selected = int(count_len_dataset(f"{args.data_dir}/{dataset}") * args.percentage)
+    breakpoint()
 
-    
     # Train an Oracle model O 
     # ft_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port}\
     #     --config_file examples/accelerate/default.yaml \
@@ -300,6 +301,7 @@ def main(args):
     print(f"Training Oracle model ............................")
     run_cli_command(ft_oracle_command)
 
+    
 
     # active pipeline     
     for iter in range(args.num_iters):
@@ -335,7 +337,8 @@ def main(args):
                 --eval_steps {args.eval_steps} \
                 --evaluation_strategy {args.evaluation_strategy} \
                 --learning_rate {args.learning_rate} \
-                --num_train_epochs {args.num_train_epochs} 
+                --num_train_epochs {args.num_train_epochs}\
+                --num_samples_selected {num_samples_selected}
             """
         else: 
             selection_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py\
@@ -360,7 +363,8 @@ def main(args):
                 --eval_steps {args.eval_steps} \
                 --evaluation_strategy {args.evaluation_strategy} \
                 --learning_rate {args.learning_rate} \
-                --num_train_epochs {args.num_train_epochs} 
+                --num_train_epochs {args.num_train_epochs}\ 
+                --num_samples_selected {num_samples_selected}
             """
 
         run_cli_command(selection_command) 

@@ -250,6 +250,11 @@ class FinetuningArguments(FreezeArguments, LoraArguments, RLHFArguments, GaloreA
         metadata={"help": "Iteration ith"},
     )
 
+    num_sample_selected: int = field(
+        default=100,
+        metadata={"help": "num_sample_selected each iter"},
+    )    
+
     def __post_init__(self):
         def split_arg(arg):
             if isinstance(arg, str):
