@@ -119,8 +119,6 @@ class LLMStrategy:
         self.data_collator = PairwiseDataCollatorWithPadding(self.tokenizer, pad_to_multiple_of=8)
         self.callbacks = callbacks
 
-        breakpoint()    
-
         self.training_args = training_args
         self.data_args = data_args
         self.model_args = model_args
@@ -558,7 +556,7 @@ class LLMStrategy:
             np_last_hidden_states = np.load(filename)
             print(f"Loaded array from {filename}")
         else:
-            predict_results = self.trainer.predict(self.pool_dataset, metric_key_prefix="test")
+            predict_results = self.trainer.predict(self.pool_dataset, metric_key_prefix="predict")
             np_last_hidden_states = predict_results.predictions
             
             # Save the array into a file
