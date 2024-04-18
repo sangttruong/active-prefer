@@ -25,6 +25,9 @@ from .trainer import PairwiseTrainer, OracleTrainer
 from accelerate import Accelerator
 from trl import AutoModelForCausalLMWithValueHead
 
+from safetensors import safe_open
+from safetensors.torch import save_file
+
 
 if TYPE_CHECKING:
     from transformers import Seq2SeqTrainingArguments, TrainerCallback
@@ -230,6 +233,7 @@ def run_oracle_rm(
     cutoff_len = data_args.cutoff_len
     pad_token_id = tokenizer.pad_token_id
     percentage = 0.9
+    output_vhead = f"{training_args.output_dir}/value_head.safetensors"
 
     train_oracle_model(
         train_dataset, 
@@ -239,6 +243,7 @@ def run_oracle_rm(
         optimizer_params, 
         create_scheduler, 
         training_args.num_train_epochs, 
+        output_vhead,
         percentage,
         seed,
     )
@@ -254,6 +259,8 @@ def set_seed(seed):
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
 
+
+
 def train_oracle_model(
     train_dataset, 
     cutoff_len, 
@@ -262,6 +269,7 @@ def train_oracle_model(
     optimizer_params, 
     create_scheduler, 
     num_epochs,
+    output_vhead,
     percentage=0.9, 
     seed = 42,
 ):
@@ -332,6 +340,9 @@ def train_oracle_model(
         scheduler.step()
 
         print(f"Epoch {epoch+1}, Loss: {epoch_loss / len(train_dataset)}, Learning Rate: {scheduler.get_last_lr()}")
+
+    save_file(v_head.state_dict(), output_vhead, metadata={"format": "pt"}) # save model
+        
 
 def run_selection(
     model_args: "ModelArguments",

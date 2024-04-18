@@ -244,7 +244,7 @@ def main(args):
         --dataset {dataset} \
         --dataset_dir {args.dataset_dir} \
         --template {args.template} \
-        --finetuning_type full \
+        --finetuning_type freeze \
         --overwrite_output_dir \
         --cutoff_len {args.cutoff_len} \
         --per_device_train_batch_size {args.per_device_train_batch_size} \
