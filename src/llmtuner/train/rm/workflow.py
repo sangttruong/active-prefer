@@ -235,6 +235,7 @@ def run_oracle_rm(
     percentage = 0.9
     output_vhead = f"{training_args.output_dir}/value_head.safetensors"
 
+    # Training
     train_oracle_model(
         train_dataset, 
         cutoff_len, 
@@ -247,6 +248,10 @@ def run_oracle_rm(
         percentage,
         seed,
     )
+
+    # Predict
+    if training_args.do_predict:
+        pass
     
     ##########################
     del trainer, base_model
@@ -258,8 +263,6 @@ def set_seed(seed):
     np.random.seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
-
-
 
 def train_oracle_model(
     train_dataset, 
@@ -295,7 +298,7 @@ def train_oracle_model(
 
     v_head, optimizer, train_dataset = accelerator.prepare(v_head, optimizer, train_dataset)
 
-    v_head.train()
+    v_head.eval()
     for epoch in range(num_epochs):
         epoch_loss = 0.0  # Initialize epoch loss
         for idx in sample_ids:
@@ -343,7 +346,6 @@ def train_oracle_model(
 
     save_file(v_head.state_dict(), output_vhead, metadata={"format": "pt"}) # save model
     print(f"Model v_head saved to {output_vhead}")
-
 
 def run_selection(
     model_args: "ModelArguments",
