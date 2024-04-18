@@ -191,8 +191,20 @@ def save_eval_metric(file_path, accuracy, iteration):
     json_data = [{'iteration': iteration, 'accuracy': accuracy}]
 
     with open(file_path, 'w') as file:
-        json.dump(json_data, file)
-   
+        json.dump(json_data, file) 
+
+def delete_json_file(file_path):
+    try:
+        # Check if the file exists
+        if os.path.exists(file_path):
+            # Remove the file
+            os.remove(file_path)
+            print(f"File '{file_path}' deleted successfully.")
+        else:
+            print(f"File '{file_path}' does not exist.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
 
 def copy_json_file(source_path, destination_path):
     try:
@@ -217,6 +229,7 @@ def main(args):
     source_path = f"{args.dataset_dir}/backup_dataset_info.json"
     destination_path = f"{args.dataset_dir}/dataset_info.json"
     copy_json_file(source_path, destination_path)
+    delete_json_file(f"{args.dataset_dir}/selected_entries.json")
 
     if args.dataset_name in ['allenai/ai2_arc', 'arc', "arc_challenge_train"]:
         dataset = 'arc_challenge_train'

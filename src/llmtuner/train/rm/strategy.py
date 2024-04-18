@@ -578,12 +578,12 @@ class LLMStrategy:
         pass
 
     def update(self, question_ids, iteration = 0):
-        output_selected_path = f"{self.data_args.dataset_dir}/selected_entries.json"  
+        selected_path = f"{self.data_args.dataset_dir}/selected_entries.json"  
         dataset_info_path = f"{self.data_args.dataset_dir}/dataset_info.json"
-        ori_dataset_path = f"{self.data_args.dataset_dir}/{self.dataset}.json"
+        dataset_path = f"{self.data_args.dataset_dir}/{self.dataset}.json"
 
         # Update data training
-        select_entries_by_ids(ori_dataset_path, question_ids, output_selected_path)
+        select_entries_by_ids(dataset_path, question_ids, selected_path)
 
         with open(dataset_info_path, 'r') as file:
             data_info = json.load(file)
@@ -599,11 +599,12 @@ class LLMStrategy:
 
                 print("Updated dataset info has been stored in", dataset_info_path)
 
-def select_entries_by_ids(ori_dataset_path, question_ids, output_file):
+
+def select_entries_by_ids(dataset_path, question_ids, seleted_path):
     selected_entries = []
 
     # Read data from dataset.json
-    with open(ori_dataset_path, 'r') as file:
+    with open(dataset_path, 'r') as file:
         data = json.load(file)
 
     # Iterate through the data and select entries with matching IDs
@@ -615,9 +616,9 @@ def select_entries_by_ids(ori_dataset_path, question_ids, output_file):
             remaining_entries.append(entry)
 
     # Write remaining entries back to the original file
-    with open(ori_dataset_path, 'w') as file:
+    with open(dataset_path, 'w') as file:
         json.dump(remaining_entries, file, indent=4)
 
     # Write selected entries to a new JSON file
-    with open(output_file, 'w') as outfile:
+    with open(seleted_path, 'w') as outfile:
         json.dump(selected_entries, outfile, indent=4)
