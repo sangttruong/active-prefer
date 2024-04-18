@@ -299,7 +299,6 @@ def main(args):
     
     print(f"Training Oracle model ............................")
     # run_cli_command(ft_oracle_command)
-
     
 
     # active pipeline     
@@ -337,12 +336,13 @@ def main(args):
                 --evaluation_strategy {args.evaluation_strategy} \
                 --learning_rate {args.learning_rate} \
                 --num_train_epochs {args.num_train_epochs}\
-                --num_samples_selected {num_samples_selected}
+                --num_samples_selected {num_sample_selected}
             """
         else: 
             selection_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py\
                 --stage selection \
                 --do_predict \
+                --active_iter {iter}\
                 --model_name_or_path {args.model_name_or_path} \
                 --dataset_dir {args.dataset_dir} \
                 --dataset {dataset} \
@@ -353,13 +353,19 @@ def main(args):
                 --cutoff_len {args.cutoff_len} \
                 --per_device_train_batch_size {args.per_device_train_batch_size} \
                 --per_device_eval_batch_size {args.per_device_eval_batch_size} \
+                --gradient_accumulation_steps {args.gradient_accumulation_steps} \
+                --lr_scheduler_type {args.lr_scheduler_type} \
                 --logging_steps {args.logging_steps} \
+                --warmup_steps {args.warmup_steps} \
                 --save_steps {args.save_steps} \
-                --active_iter {iter}\
+                --eval_steps {args.eval_steps} \
+                --evaluation_strategy {args.evaluation_strategy} \
+                --learning_rate {args.learning_rate} \
+                --num_train_epochs {args.num_train_epochs}\ 
                 --num_sample_selected {num_sample_selected}
             """
-        breakpoint()
-        run_cli_command(selection_command) 
+
+        # run_cli_command(selection_command) 
 
         ##########################################################
         #### TRAIN DPO
@@ -424,7 +430,7 @@ def main(args):
                 --dpo_ftx 1.0
             """
 
-        run_cli_command(dpo_ft_command) 
+        # run_cli_command(dpo_ft_command) 
 
         eval_dpo_ft_output_path = f"{dpo_adapter_path}/iter_{iter}"
 
@@ -570,7 +576,7 @@ def main(args):
                 --fp16
                 """
 
-        run_cli_command(rm_ft_command) 
+        # run_cli_command(rm_ft_command) 
 
         eval_rm_command_output_path = f"{reward_model_path}/iter_{iter}"
 
