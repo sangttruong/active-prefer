@@ -399,7 +399,7 @@ def main(args):
                 --num_train_epochs {args.num_train_epochs}\
                 --num_sample_selected {num_sample_selected}
             """
-
+        breakpoint()
         run_cli_command(selection_command) 
         ##########################################################
         #### TRAIN DPO
