@@ -353,6 +353,7 @@ def main(args):
                 --stage selection \
                 --do_predict \
                 --active_iter {iter}\
+                --num_sample_selected {num_sample_selected} \
                 --model_name_or_path {args.model_name_or_path} \
                 --dataset_dir {args.dataset_dir} \
                 --dataset {dataset} \
@@ -371,8 +372,7 @@ def main(args):
                 --eval_steps {args.eval_steps} \
                 --evaluation_strategy {args.evaluation_strategy} \
                 --learning_rate {args.learning_rate} \
-                --num_train_epochs {args.num_train_epochs}\
-                --num_sample_selected {num_sample_selected}
+                --num_train_epochs {args.num_train_epochs}
             """
         else: 
             selection_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py\
@@ -397,7 +397,7 @@ def main(args):
                 --eval_steps {args.eval_steps} \
                 --evaluation_strategy {args.evaluation_strategy} \
                 --learning_rate {args.learning_rate} \
-                --num_train_epochs {args.num_train_epochs}\ 
+                --num_train_epochs {args.num_train_epochs}\
                 --num_sample_selected {num_sample_selected}
             """
 
