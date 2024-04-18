@@ -231,7 +231,6 @@ def main(args):
     oracle_adapter_path = f"saves/{model_name}/{dataset}/{args.method}/oracle"
     eval_metric_dir = f"saves/{model_name}/{dataset}/{args.method}"
     num_sample_selected = int(count_len_dataset(f"{args.dataset_dir}/{dataset}.json") * args.percentage)
-    breakpoint()
 
     # Train an Oracle model O 
     # ft_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port}\
@@ -299,7 +298,7 @@ def main(args):
         """
     
     print(f"Training Oracle model ............................")
-    run_cli_command(ft_oracle_command)
+    # run_cli_command(ft_oracle_command)
 
     
 
