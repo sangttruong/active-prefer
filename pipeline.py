@@ -230,7 +230,7 @@ def main(args):
     dpo_adapter_path = f"saves/{model_name}/{dataset}/{args.method}/dpo"
     oracle_adapter_path = f"saves/{model_name}/{dataset}/{args.method}/oracle"
     eval_metric_dir = f"saves/{model_name}/{dataset}/{args.method}"
-    num_sample_selected = int(count_len_dataset(f"{args.dataset_dir}/{dataset}") * args.percentage)
+    num_sample_selected = int(count_len_dataset(f"{args.dataset_dir}/{dataset}.json") * args.percentage)
     breakpoint()
 
     # Train an Oracle model O 
