@@ -587,10 +587,10 @@ class LLMStrategy:
                     flatten = list(emb)
                     predict_results.extend(flatten)
 
-                    ###############
-                    idx += 1
-                    if idx > 10:
-                        break
+                    # ###############
+                    # idx += 1
+                    # if idx > 10:
+                    #     break
             # ------------------------------------------------------
             # np_last_hidden_states = np.stack(predict_results)
             # predict_results = self.trainer.predict(self.pool_dataset, metric_key_prefix="predict")
