@@ -565,7 +565,7 @@ class LLMStrategy:
             predict_results = []
             idx = 0
             with torch.no_grad():
-                for idx, batch in tqdm(dataloader)):
+                for idx, batch in tqdm(dataloader):
                     emb = self.base_model(**batch)
                     batch_size, ctx, dim = emb[0].shape
                     emb = emb[0].reshape(2,batch_size // 2, ctx, dim)
