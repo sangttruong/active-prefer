@@ -64,7 +64,6 @@ def load_model(
     r"""
     Loads pretrained model. Must after load_tokenizer.
     """
-    # breakpoint()
     init_kwargs = _get_init_kwargs(model_args)
     config = AutoConfig.from_pretrained(model_args.model_name_or_path, **init_kwargs)
     patch_config(config, tokenizer, model_args, init_kwargs, is_trainable)
