@@ -272,8 +272,8 @@ class LLMStrategy:
 
     def train(self, question_ids, seed = 42):
         # Train the model
-        last_hidden_states = self.get_embedding()
-        train_dataset = CustomDataset(last_hidden_states, self.pool_dataset)  # Only need change train_dataset for diff oracle model
+        last_hidden_states, is_load = self.get_embedding()
+        train_dataset = CustomDataset(last_hidden_states, self.pool_dataset, is_load)  # Only need change train_dataset for diff oracle model
 
         # Select subset for traning by question_ids
         sample_ids = [id for id, example in enumerate(self.pool_dataset) if example['id'] in question_ids]
@@ -326,8 +326,8 @@ class LLMStrategy:
         optimizer = torch.optim.AdamW(model, **optimizer_params)
         
         # training data
-        last_hidden_states = self.get_embedding()
-        train_dataset = CustomDataset(last_hidden_states, self.pool_dataset)  
+        last_hidden_states, is_load = self.get_embedding()
+        train_dataset = CustomDataset(last_hidden_states, self.pool_dataset, is_load)  
         
         # training args
         num_epochs = int(num_epochs)
@@ -460,8 +460,8 @@ class LLMStrategy:
         accelerator = Accelerator()
         device = accelerator.device
         
-        last_hidden_states = self.get_embedding()
-        train_dataset = CustomDataset(last_hidden_states, self.pool_dataset) 
+        last_hidden_states, is_load = self.get_embedding()
+        train_dataset = CustomDataset(last_hidden_states, self.pool_dataset, is_load) 
 
         self.v_head.eval()
         predictions = []
@@ -488,9 +488,8 @@ class LLMStrategy:
         accelerator = Accelerator()
         device = accelerator.device
         
-        breakpoint()
         last_hidden_states, is_load = self.get_embedding(True)
-        train_dataset = CustomDataset(last_hidden_states, self.pool_dataset) 
+        train_dataset = CustomDataset(last_hidden_states, self.pool_dataset, is_load) 
 
         self.v_head.to(device)
         self.v_head.eval()
@@ -498,8 +497,6 @@ class LLMStrategy:
         with torch.no_grad():
             for idx in range(len(train_dataset)):
                 example = train_dataset[idx]
-
-                breakpoint()
 
                 last_hidden_state_chosen = example['last_hidden_state_chosen'][-1].to(device)
                 last_hidden_state_rejected = example['last_hidden_state_rejected'][-1].to(device)
@@ -525,8 +522,8 @@ class LLMStrategy:
         accelerator = Accelerator()
         device = accelerator.device
         
-        last_hidden_states = self.get_embedding()
-        train_dataset = CustomDataset(last_hidden_states, self.pool_dataset) 
+        last_hidden_states, is_load = self.get_embedding()
+        train_dataset = CustomDataset(last_hidden_states, self.pool_dataset, is_load) 
 
         self.v_head.eval()
         predictions = {}
@@ -587,7 +584,6 @@ class LLMStrategy:
                     batch_size, ctx, dim = emb[0].shape
                     emb = emb[0].reshape(batch_size // 2, 2, ctx, dim)
                     emb = emb.cpu()
-                    print(emb.shape)
                     flatten = list(emb)
                     predict_results.extend(flatten)
 
