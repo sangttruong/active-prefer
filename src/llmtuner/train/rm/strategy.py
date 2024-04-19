@@ -83,7 +83,7 @@ class ValueHead(nn.Module):
 
 class CustomDataset(Dataset):
     def __init__(self, embeddings_feature, dataset):
-        self.embeddings_feature = embeddings_feature
+        self.embeddings_feature = embeddings_feature # tuple
         self.dataset = dataset
 
     def __len__(self):
@@ -92,8 +92,8 @@ class CustomDataset(Dataset):
     def __getitem__(self, i):
         example = self.dataset[i]
         return {"question_id": example['id'], # string 
-                "last_hidden_state_chosen": self.embeddings_feature[2*i], # tensor (1024 x 4096)
-                "last_hidden_state_rejected": self.embeddings_feature[2*i + 1],  # tensor (1024 x 4096)
+                "last_hidden_state_chosen": self.embeddings_feature[i][0], # tensor (ctx x 4096)
+                "last_hidden_state_rejected": self.embeddings_feature[i][1],  # tensor (ctx x 4096)
                 'chosen_ids': torch.tensor(example['chosen_ids']), # list ids
                 'rejected_ids': torch.tensor(example['rejected_ids']), # list ids
                 }
