@@ -563,9 +563,12 @@ class LLMStrategy:
             self.pool_dataset
             # ------------------------------------------------------
             from torch.utils.data import DataLoader
-            dataloader = DataLoader(self.pool_dataset, batch_size=4)
+            from transformers import DataCollatorWithPadding
+            data_collator = DataCollatorWithPadding(self.tokenizer)
+            dataloader = DataLoader(self.pool_dataset, batch_size=16, collate_fn=data_collator)
+            # dataloader = DataLoader(, batch_size=4, collate_fn=lambda x: x)
+            breakpoint()
             for batch in dataloader:
-                breakpoint()
                 emb = self.base_model(batch)
             # ------------------------------------------------------
             with torch.no_grad():
