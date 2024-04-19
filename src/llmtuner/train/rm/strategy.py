@@ -568,12 +568,14 @@ class LLMStrategy:
             # dataloader = DataLoader(self.pool_dataset, batch_size=16, collate_fn=data_collator)
             dataloader = self.trainer.get_test_dataloader(self.pool_dataset)
             # dataloader = DataLoader(, batch_size=4, collate_fn=lambda x: x)
-            breakpoint()
-            for batch in dataloader:
-                emb = self.base_model(batch)
-            # ------------------------------------------------------
             with torch.no_grad():
-                predict_results = self.trainer.predict(self.pool_dataset, metric_key_prefix="predict")
+                for batch in dataloader:
+                    emb = self.base_model(**batch)
+                    breakpoint()
+                    emb = emb.cpu()
+            # ------------------------------------------------------
+            
+            predict_results = self.trainer.predict(self.pool_dataset, metric_key_prefix="predict")
             np_last_hidden_states = predict_results.predictions
             
             # Save the array into a file
