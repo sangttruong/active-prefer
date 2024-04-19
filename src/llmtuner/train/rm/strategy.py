@@ -478,7 +478,7 @@ class LLMStrategy:
         accelerator = Accelerator()
         device = accelerator.device
         
-        last_hidden_states = self.get_embedding(True)
+        last_hidden_states = self.get_embedding()
         train_dataset = CustomDataset(last_hidden_states, self.pool_dataset) 
 
         self.v_head.to(device)
@@ -550,8 +550,6 @@ class LLMStrategy:
         # Predict probabilities using dropout but return individual dropout iterations
         pass
 
-
-    
     def get_embedding(self, is_override = False):
         # Get embeddings from the penultimate layer of the network
         filename = f"{self.training_args.output_dir}/last_hidden_states.npy"
@@ -566,12 +564,14 @@ class LLMStrategy:
             dataloader = self.trainer.get_test_dataloader(self.pool_dataset)
             predict_results = []
             with torch.no_grad():
-                for batch in tqdm(dataloader):
+                for idx, batch in tqdm(enumerate(dataloader)):
                     emb = self.base_model(**batch)
                     batch_size, ctx, dim = emb[0].shape
                     emb = emb[0].reshape(2,batch_size // 2, ctx, dim)
                     emb = emb.cpu()
                     predict_results.append(emb)
+                    if idx > 10:
+                        break
             
             np_last_hidden_states = np.stack(predict_results)
             breakpoint()
