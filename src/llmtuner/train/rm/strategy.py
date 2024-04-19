@@ -479,7 +479,7 @@ class LLMStrategy:
         device = accelerator.device
         
         breakpoint()
-        last_hidden_states = self.get_embedding()
+        last_hidden_states = self.get_embedding(True)
         train_dataset = CustomDataset(last_hidden_states, self.pool_dataset) 
 
         self.v_head.to(device)
@@ -573,6 +573,7 @@ class LLMStrategy:
                     batch_size, ctx, dim = emb[0].shape
                     emb = emb[0].reshape(2,batch_size // 2, ctx, dim)
                     emb = emb.cpu()
+                    print(emb.shape)
                     predict_results.append(emb)
 
                     ###############
