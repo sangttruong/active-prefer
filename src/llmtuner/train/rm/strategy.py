@@ -24,6 +24,7 @@ import numpy as np
 import random
 import json
 import copy
+from tqdm import tqdm
 
 from ...data import get_dataset, split_dataset
 from ...extras.callbacks import FixValueHeadModelCallback
@@ -565,7 +566,7 @@ class LLMStrategy:
             dataloader = self.trainer.get_test_dataloader(self.pool_dataset)
             predict_results = []
             with torch.no_grad():
-                for batch in dataloader:
+                for batch in tqdm(dataloader):
                     emb = self.base_model(**batch)
                     batch_size, ctx, dim = emb[0].shape
                     emb = emb[0].reshape(2,batch_size // 2, ctx, dim)
