@@ -563,13 +563,17 @@ class LLMStrategy:
             # ------------------------------------------------------
             dataloader = self.trainer.get_test_dataloader(self.pool_dataset)
             predict_results = []
+            idx = 0
             with torch.no_grad():
-                for idx, batch in tqdm(enumerate(dataloader)):
+                for idx, batch in tqdm(dataloader)):
                     emb = self.base_model(**batch)
                     batch_size, ctx, dim = emb[0].shape
                     emb = emb[0].reshape(2,batch_size // 2, ctx, dim)
                     emb = emb.cpu()
                     predict_results.append(emb)
+
+                    ###############
+                    idx += 1
                     if idx > 10:
                         break
             
