@@ -565,7 +565,8 @@ class LLMStrategy:
             from torch.utils.data import DataLoader
             from transformers import DataCollatorWithPadding
             data_collator = DataCollatorWithPadding(self.tokenizer)
-            dataloader = DataLoader(self.pool_dataset, batch_size=16, collate_fn=data_collator)
+            # dataloader = DataLoader(self.pool_dataset, batch_size=16, collate_fn=data_collator)
+            dataloader = self.trainer.get_test_dataloader(self.pool_dataset)
             # dataloader = DataLoader(, batch_size=4, collate_fn=lambda x: x)
             breakpoint()
             for batch in dataloader:
