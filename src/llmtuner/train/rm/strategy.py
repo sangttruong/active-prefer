@@ -585,10 +585,11 @@ class LLMStrategy:
                 for batch in tqdm(dataloader):
                     emb = self.base_model(**batch)
                     batch_size, ctx, dim = emb[0].shape
-                    emb = emb[0].reshape(2, batch_size // 2, ctx, dim)
+                    emb = emb[0].reshape(batch_size // 2, 2, ctx, dim)
                     emb = emb.cpu()
                     print(emb.shape)
-                    predict_results.append(emb)
+                    flatten = list(emb)
+                    predict_results.extend(flatten)
 
                     ###############
                     idx += 1
