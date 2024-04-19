@@ -478,6 +478,7 @@ class LLMStrategy:
         accelerator = Accelerator()
         device = accelerator.device
         
+        breakpoint()
         last_hidden_states = self.get_embedding()
         train_dataset = CustomDataset(last_hidden_states, self.pool_dataset) 
 
@@ -487,6 +488,8 @@ class LLMStrategy:
         with torch.no_grad():
             for idx in range(len(train_dataset)):
                 example = train_dataset[idx]
+
+                breakpoint()
 
                 last_hidden_state_chosen = example['last_hidden_state_chosen'][-1].to(device)
                 last_hidden_state_rejected = example['last_hidden_state_rejected'][-1].to(device)
@@ -576,9 +579,9 @@ class LLMStrategy:
                     idx += 1
                     if idx > 10:
                         break
-            
-            np_last_hidden_states = np.stack(predict_results)
+
             breakpoint()
+            np_last_hidden_states = np.stack(predict_results)
             # ------------------------------------------------------
             # predict_results = self.trainer.predict(self.pool_dataset, metric_key_prefix="predict")
             np_last_hidden_states = predict_results.predictions
