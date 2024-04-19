@@ -548,6 +548,8 @@ class LLMStrategy:
     def predict_prob_dropout_split(self, X, Y, n_drop):
         # Predict probabilities using dropout but return individual dropout iterations
         pass
+
+
     
     def get_embedding(self, is_override = False):
         # Get embeddings from the penultimate layer of the network
@@ -558,9 +560,16 @@ class LLMStrategy:
             print(f"Loaded array from {filename}")
         else:
             self.base_model.eval()
+            self.pool_dataset
+            # ------------------------------------------------------
+            from torch.utils.data import DataLoader
+            dataloader = DataLoader(self.pool_dataset, batch_size=4)
+            for batch in dataloader:
+                breakpoint()
+                emb = self.base_model(batch)
+            # ------------------------------------------------------
             with torch.no_grad():
                 predict_results = self.trainer.predict(self.pool_dataset, metric_key_prefix="predict")
-            breakpoint()
             np_last_hidden_states = predict_results.predictions
             
             # Save the array into a file
