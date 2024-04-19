@@ -562,20 +562,20 @@ class LLMStrategy:
             self.base_model.eval()
             self.pool_dataset
             # ------------------------------------------------------
-            from torch.utils.data import DataLoader
-            from transformers import DataCollatorWithPadding
-            data_collator = DataCollatorWithPadding(self.tokenizer)
-            # dataloader = DataLoader(self.pool_dataset, batch_size=16, collate_fn=data_collator)
             dataloader = self.trainer.get_test_dataloader(self.pool_dataset)
-            # dataloader = DataLoader(, batch_size=4, collate_fn=lambda x: x)
+            predict_results = []
             with torch.no_grad():
                 for batch in dataloader:
                     emb = self.base_model(**batch)
-                    breakpoint()
+                    batch_size, ctx, dim = emb[0].shape
+                    emb = emb[0].reshape(2,batch_size // 2, ctx, dim)
                     emb = emb.cpu()
-            # ------------------------------------------------------
+                    predict_results.append(emb)
             
-            predict_results = self.trainer.predict(self.pool_dataset, metric_key_prefix="predict")
+            np_last_hidden_states = np.stack(predict_results)
+            breakpoint()
+            # ------------------------------------------------------
+            # predict_results = self.trainer.predict(self.pool_dataset, metric_key_prefix="predict")
             np_last_hidden_states = predict_results.predictions
             
             # Save the array into a file
