@@ -83,21 +83,31 @@ class ValueHead(nn.Module):
         return output
 
 class CustomDataset(Dataset):
-    def __init__(self, embeddings_feature, dataset):
+    def __init__(self, embeddings_feature, dataset, is_load=False):
         self.embeddings_feature = embeddings_feature # tuple
         self.dataset = dataset
+        self.is_load = is_load
 
     def __len__(self):
         return len(self.dataset)
 
     def __getitem__(self, i):
         example = self.dataset[i]
-        return {"question_id": example['id'], # string 
-                "last_hidden_state_chosen": self.embeddings_feature[i][0], # tensor (ctx x 4096)
-                "last_hidden_state_rejected": self.embeddings_feature[i][1],  # tensor (ctx x 4096)
-                'chosen_ids': torch.tensor(example['chosen_ids']), # list ids
-                'rejected_ids': torch.tensor(example['rejected_ids']), # list ids
-                }
+        
+        if self.is_load:
+            return {"question_id": example['id'], # string 
+                    "last_hidden_state_chosen": self.embeddings_feature[f'arr_{i}'][i][0], # tensor (ctx x 4096)
+                    "last_hidden_state_rejected": self.embeddings_feature[f'arr_{i}'][i][1],  # tensor (ctx x 4096)
+                    'chosen_ids': torch.tensor(example['chosen_ids']), # list ids
+                    'rejected_ids': torch.tensor(example['rejected_ids']), # list ids
+                    }
+        else:
+            return {"question_id": example['id'], # string 
+                    "last_hidden_state_chosen": self.embeddings_feature[i][0], # tensor (ctx x 4096)
+                    "last_hidden_state_rejected": self.embeddings_feature[i][1],  # tensor (ctx x 4096)
+                    'chosen_ids': torch.tensor(example['chosen_ids']), # list ids
+                    'rejected_ids': torch.tensor(example['rejected_ids']), # list ids
+                    }
 
 def set_seed(seed):
     random.seed(seed)
@@ -479,7 +489,7 @@ class LLMStrategy:
         device = accelerator.device
         
         breakpoint()
-        last_hidden_states = self.get_embedding(True)
+        last_hidden_states, is_load = self.get_embedding(True)
         train_dataset = CustomDataset(last_hidden_states, self.pool_dataset) 
 
         self.v_head.to(device)
@@ -555,11 +565,15 @@ class LLMStrategy:
 
     def get_embedding(self, is_override = False):
         # Get embeddings from the penultimate layer of the network
-        filename = f"{self.training_args.output_dir}/last_hidden_states.npy"
+        # filename = f"{self.training_args.output_dir}/last_hidden_states.npy"
+        filename = f"{self.training_args.output_dir}/last_hidden_states.npz"
+
         # Check if the file exists
         if is_override == False and os.path.isfile(filename):
-            np_last_hidden_states = np.load(filename)
+            # np_last_hidden_states = np.load(filename)
+            data = np.load(filename)
             print(f"Loaded array from {filename}")
+            return data, True
         else:
             self.base_model.eval()
             self.pool_dataset
@@ -571,7 +585,7 @@ class LLMStrategy:
                 for batch in tqdm(dataloader):
                     emb = self.base_model(**batch)
                     batch_size, ctx, dim = emb[0].shape
-                    emb = emb[0].reshape(2,batch_size // 2, ctx, dim)
+                    emb = emb[0].reshape(2, batch_size // 2, ctx, dim)
                     emb = emb.cpu()
                     print(emb.shape)
                     predict_results.append(emb)
@@ -580,20 +594,18 @@ class LLMStrategy:
                     idx += 1
                     if idx > 10:
                         break
-
-            breakpoint()
-            np_last_hidden_states = np.stack(predict_results)
             # ------------------------------------------------------
+            # np_last_hidden_states = np.stack(predict_results)
             # predict_results = self.trainer.predict(self.pool_dataset, metric_key_prefix="predict")
-            np_last_hidden_states = predict_results.predictions
+            # np_last_hidden_states = predict_results.predictions
             
-            # Save the array into a file
-            np.save(filename, np_last_hidden_states)
-            print(f"Array saved to {filename}")
-        
-        last_hidden_states = torch.tensor(np_last_hidden_states)  # Using torch.tensor()
+            # # Save the array into a file
+            # np.save(filename, np_last_hidden_states)
+            # print(f"Array saved to {filename}")
+            np.savez(filename, *predict_results)
 
-        return last_hidden_states
+        # last_hidden_states = torch.tensor(np_last_hidden_states)  # Using torch.tensor()
+        return predict_results, False
 
     # gradient embedding for badge (assumes cross-entropy loss)
     def get_grad_embedding(self, X, Y, model=[]):
