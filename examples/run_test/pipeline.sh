@@ -21,12 +21,12 @@ CUDA_VISIBLE_DEVICES=3,6 python src/train_bash.py \
     --dataset_dir data\
     --dataset reward_bench_train\
     --template default\
-    --finetuning_type full\
+    --finetuning_type freeze\
     --output_dir saves/Llama-2-7b-hf/reward_bench_train/random/reward\
     --overwrite_output_dir\
-    --cutoff_len 1024\
-    --per_device_train_batch_size 4\
-    --per_device_eval_batch_size 4\
+    --cutoff_len 512\
+    --per_device_train_batch_size 2\
+    --per_device_eval_batch_size 2\
     --gradient_accumulation_steps 8\
     --lr_scheduler_type cosine\
     --logging_steps 400\

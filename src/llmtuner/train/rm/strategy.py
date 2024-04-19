@@ -551,15 +551,16 @@ class LLMStrategy:
     
     def get_embedding(self, is_override = False):
         # Get embeddings from the penultimate layer of the network
-        self.base_model.eval()
         filename = f"{self.training_args.output_dir}/last_hidden_states.npy"
         # Check if the file exists
         if is_override == False and os.path.isfile(filename):
             np_last_hidden_states = np.load(filename)
             print(f"Loaded array from {filename}")
         else:
+            self.base_model.eval()
             with torch.no_grad():
                 predict_results = self.trainer.predict(self.pool_dataset, metric_key_prefix="predict")
+            breakpoint()
             np_last_hidden_states = predict_results.predictions
             
             # Save the array into a file
