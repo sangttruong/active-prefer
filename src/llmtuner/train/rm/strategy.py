@@ -40,6 +40,9 @@ from .trainer import PairwiseTrainer, OracleTrainer
 from accelerate import Accelerator
 from trl import AutoModelForCausalLMWithValueHead
 
+from safetensors import safe_open
+from safetensors.torch import save_file
+
 
 if TYPE_CHECKING:
     from transformers import Seq2SeqTrainingArguments, TrainerCallback
@@ -313,8 +316,7 @@ class LLMStrategy:
         accelerator = Accelerator()
         device = accelerator.device
 
-        if model is None:
-            model = self.v_head.to(device) 
+        model = self.v_head.to(device) 
 
         optimizer_params = self.trainer.create_optimizer().param_groups[0]
         create_scheduler = self.trainer.create_scheduler
@@ -345,6 +347,8 @@ class LLMStrategy:
         allWeights = []
 
         for m in range(nEns):
+            output_vhead = f"{self.training_args.output_dir}/qbc_{m}.safetensors"
+
             # initialize new model and optimizer
             model =  self.v_head.apply(weight_reset).to(device)
             model.train()
@@ -411,7 +415,11 @@ class LLMStrategy:
             
             allAvs.append(avIterates)
             allWeights.append(torch.cat([deepcopy(p.detach().cpu()).flatten() for p in model.parameters()]))
-                
+
+            # Save model
+            save_file(model.state_dict(), output_vhead, metadata={"format": "pt"}) # save model
+            print(f"Model {m} saved to {output_vhead}")
+
         for m in range(nEns):
             avIterates = torch.stack(allAvs[m])
             if k > 1: avIterates = torch.stack(allAvs[m][1:])
