@@ -318,15 +318,10 @@ class LLMStrategy:
 
         model = self.v_head.to(device) 
 
-        optimizer_params = self.trainer.create_optimizer().param_groups[0]
-        create_scheduler = self.trainer.create_scheduler
+        
         cutoff_len = self.data_args.cutoff_len
         pad_token_id = self.tokenizer.pad_token_id
 
-        # optimizer 
-        optimizer_params.pop('params', None)     
-        optimizer = torch.optim.AdamW(model.parameters(), **optimizer_params)
-        
         # training data
         last_hidden_states, is_load = self.get_embedding()
         train_dataset = CustomDataset(last_hidden_states, self.pool_dataset, is_load)  
@@ -335,14 +330,8 @@ class LLMStrategy:
         num_epochs = int(self.training_args.num_train_epochs)
         num_training_steps_per_epoch = len(train_dataset) 
         num_training_steps = num_epochs * num_training_steps_per_epoch
-        if sample_ids is None:
-            sample_ids = list(range(len(train_dataset)))
         
-        # scheduler
-        scheduler = create_scheduler(num_training_steps, optimizer = optimizer)
         
-        model, optimizer, train_dataset = accelerator.prepare(model, optimizer, train_dataset)
-
         allAvs = []
         allWeights = []
 
@@ -350,9 +339,19 @@ class LLMStrategy:
             output_vhead = f"{self.training_args.output_dir}/qbc_{m}.safetensors"
 
             # initialize new model and optimizer
-            model =  self.v_head.apply(weight_reset).to(device)
-            model.train()
+            sample_ids = list(range(len(train_dataset)))
 
+            # optimizer, scheduler
+            optimizer_params = self.trainer.create_optimizer().param_groups[0]
+            create_scheduler = self.trainer.create_scheduler
+            optimizer_params.pop('params', None)     
+            optimizer = torch.optim.AdamW(model.parameters(), **optimizer_params)
+            scheduler = create_scheduler(num_training_steps, optimizer = optimizer)
+    
+            model =  self.v_head.apply(weight_reset).to(device)
+            model, optimizer, train_dataset = accelerator.prepare(model, optimizer, train_dataset)
+            model.train()
+            
             avIterates = []
             steps = 0 
             k = 0
