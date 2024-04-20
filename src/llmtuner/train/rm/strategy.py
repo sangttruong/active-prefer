@@ -332,7 +332,7 @@ class LLMStrategy:
         train_dataset = CustomDataset(last_hidden_states, self.pool_dataset, is_load)  
         
         # training args
-        num_epochs = int(num_epochs)
+        num_epochs = int(self.training_args.num_train_epochs)
         num_training_steps_per_epoch = len(train_dataset) 
         num_training_steps = num_epochs * num_training_steps_per_epoch
         if sample_ids is None:
