@@ -325,7 +325,7 @@ class LLMStrategy:
 
         # optimizer 
         optimizer_params.pop('params', None)     
-        optimizer = torch.optim.AdamW(model, **optimizer_params)
+        optimizer = torch.optim.AdamW(model.parameters(), **optimizer_params)
         
         # training data
         last_hidden_states, is_load = self.get_embedding()
