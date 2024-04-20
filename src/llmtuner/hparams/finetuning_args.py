@@ -235,7 +235,7 @@ class FinetuningArguments(FreezeArguments, LoraArguments, RLHFArguments, GaloreA
         metadata={"help": "Freeze all except v_head"},
     )
     
-    acquisition: Literal["random", "max_entropy", "least_confident"] = field(
+    acquisition: Literal["random", "max_entropy", "least_confident", "qbc"] = field(
         default="max_entropy",
         metadata={"help": "Acquisition functions"},
     )
