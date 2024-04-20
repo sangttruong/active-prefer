@@ -12,6 +12,8 @@ import math
 
 from scipy.stats import entropy
 
+from openai import OpenAI
+
 def read_inference_results(prediction_path):
     question_scores = {}
 
@@ -224,6 +226,29 @@ def copy_json_file(source_path, destination_path):
         print(f"An error occurred: {e}")
 
 
+import subprocess
+import time
+
+def run_server(cmd_string):
+    try:
+        server_process = subprocess.Popen(cmd_string, shell=True)
+        return server_process
+    except Exception as e:
+        print(f"Error starting server: {e}")
+        return None
+
+def shutdown_server(process):
+    try:
+        process.terminate()
+        print("Server shutdown successfully.")
+    except Exception as e:
+        print(f"Error shutting down server: {e}")
+
+   
+    
+    
+
+
 def main(args):
     # Prepare dataset
     source_path = f"{args.dataset_dir}/backup_dataset_info.json"
@@ -268,41 +293,6 @@ def main(args):
     num_sample_selected = int(count_len_dataset(f"{args.dataset_dir}/{dataset}.json") * args.percentage)
 
     # Train an Oracle model O 
-    # ft_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port}\
-    #     --config_file examples/accelerate/default.yaml \
-    #     src/train_bash.py \
-    #     --stage rm \
-    #     --do_train \
-    #     --flash_attn True\
-    #     --model_name_or_path {args.model_name_or_path}\
-    #     --output_dir {oracle_adapter_path}\
-    #     --dataset {dataset} \
-    #     --dataset_dir {args.dataset_dir} \
-    #     --template {args.template} \
-    #     --finetuning_type freeze \
-    #     --overwrite_output_dir \
-    #     --cutoff_len {args.cutoff_len} \
-    #     --per_device_train_batch_size {args.per_device_train_batch_size} \
-    #     --per_device_eval_batch_size {args.per_device_eval_batch_size} \
-    #     --gradient_accumulation_steps {args.gradient_accumulation_steps} \
-    #     --lr_scheduler_type {args.lr_scheduler_type} \
-    #     --logging_steps {args.logging_steps} \
-    #     --warmup_steps {args.warmup_steps} \
-    #     --save_steps {args.save_steps} \
-    #     --eval_steps {args.save_steps} \
-    #     --evaluation_strategy {args.evaluation_strategy} \
-    #     --learning_rate {args.learning_rate} \
-    #     --num_train_epochs {args.num_train_epochs} \
-    #     --max_samples {args.max_samples} \
-    #     --val_size 0.1 \
-    #     --ddp_timeout 1800000 \
-    #     --plot_loss \
-    #     --only_training_vhead True \
-    #     --report_to none\
-    #     --fp16
-    #     """
-
-
     ft_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
         --stage oracle \
         --do_train \
@@ -691,57 +681,137 @@ def main(args):
         ##########################################################
         ####  Eval
         ##########################################################
-        dataset_name_generated = f"{dataset}_generated"
-
-        if args.use_accelerate_eval:
-            generate_text_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port} \
-                --config_file examples/accelerate/default.yaml \
-                src/train_bash.py \
-                --stage sft \
-                --do_predict \
-                --model_name_or_path {args.model_name_or_path} \
-                --adapter_name_or_path {dpo_adapter_path} \
-                --dataset {testset} \
-                --dataset_dir {args.dataset_dir} \
-                --template {args.template} \
-                --finetuning_type {args.finetuning_type} \
-                --output_dir {args.dataset_dir} \
-                --overwrite_cache \
-                --overwrite_output_dir \
-                --cutoff_len {args.cutoff_len} \
-                --preprocessing_num_workers 16 \
-                --per_device_eval_batch_size {args.per_device_eval_batch_size} \
-                --predict_with_generate \
-                --report_to none \
-                --fp16
-            """
-        else:
-            generate_text_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
-                --stage sft \
-                --do_predict \
-                --model_name_or_path {args.model_name_or_path} \
-                --adapter_name_or_path {dpo_adapter_path} \
-                --dataset {testset} \
-                --dataset_dir {args.dataset_dir} \
-                --template {args.template} \
-                --finetuning_type {args.finetuning_type} \
-                --output_dir {args.dataset_dir} \
-                --overwrite_cache \
-                --overwrite_output_dir \
-                --cutoff_len {args.cutoff_len} \
-                --preprocessing_num_workers 16 \
-                --per_device_eval_batch_size {args.per_device_eval_batch_size} \
-                --predict_with_generate \
-                --fp16
-            """
 
         print(f"Generating text from the new DPO model .....................")
-        run_cli_command(generate_text_command)
-        
+        dataset_name_generated = f"{dataset}_generated"
+
+        # if args.use_accelerate_eval:
+        #     generate_text_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port} \
+        #         --config_file examples/accelerate/default.yaml \
+        #         src/train_bash.py \
+        #         --stage sft \
+        #         --do_predict \
+        #         --model_name_or_path {args.model_name_or_path} \
+        #         --adapter_name_or_path {dpo_adapter_path} \
+        #         --dataset {testset} \
+        #         --dataset_dir {args.dataset_dir} \
+        #         --template {args.template} \
+        #         --finetuning_type {args.finetuning_type} \
+        #         --output_dir {args.dataset_dir} \
+        #         --overwrite_cache \
+        #         --overwrite_output_dir \
+        #         --cutoff_len {args.cutoff_len} \
+        #         --preprocessing_num_workers 16 \
+        #         --per_device_eval_batch_size {args.per_device_eval_batch_size} \
+        #         --predict_with_generate \
+        #         --report_to none \
+        #         --fp16
+        #     """
+        # else:
+        #     generate_text_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
+        #         --stage sft \
+        #         --do_predict \
+        #         --model_name_or_path {args.model_name_or_path} \
+        #         --adapter_name_or_path {dpo_adapter_path} \
+        #         --dataset {testset} \
+        #         --dataset_dir {args.dataset_dir} \
+        #         --template {args.template} \
+        #         --finetuning_type {args.finetuning_type} \
+        #         --output_dir {args.dataset_dir} \
+        #         --overwrite_cache \
+        #         --overwrite_output_dir \
+        #         --cutoff_len {args.cutoff_len} \
+        #         --preprocessing_num_workers 16 \
+        #         --per_device_eval_batch_size {args.per_device_eval_batch_size} \
+        #         --predict_with_generate \
+        #         --fp16
+        #     """
         # add dataset_name_generated into dataset_info to inference oracle model
-        jsonl_to_json(f"{args.dataset_dir}/generated_predictions.jsonl", f"{args.dataset_dir}/generated_predictions.json")
+        # jsonl_to_json(f"{args.dataset_dir}/generated_predictions.jsonl", f"{args.dataset_dir}/generated_predictions.json")
+        # add_new_dataset_info(args.data_info_path, dataset_name_generated, f"generated_predictions.json")
+
+        
+
+        # Export DPO finetuned model 
+        dpo_full_path = f"{dpo_adapter_path}/full"
+
+        export_command = f""""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/export_model.py \
+            --model_name_or_path {args.model_name_or_path} \
+            --adapter_name_or_path {dpo_adapter_path} \
+            --export_hub_model_id
+            --template {args.template} \
+            --finetuning_type {args.finetuning_type} \
+            --export_dir {dpo_full_path} \
+            --export_size 2 \
+            --export_legacy_format False
+        """
+        run_cli_command(export_command)
+
+        # Push model to hf-hub
+        
+        # Deploy
+        api_port = 8006
+        if "llama" in args.model_name_or_path.lower():
+            template = "llama"
+        elif "mistral" in args.model_name_or_path.lower():
+            template = "mistral"
+
+        deploy_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} API_PORT={args.api_port} python src/api_demo.py \
+            --model_name_or_path {dpo_full_path}\
+            --template {template} \
+            --infer_backend vllm \
+            --vllm_enforce_eager
+        """
+        server_process = run_server(deploy_command)
+        # Inference 
+
+        
+        client = OpenAI(
+            base_url=f"http://localhost:{args.api_port}/v1",
+            api_key="token-abc123",
+        )
+
+        testset_path = f"{args.dataset_dir}/{testset}.json" 
+        with open(testset_path, 'r') as json_file:
+            test_data = json.load(json_file)
+
+        predictions = []
+        for sample in test_data:
+            pred_sample = copy.deepcopy(sample)
+
+            completion = client.chat.completions.create(
+                model=dpo_full_path,
+                messages=[
+                    {"role": "user", "content": pred_sample['instruction']}
+                ]
+            )
+            pred = completion.choices[0].message.content
+            pred_sample['output'][0] = pred
+            
+            predictions.append(pred_sample)
+
+
+        # Save result at "args.dataset_dir}/generated_predictions.json" 
+        output_file_path = os.path.join(args.dataset_dir, "generated_predictions.json")
+
+        # Save the predictions to the JSON file
+        with open(output_file_path, 'w') as output_file:
+            json.dump(predictions, output_file)
+        print(f"Predictions saved to: {output_file_path}")
+        
+        # Add new dataset info to datset_info.json to run predict reward model
         add_new_dataset_info(args.data_info_path, dataset_name_generated, f"generated_predictions.json")
 
+        # Shutdown 
+        if server_process:
+            try:
+                # Shutdown the server
+                shutdown_server(server_process)
+            except KeyboardInterrupt:
+                print("KeyboardInterrupt received. Shutting down server.")
+                shutdown_server(server_process)
+
+        # -------------
         if args.use_accelerate_eval:
             inference_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port} \
                 --config_file examples/accelerate/default.yaml \
@@ -779,6 +849,7 @@ def main(args):
         run_cli_command(inference_oracle_command)
         delete_item_dataset_info(args.data_info_path, dataset_name_generated) # clean dataset_info
 
+        # -------------------------
         # Get accuracy        
         accuracy = calculate_accuracy(f"{oracle_adapter_path}/generated_predictions.jsonl")
         print("Accuracy:", accuracy)
@@ -826,7 +897,9 @@ def parse_arguments():
     parser.add_argument("--method", type=str, default="max_entropy", help="Selection method")
     parser.add_argument("--dataset", type=str, default="arc_sample", help="Dataset name")
     parser.add_argument("--gpu_ids", type=str, default="0,1", help="")
-    parser.add_argument("--main_process_port", type=int, default=29505, help="Port")
+    parser.add_argument("--main_process_port", type=int, default=29505, help="Deepspeed Port")
+    parser.add_argument("--api_port", type=int, default=8005, help="Deploy API port")
+
     return parser.parse_args()
 
 if __name__ == "__main__":

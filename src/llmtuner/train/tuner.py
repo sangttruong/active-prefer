@@ -94,5 +94,6 @@ def export_model(args: Optional[Dict[str, Any]] = None):
     del model
     gc.collect()
     torch.cuda.empty_cache()
+    
 if __name__ == "__main__":
     run_exp()
