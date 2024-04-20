@@ -10,7 +10,8 @@ python pipeline.py \
     --gpu_ids 2,3 \
     --use_accelerate \
     --sanity_check \
-    --main_process_port 29505
+    --main_process_port 29505\
+    --api_port 8007
     
 
 CUDA_VISIBLE_DEVICES=3,6 python src/train_bash.py \

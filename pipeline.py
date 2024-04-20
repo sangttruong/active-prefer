@@ -450,6 +450,7 @@ def main(args):
                 --num_train_epochs {args.num_train_epochs} \
                 --max_samples {args.max_samples} \
                 --plot_loss \
+                --report_to none\
                 --dpo_ftx 1.0
             """
 
@@ -685,53 +686,6 @@ def main(args):
         print(f"Generating text from the new DPO model .....................")
         dataset_name_generated = f"{dataset}_generated"
 
-        # if args.use_accelerate_eval:
-        #     generate_text_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port} \
-        #         --config_file examples/accelerate/default.yaml \
-        #         src/train_bash.py \
-        #         --stage sft \
-        #         --do_predict \
-        #         --model_name_or_path {args.model_name_or_path} \
-        #         --adapter_name_or_path {dpo_adapter_path} \
-        #         --dataset {testset} \
-        #         --dataset_dir {args.dataset_dir} \
-        #         --template {args.template} \
-        #         --finetuning_type {args.finetuning_type} \
-        #         --output_dir {args.dataset_dir} \
-        #         --overwrite_cache \
-        #         --overwrite_output_dir \
-        #         --cutoff_len {args.cutoff_len} \
-        #         --preprocessing_num_workers 16 \
-        #         --per_device_eval_batch_size {args.per_device_eval_batch_size} \
-        #         --predict_with_generate \
-        #         --report_to none \
-        #         --fp16
-        #     """
-        # else:
-        #     generate_text_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
-        #         --stage sft \
-        #         --do_predict \
-        #         --model_name_or_path {args.model_name_or_path} \
-        #         --adapter_name_or_path {dpo_adapter_path} \
-        #         --dataset {testset} \
-        #         --dataset_dir {args.dataset_dir} \
-        #         --template {args.template} \
-        #         --finetuning_type {args.finetuning_type} \
-        #         --output_dir {args.dataset_dir} \
-        #         --overwrite_cache \
-        #         --overwrite_output_dir \
-        #         --cutoff_len {args.cutoff_len} \
-        #         --preprocessing_num_workers 16 \
-        #         --per_device_eval_batch_size {args.per_device_eval_batch_size} \
-        #         --predict_with_generate \
-        #         --fp16
-        #     """
-        # add dataset_name_generated into dataset_info to inference oracle model
-        # jsonl_to_json(f"{args.dataset_dir}/generated_predictions.jsonl", f"{args.dataset_dir}/generated_predictions.json")
-        # add_new_dataset_info(args.data_info_path, dataset_name_generated, f"generated_predictions.json")
-
-        
-
         # Export DPO finetuned model 
         dpo_full_path = f"{dpo_adapter_path}/full"
 
@@ -750,7 +704,6 @@ def main(args):
         # Push model to hf-hub
         
         # Deploy
-        api_port = 8006
         if "llama" in args.model_name_or_path.lower():
             template = "llama"
         elif "mistral" in args.model_name_or_path.lower():
@@ -764,7 +717,6 @@ def main(args):
         """
         server_process = run_server(deploy_command)
         # Inference 
-
         
         client = OpenAI(
             base_url=f"http://localhost:{args.api_port}/v1",
