@@ -36,6 +36,9 @@ if TYPE_CHECKING:
 
 
 from .entropy_sampling import EntropySampling
+from .random_sampling import RandomSampling
+from .committees import QueryByCommittees
+
 
 def run_rm(
     model_args: "ModelArguments",
@@ -355,9 +358,13 @@ def run_selection(
     finetuning_args: "FinetuningArguments",
     callbacks: Optional[List["TrainerCallback"]] = None,
 ):
-    
-    if finetuning_args.acquisition == 'max_entropy':
+    print(f"Acquisition: {finetuning_args.acquisition}")
+    if finetuning_args.acquisition == 'random':
+        straytegy = RandomSampling(model_args, data_args, training_args,  finetuning_args, callbacks)
+    elif finetuning_args.acquisition == 'max_entropy':
         straytegy = EntropySampling(model_args, data_args, training_args,  finetuning_args, callbacks)
+    elif finetuning_args.acquisition == 'qbc':
+        straytegy = QueryByCommittees(model_args, data_args, training_args,  finetuning_args, callbacks)
     
     straytegy.query(n = finetuning_args.num_sample_selected, iteration = finetuning_args.active_iter)
     

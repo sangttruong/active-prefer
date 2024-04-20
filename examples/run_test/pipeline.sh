@@ -7,15 +7,17 @@ python pipeline.py \
     --num_iters 2\
     --num_train_epochs 2\
     --percentage 0.1 \
-    --gpu_ids 2,3 \
     --use_accelerate \
     --sanity_check \
     --main_process_port 29505\
-    --api_port 8007
+    --api_port 8007\
+    --gpu_ids 6,7
+    
     
 
 CUDA_VISIBLE_DEVICES=3,6 python src/train_bash.py \
     --stage selection\
+    --acquisition qbc\
     --do_predict\
     --active_iter 0\
     --model_name_or_path meta-llama/Llama-2-7b-hf\
@@ -37,4 +39,4 @@ CUDA_VISIBLE_DEVICES=3,6 python src/train_bash.py \
     --evaluation_strategy steps\
     --learning_rate 5e-05\
     --num_train_epochs 2.0\
-    --num_sample_selected 409
+    --num_sample_selected 30

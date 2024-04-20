@@ -587,18 +587,7 @@ class LLMStrategy:
                     flatten = list(emb)
                     predict_results.extend(flatten)
 
-                    # ###############
-                    # idx += 1
-                    # if idx > 10:
-                    #     break
-            # ------------------------------------------------------
-            # np_last_hidden_states = np.stack(predict_results)
-            # predict_results = self.trainer.predict(self.pool_dataset, metric_key_prefix="predict")
-            # np_last_hidden_states = predict_results.predictions
-            
-            # # Save the array into a file
-            # np.save(filename, np_last_hidden_states)
-            # print(f"Array saved to {filename}")
+
             np.savez(filename, *predict_results)
 
         # last_hidden_states = torch.tensor(np_last_hidden_states)  # Using torch.tensor()
