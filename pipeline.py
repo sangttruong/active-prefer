@@ -713,21 +713,23 @@ def main(args):
         dataset_name_generated = f"{dataset}_generated"
 
         # Export DPO finetuned model 
-        if args.is_using_vllm:
-            dpo_full_path = f"{dpo_adapter_path}/full"
+        dpo_full_path = f"{dpo_adapter_path}/full"
 
-            export_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/export_model.py \
-                --model_name_or_path {args.model_name_or_path} \
-                --adapter_name_or_path {dpo_adapter_path} \
-                --export_dir {dpo_full_path} \
-                --template {args.template} \
-                --finetuning_type {args.finetuning_type} \
-                --export_size 2 \
-                --export_legacy_format False
-                """
+        export_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/export_model.py \
+            --model_name_or_path {args.model_name_or_path} \
+            --adapter_name_or_path {dpo_adapter_path} \
+            --export_dir {dpo_full_path} \
+            --template {args.template} \
+            --finetuning_type {args.finetuning_type} \
+            --export_size 2 \
+            --export_legacy_format False
+            """
+        
+        # Export model
+        run_cli_command(export_command) 
+
+        if args.is_using_vllm:
             
-            # Export model
-            run_cli_command(export_command) 
 
             # Deploy
             if "llama" in args.model_name_or_path.lower():
@@ -780,11 +782,12 @@ def main(args):
             kill_cmd = f"python src/api_demo.py --model_name_or_path {dpo_full_path} --template {template} --infer_backend vllm --vllm_enforce_eager"
             find_and_kill_process(kill_cmd)
         else:
+            # --model_name_or_path {args.model_name_or_path} \
+            # --adapter_name_or_path {dpo_adapter_path} \
             generate_text_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
                 --stage sft \
                 --do_predict \
-                --model_name_or_path {args.model_name_or_path} \
-                --adapter_name_or_path {dpo_adapter_path} \
+                --model_name_or_path {dpo_full_path} \
                 --dataset {testset} \
                 --dataset_dir {args.dataset_dir} \
                 --template {args.template} \
