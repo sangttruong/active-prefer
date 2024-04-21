@@ -6,6 +6,8 @@ import argparse
 import json
 import random
 import os
+import subprocess
+import time
 import copy
 import json
 import math
@@ -227,8 +229,6 @@ def copy_json_file(source_path, destination_path):
         print(f"An error occurred: {e}")
 
 
-import subprocess
-import time
 
 def run_server(cmd_string):
     try:
@@ -712,10 +712,11 @@ def main(args):
             --infer_backend vllm \
             --vllm_enforce_eager
         """
-        # server_process = run_server(deploy_command)
         
+
         print("Deploy LLM.....")
-        run_cli_command(deploy_command)
+        server_process = run_server(deploy_command) # subprocess
+        # run_cli_command(deploy_command) # os.system
         time.sleep(60)  # Sleep for 60 seconds
         print("OKE")
 
