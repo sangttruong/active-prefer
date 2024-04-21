@@ -124,7 +124,6 @@ def run_oracle_rm(
 ):
 
     oracle = LLMStrategy(model_args, data_args, training_args,  finetuning_args, callbacks)
-    print(f"Begin training oracle")
     oracle.train(seed=42)
     
     ##########################

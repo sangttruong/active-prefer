@@ -270,40 +270,132 @@ class LLMStrategy:
         if save_path:
             save_file(model.state_dict(), save_path, metadata={"format": "pt"}) # save model
             print(f"Model saved to {save_path}")
-            # torch.save({
-            #     'model_state_dict': model.state_dict(),
-            # }, save_path)
 
     def train(self, question_ids = None, seed = 42):
-        # Train the model
-        last_hidden_states, is_load = self.get_embedding()
-        train_dataset = CustomDataset(last_hidden_states, self.pool_dataset, is_load)  # Only need change train_dataset for diff oracle model
+        # # Train the model
+        # last_hidden_states, is_load = self.get_embedding()
+        # train_dataset = CustomDataset(last_hidden_states, self.pool_dataset, is_load)  # Only need change train_dataset for diff oracle model
 
-        # Select subset for traning by question_ids
-        if question_ids:
-            sample_ids = [id for id, example in enumerate(self.pool_dataset) if example['id'] in question_ids]
-        else:
-            sample_ids = list(range(len(self.pool_dataset)))
+        # # Select subset for traning by question_ids
+        # if question_ids:
+        #     sample_ids = [id for id, example in enumerate(self.pool_dataset) if example['id'] in question_ids]
+        # else:
+        #     sample_ids = list(range(len(self.pool_dataset)))
 
-        optimizer_params = self.trainer.create_optimizer().param_groups[0]
-        base_model_config = self.base_model.config
-        create_scheduler = self.trainer.create_scheduler
+        # optimizer_params = self.trainer.create_optimizer().param_groups[0]
+        # base_model_config = self.base_model.config
+        # create_scheduler = self.trainer.create_scheduler
+        # cutoff_len = self.data_args.cutoff_len
+        # pad_token_id = self.tokenizer.pad_token_id
+        # seed = seed
+
+        # self._train_model(
+        #     train_dataset, 
+        #     cutoff_len, 
+        #     pad_token_id, 
+        #     optimizer_params, 
+        #     create_scheduler,
+        #     self.training_args.num_train_epochs,
+        #     model = self.v_head, # default self.v_head
+        #     sample_ids = sample_ids, # important 
+        #     seed = seed,
+        #     save_path = f"{self.training_args.output_dir}/value_head.safetensors"
+        # )
+
+        # Train multiple models and return their weights and average parameter updates
+    
+        accelerator = Accelerator()
+        device = accelerator.device
+
+        model = self.v_head.to(device) 
+        
         cutoff_len = self.data_args.cutoff_len
         pad_token_id = self.tokenizer.pad_token_id
-        seed = seed
 
-        self._train_model(
-            train_dataset, 
-            cutoff_len, 
-            pad_token_id, 
-            optimizer_params, 
-            create_scheduler,
-            self.training_args.num_train_epochs,
-            model = self.v_head, # default self.v_head
-            sample_ids = sample_ids, # important 
-            seed = seed,
-            save_path = f"{self.training_args.output_dir}/value_head.safetensors"
-        )
+        # training data
+        train_dataset = self.get_training_dataset(is_override = True)
+
+        # training args
+        num_epochs = int(self.training_args.num_train_epochs)
+        num_training_steps_per_epoch = len(train_dataset) 
+        num_training_steps = num_epochs * num_training_steps_per_epoch
+
+
+        for m in range(1):
+            v_head_path = f"{self.training_args.output_dir}/value_head.safetensors"
+
+            # initialize new model and optimizer
+            sample_ids = list(range(len(train_dataset)))
+
+            # optimizer, scheduler
+            optimizer_params = self.trainer.create_optimizer().param_groups[0]
+            create_scheduler = self.trainer.create_scheduler
+            optimizer_params.pop('params', None)     
+            optimizer = torch.optim.AdamW(model.parameters(), **optimizer_params)
+            scheduler = create_scheduler(num_training_steps, optimizer = optimizer)
+
+            # if not is_continues:
+            #     model = self.v_head.apply(weight_reset).to(device)
+            # else:
+            #     print(f"Continue training from {v_head_path}")
+            #     vhead_params = load_file(v_head_path)
+            #     model.load_state_dict(vhead_params, strict=False)
+
+            model, optimizer, train_dataset = accelerator.prepare(model, optimizer, train_dataset)
+            model.train()
+             
+            # Traing loop
+            for epoch in range(num_epochs):
+                epoch_loss = 0.0  # Initialize epoch loss
+                for idx in sample_ids:
+                    example = train_dataset[idx]
+                    last_hidden_state_chosen = example['last_hidden_state_chosen'].to(device)
+                    last_hidden_state_rejected = example['last_hidden_state_rejected'].to(device)
+                    chosen_input_ids = example['chosen_ids']
+                    rejected_input_ids = example['rejected_ids']
+
+                    optimizer.zero_grad()
+                    chosen_rewards = model(last_hidden_state_chosen) # [1024, 1]
+                    rejected_rewards = model(last_hidden_state_rejected) # [1024, 1]
+
+                    # Calculate loss
+                    padding_chosen = max(0, cutoff_len - len(chosen_input_ids))
+                    padding_rejected = max(0, cutoff_len - len(rejected_input_ids))
+                    chosen_input_ids = F.pad(chosen_input_ids, (0, padding_chosen), value = pad_token_id)
+                    rejected_input_ids = F.pad(rejected_input_ids, (0, padding_rejected), value = pad_token_id)
+
+                    chosen_length = (chosen_input_ids != pad_token_id).nonzero()[-1] + 1
+                    rejected_length = (rejected_input_ids != pad_token_id).nonzero()[-1] + 1
+                    check_divergence = (chosen_input_ids != rejected_input_ids).nonzero()
+
+                    if len(check_divergence) == 0:
+                        end_index = chosen_length
+                        div_index = end_index - 1
+                    else:
+                        end_index = max(chosen_length, rejected_length)
+                        div_index = check_divergence[0]
+
+                    chosen_trunc_rewards = chosen_rewards[div_index:end_index]
+                    rejected_trunc_rewards = rejected_rewards[div_index:end_index]
+                    loss = -torch.nn.functional.logsigmoid(chosen_trunc_rewards - rejected_trunc_rewards).mean()
+
+                    loss.backward()
+                    optimizer.step()
+
+                    epoch_loss += loss.item()  # Accumulate the loss
+
+
+                # Update the learning rate after each epoch
+                scheduler.step()
+
+                print(f"Epoch {epoch+1}, Loss: {epoch_loss / len(train_dataset)}")
+            
+            # Save model
+            save_file(model.state_dict(), v_head_path, metadata={"format": "pt"}) # save model
+            print(f"Model {m} saved to {v_head_path}")
+
+
+        return save_paths
 
     
     def getNet(self, params):
