@@ -358,13 +358,13 @@ class LLMStrategy:
 
 
                 # Calculate chosen_length
-                if chosen_input_ids.nonzero()[0].size > 0:
+                if chosen_input_ids.nonzero()[0].size() > 0:
                     chosen_length = (chosen_input_ids != pad_token_id).nonzero()[-1] + 1
                 else:
                     chosen_length = 0  # or any other appropriate value
 
                 # Calculate rejected_length
-                if rejected_input_ids.nonzero()[0].size > 0:
+                if rejected_input_ids.nonzero()[0].size() > 0:
                     rejected_length = (rejected_input_ids != pad_token_id).nonzero()[-1] + 1
                 else:
                     rejected_length = 0  # or any other appropriate value
