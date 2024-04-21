@@ -274,14 +274,17 @@ class LLMStrategy:
                 'model_state_dict': model.state_dict(),
             }, save_path)
 
-    def train(self, question_ids, seed = 42):
+    def train(self, question_ids = None, seed = 42):
         # Train the model
         last_hidden_states, is_load = self.get_embedding()
         train_dataset = CustomDataset(last_hidden_states, self.pool_dataset, is_load)  # Only need change train_dataset for diff oracle model
 
         # Select subset for traning by question_ids
-        sample_ids = [id for id, example in enumerate(self.pool_dataset) if example['id'] in question_ids]
-        
+        if question_ids:
+            sample_ids = [id for id, example in enumerate(self.pool_dataset) if example['id'] in question_ids]
+        else:
+            sample_ids = list(range(len(self.pool_dataset)))
+
         optimizer_params = self.trainer.create_optimizer().param_groups[0]
         base_model_config = self.base_model.config
         create_scheduler = self.trainer.create_scheduler
@@ -298,13 +301,13 @@ class LLMStrategy:
             create_scheduler,
             self.training_args.num_train_epochs,
             model = None, # default self.v_head
-            sample_ids = sample_ids, # importance 
+            sample_ids = sample_ids, # important 
             seed = seed,
+            save_path = f"{self.training_args.output_dir}/value_head.safetensors"
         )
 
 
     
-
     def getNet(self, params):
         # Construct and return a model given parameters
         i = 0

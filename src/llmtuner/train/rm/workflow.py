@@ -35,6 +35,7 @@ if TYPE_CHECKING:
     from ...hparams import DataArguments, FinetuningArguments, ModelArguments
 
 
+from .strategy import LLMStrategy
 from .entropy_sampling import EntropySampling
 from .random_sampling import RandomSampling
 from .committees import QueryByCommittees
@@ -171,91 +172,91 @@ def run_oracle_rm(
     callbacks: Optional[List["TrainerCallback"]] = None,
     seed = 42,
 ):
-    tokenizer = load_tokenizer(model_args)
-    dataset = get_dataset(tokenizer, model_args, data_args, training_args, stage="rm")
-    base_model = load_model(tokenizer, model_args, finetuning_args, is_trainable=False, add_valuehead=False)
-    data_collator = PairwiseDataCollatorWithPadding(tokenizer, pad_to_multiple_of=8)
+    # tokenizer = load_tokenizer(model_args)
+    # dataset = get_dataset(tokenizer, model_args, data_args, training_args, stage="rm")
+    # base_model = load_model(tokenizer, model_args, finetuning_args, is_trainable=False, add_valuehead=False)
+    # data_collator = PairwiseDataCollatorWithPadding(tokenizer, pad_to_multiple_of=8)
 
-    nearest_multiple = len(dataset) // 8 * 8
-    dataset = dataset.select(list(range(nearest_multiple)))
+    # nearest_multiple = len(dataset) // 8 * 8
+    # dataset = dataset.select(list(range(nearest_multiple)))
 
-    # Replace lm_head with identity
-    if hasattr(base_model, "lm_head"):
-        base_model.lm_head = torch.nn.Identity()
+    # # Replace lm_head with identity
+    # if hasattr(base_model, "lm_head"):
+    #     base_model.lm_head = torch.nn.Identity()
 
-    # Update arguments
-    training_args.remove_unused_columns = False  # important for pairwise dataset
+    # # Update arguments
+    # training_args.remove_unused_columns = False  # important for pairwise dataset
 
-    # Initialize our Trainer
-    trainer = PairwiseTrainer(
-        model=base_model,
-        args=training_args,
-        finetuning_args=finetuning_args,
-        tokenizer=tokenizer,
-        data_collator=data_collator,
-        callbacks=callbacks + [FixValueHeadModelCallback()],
-        compute_metrics=compute_accuracy,
-        **split_dataset(dataset, data_args, training_args),
-    )
+    # # Initialize our Trainer
+    # trainer = PairwiseTrainer(
+    #     model=base_model,
+    #     args=training_args,
+    #     finetuning_args=finetuning_args,
+    #     tokenizer=tokenizer,
+    #     data_collator=data_collator,
+    #     callbacks=callbacks + [FixValueHeadModelCallback()],
+    #     compute_metrics=compute_accuracy,
+    #     **split_dataset(dataset, data_args, training_args),
+    # )
 
-    ##########################
-    # Training
+    # ##########################
+    # # Training
 
-    # Save and load
-    model_name = model_args.model_name_or_path.split('/')[-1]
-    dataset_name = data_args.dataset
-    filename = f"{training_args.output_dir}/{model_name}/{dataset_name}/last_hidden_states.npy"
+    # # Save and load
+    # model_name = model_args.model_name_or_path.split('/')[-1]
+    # dataset_name = data_args.dataset
+    # filename = f"{training_args.output_dir}/{model_name}/{dataset_name}/last_hidden_states.npy"
 
-    # Check if the file exists
-    debug = True
-    if not debug and os.path.isfile(filename):
-        np_last_hidden_states = np.load(filename)
-        print(f"Loaded array from {filename}")
-    else:
-        # Ensure directory exists or create it
-        directory = os.path.dirname(filename)
-        if not os.path.exists(directory):
-            os.makedirs(directory)
+    # # Check if the file exists
+    # debug = True
+    # if not debug and os.path.isfile(filename):
+    #     np_last_hidden_states = np.load(filename)
+    #     print(f"Loaded array from {filename}")
+    # else:
+    #     # Ensure directory exists or create it
+    #     directory = os.path.dirname(filename)
+    #     if not os.path.exists(directory):
+    #         os.makedirs(directory)
 
-        predict_results = trainer.predict(dataset, metric_key_prefix="predict")
-        np_last_hidden_states = predict_results.predictions
+    #     predict_results = trainer.predict(dataset, metric_key_prefix="predict")
+    #     np_last_hidden_states = predict_results.predictions
 
-        # Save the array into a file
-        np.save(filename, np_last_hidden_states)
-        print(f"Array saved to {filename}")
+    #     # Save the array into a file
+    #     np.save(filename, np_last_hidden_states)
+    #     print(f"Array saved to {filename}")
     
-    # Training Oracle model
-    last_hidden_states = torch.tensor(np_last_hidden_states)  # Using torch.tensor()
-    train_dataset = CustomDataset(last_hidden_states, dataset)  # Only need change train_dataset for diff oracle model
+    # # Training Oracle model
+    # last_hidden_states = torch.tensor(np_last_hidden_states)  # Using torch.tensor()
+    # train_dataset = CustomDataset(last_hidden_states, dataset)  # Only need change train_dataset for diff oracle model
 
     
-    optimizer_params = trainer.create_optimizer().param_groups[0]
-    base_model_config = base_model.config
-    create_scheduler = trainer.create_scheduler
-    cutoff_len = data_args.cutoff_len
-    pad_token_id = tokenizer.pad_token_id
-    percentage = 0.9
-    output_vhead = f"{training_args.output_dir}/value_head.safetensors"
+    # optimizer_params = trainer.create_optimizer().param_groups[0]
+    # base_model_config = base_model.config
+    # create_scheduler = trainer.create_scheduler
+    # cutoff_len = data_args.cutoff_len
+    # pad_token_id = tokenizer.pad_token_id
+    # percentage = 0.9
+    # output_vhead = f"{training_args.output_dir}/value_head.safetensors"
 
-    # Training
-    train_oracle_model(
-        train_dataset, 
-        cutoff_len, 
-        pad_token_id, 
-        base_model_config, 
-        optimizer_params, 
-        create_scheduler, 
-        training_args.num_train_epochs, 
-        output_vhead,
-        percentage,
-        seed,
-    )
+    # # Training
+    # train_oracle_model(
+    #     train_dataset, 
+    #     cutoff_len, 
+    #     pad_token_id, 
+    #     base_model_config, 
+    #     optimizer_params, 
+    #     create_scheduler, 
+    #     training_args.num_train_epochs, 
+    #     output_vhead,
+    #     percentage,
+    #     seed,
+    # )
     
 
     #
-    # commitee = QueryByCommittees(model_args, data_args, training_args,  finetuning_args, callbacks)
-    # print(f"Begin training commitees")
-    # commitee.train_commitees(nEns=30)
+    oracle = LLMStrategy(model_args, data_args, training_args,  finetuning_args, callbacks)
+    print(f"Begin training oracle")
+    oracle.train(seed=42)
     
     ##########################
     del trainer, base_model

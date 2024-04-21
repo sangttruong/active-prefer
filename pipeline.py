@@ -320,14 +320,14 @@ def main(args):
     # Train an Oracle model O 
     ft_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
         --stage oracle \
-        --do_train \
+        --do_predict \
         --flash_attn True\
         --model_name_or_path {args.model_name_or_path}\
         --output_dir {oracle_adapter_path}\
         --dataset {dataset} \
         --dataset_dir {args.dataset_dir} \
         --template {args.template} \
-        --finetuning_type full \
+        --finetuning_type freeze \
         --overwrite_output_dir \
         --cutoff_len {args.cutoff_len} \
         --per_device_train_batch_size {args.per_device_train_batch_size} \
