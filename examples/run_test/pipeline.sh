@@ -10,8 +10,7 @@ python pipeline.py \
     --use_accelerate \
     --sanity_check \
     --main_process_port 29505\
-    --api_port 8007\
-    --gpu_ids 3,4
+    --gpu_ids 6,7
     
     
 
@@ -53,3 +52,12 @@ export TRITON_CACHE_DIR="/lfs/local/0/sttruong/.triton_1"
 export LIBRARY_PATH=/dfs/user/sttruong/miniconda3/envs/active_rlhf/lib/python3.10/site-packages/torch/lib:/dfs/user/sttruong/miniconda3/envs/active_rlhf/lib:$LIBRARY_PATH
 export LD_LIBRARY_PATH=/dfs/user/sttruong/miniconda3/envs/active_rlhf/lib/python3.10/site-packages/torch/lib:/dfs/user/sttruong/miniconda3/envs/active_rlhf/lib:$LD_LIBRARY_PATH
 
+-----------------------------------------------
+export PATH=/usr/local/cuda-12.4/bin:$PATH
+export HF_HOME="/lfs/local/0/sttruong/env/.huggingface"
+export HF_DATASETS_CACHE="/lfs/local/0/sttruong/env/.huggingface/datasets"
+export TRITON_CACHE_DIR="/lfs/local/0/sttruong/.triton_1"
+
+export LIBRARY_PATH=/dfs/user/sttruong/miniconda3/envs/bosd/lib/python3.10/site-packages/torch/lib:/dfs/user/sttruong/miniconda3/envs/bosd/lib:$LIBRARY_PATH
+
+export LD_LIBRARY_PATH=/dfs/user/sttruong/miniconda3/envs/bosd/lib/python3.10/site-packages/torch/lib:/dfs/user/sttruong/miniconda3/envs/bosd/lib:$LD_LIBRARY_PATH
