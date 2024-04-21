@@ -350,7 +350,7 @@ def main(args):
     print(f"Training Oracle model ............................")
     run_cli_command(ft_oracle_command)
     
-
+    active_accuracy = []
     # active pipeline     
     for iter in range(args.num_iters):
         print(f"######### ITERARION: {iter} ############")
@@ -851,6 +851,10 @@ def main(args):
         # Get accuracy        
         accuracy = calculate_accuracy(f"{oracle_adapter_path}/generated_predictions.jsonl")
         print("Accuracy:", accuracy)
+        active_accuracy.append({
+            "iter": {iter},
+            "acc": accuracy 
+        })
         
         save_eval_metric_path = f"{eval_metric_dir}/accuracy_results_{iter}.json"
         save_eval_metric(save_eval_metric_path, accuracy, iter)
@@ -858,6 +862,7 @@ def main(args):
         print("=========================================================")
         
     print("DONE!!!")
+    print(active_accuracy)
     delete_selected_info(args.data_info_path, f"{model_name}_iter")
 
 def parse_arguments():
