@@ -24,6 +24,7 @@ from llmtuner import ChatModel, create_app
 def parse_args():
     parser = argparse.ArgumentParser(description="API Demo Arguments")
     parser.add_argument("--model_name_or_path", type=str, required=True, help="Path to the model")
+    parser.add_argument("--testset", type=str, default="reward_bench_test", help="testset for generations")
     parser.add_argument("--template", type=str, required=True, help="Template to use")
     parser.add_argument("--infer_backend", type=str, required=True, help="Inference backend")
     parser.add_argument("--vllm_enforce_eager", action="store_true", help="Enforce eager execution for VLLM")
@@ -33,7 +34,7 @@ def parse_args():
 
 def main():
     args = parse_args()
-    os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu_ids
+    # os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu_ids
     os.environ["API_PORT"] = str(args.api_port)
 
     infer_args = {
@@ -47,6 +48,10 @@ def main():
     app = create_app(chat_model)
     print("Visit http://localhost:{}/docs for API document.".format(args.api_port))
     uvicorn.run(app, host="0.0.0.0", port=args.api_port, workers=1)
+
+
+    ### Begin inference DPO model
+
 
 if __name__ == "__main__":
     main()
