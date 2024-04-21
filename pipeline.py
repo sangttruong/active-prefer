@@ -706,13 +706,13 @@ def main(args):
         elif "mistral" in args.model_name_or_path.lower():
             template = "mistral"
 
-        deploy_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} API_PORT={args.api_port} python src/api_demo.py \
-            --model_name_or_path {dpo_full_path}\
-            --template {template} \
-            --infer_backend vllm \
-            --vllm_enforce_eager
-        """
-        
+        # deploy_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} API_PORT={args.api_port} python src/api_demo.py \
+        #     --model_name_or_path {dpo_full_path}\
+        #     --template {template} \
+        #     --infer_backend vllm \
+        #     --vllm_enforce_eager
+        # """
+        deploy_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} API_PORT={args.api_port} python src/api_demo.py --model_name_or_path {dpo_full_path} --template {template} --infer_backend vllm --vllm_enforce_eager"""
 
         print("Deploy LLM.....")
         server_process = run_server(deploy_command) # subprocess
