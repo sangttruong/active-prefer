@@ -573,7 +573,6 @@ class LLMStrategy:
     def get_training_dataset(self, is_override):
         last_hidden_states, is_load = self.get_embedding(is_override)
         train_dataset = CustomDataset(last_hidden_states, self.pool_dataset, is_load)  
-        breakpoint()
         return train_dataset
         
     # gradient embedding for badge (assumes cross-entropy loss)
