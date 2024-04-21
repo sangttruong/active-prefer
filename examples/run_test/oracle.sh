@@ -4,7 +4,7 @@ CUDA_VISIBLE_DEVICES=3,4 python src/train_bash.py \
     --stage oracle \
     --do_train \
     --model_name_or_path meta-llama/Llama-2-7b-hf \
-    --dataset truthful_qa_train \
+    --dataset rewa \
     --dataset_dir data \
     --template default \
     --finetuning_type freeze \

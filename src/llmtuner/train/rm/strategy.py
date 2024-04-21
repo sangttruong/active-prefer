@@ -270,9 +270,11 @@ class LLMStrategy:
         
         # Save parameters if save_params is provided
         if save_path:
-            torch.save({
-                'model_state_dict': model.state_dict(),
-            }, save_path)
+            save_file(model.state_dict(), save_path, metadata={"format": "pt"}) # save model
+            print(f"Model saved to {save_path}")
+            # torch.save({
+            #     'model_state_dict': model.state_dict(),
+            # }, save_path)
 
     def train(self, question_ids = None, seed = 42):
         # Train the model
