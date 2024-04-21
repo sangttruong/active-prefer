@@ -206,7 +206,7 @@ class LLMStrategy:
         accelerator = Accelerator()
         device = accelerator.device
 
-        model = self.v_head.to(device) 
+        model = model.to(device) 
 
         optimizer_params.pop('params', None)     
         optimizer = torch.optim.AdamW(model.parameters(), **optimizer_params)
@@ -301,7 +301,7 @@ class LLMStrategy:
             optimizer_params, 
             create_scheduler,
             self.training_args.num_train_epochs,
-            model = None, # default self.v_head
+            model = self.v_head, # default self.v_head
             sample_ids = sample_ids, # important 
             seed = seed,
             save_path = f"{self.training_args.output_dir}/value_head.safetensors"
