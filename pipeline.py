@@ -693,20 +693,21 @@ def main(args):
         export_command = f""""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/export_model.py \
             --model_name_or_path {args.model_name_or_path} \
             --adapter_name_or_path {dpo_adapter_path} \
-            --export_hub_model_id
+            --export_dir {dpo_full_path} \
             --template {args.template} \
             --finetuning_type {args.finetuning_type} \
-            --export_dir {dpo_full_path} \
             --export_size 2 \
             --export_legacy_format False
         """
-        run_cli_command(export_command)
+        # --export_hub_model_id
 
-        # Push model to hf-hub
         
+        # Export model
+        run_cli_command(export_command) 
+
         # Deploy
         if "llama" in args.model_name_or_path.lower():
-            template = "llama"
+            template = "llama2"
         elif "mistral" in args.model_name_or_path.lower():
             template = "mistral"
 
