@@ -713,73 +713,92 @@ def main(args):
         dataset_name_generated = f"{dataset}_generated"
 
         # Export DPO finetuned model 
-        dpo_full_path = f"{dpo_adapter_path}/full"
+        if args.is_using_vllm:
+            dpo_full_path = f"{dpo_adapter_path}/full"
 
-        export_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/export_model.py \
-            --model_name_or_path {args.model_name_or_path} \
-            --adapter_name_or_path {dpo_adapter_path} \
-            --export_dir {dpo_full_path} \
-            --template {args.template} \
-            --finetuning_type {args.finetuning_type} \
-            --export_size 2 \
-            --export_legacy_format False
-            """
-        
-        # Export model
-        run_cli_command(export_command) 
-
-        # Deploy
-        if "llama" in args.model_name_or_path.lower():
-            template = "llama2"
-        elif "mistral" in args.model_name_or_path.lower():
-            template = "mistral"
-
-        # deploy_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} API_PORT={args.api_port} python src/api_demo.py \
-        #     --model_name_or_path {dpo_full_path}\
-        #     --template {template} \
-        #     --infer_backend vllm \
-        #     --vllm_enforce_eager
-        # """
-        deploy_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} API_PORT={args.api_port} python src/api_demo.py --model_name_or_path {dpo_full_path} --template {template} --infer_backend vllm --vllm_enforce_eager"""
-
-        print("Deploy LLM.....")
-        server_process = run_server(deploy_command) # subprocess
-        time.sleep(60)  # Sleep for 60 seconds
-        print("OKE")
-
-        # Inference 
-        client = OpenAI(
-            base_url=f"http://localhost:{args.api_port}/v1",
-            api_key="token-abc123",
-        )
-
-        testset_path = f"{args.dataset_dir}/{testset}.json" 
-        with open(testset_path, 'r') as json_file:
-            test_data = json.load(json_file)
-
-        predictions = []
-        for sample in tqdm(test_data):
-            pred_sample = copy.deepcopy(sample)
-
-            completion = client.chat.completions.create(
-                model=dpo_full_path,
-                messages=[
-                    {"role": "user", "content": pred_sample['instruction']}
-                ]
-            )
-            pred = completion.choices[0].message.content
-            pred_sample['output'][0] = pred
+            export_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/export_model.py \
+                --model_name_or_path {args.model_name_or_path} \
+                --adapter_name_or_path {dpo_adapter_path} \
+                --export_dir {dpo_full_path} \
+                --template {args.template} \
+                --finetuning_type {args.finetuning_type} \
+                --export_size 2 \
+                --export_legacy_format False
+                """
             
-            predictions.append(pred_sample)
+            # Export model
+            run_cli_command(export_command) 
 
+            # Deploy
+            if "llama" in args.model_name_or_path.lower():
+                template = "llama2"
+            elif "mistral" in args.model_name_or_path.lower():
+                template = "mistral"
 
-        # Save result at "args.dataset_dir}/generated_predictions.json" 
-        output_file_path = os.path.join(args.dataset_dir, "generated_predictions.json")
+       
+            deploy_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} API_PORT={args.api_port} python src/api_demo.py --model_name_or_path {dpo_full_path} --template {template} --infer_backend vllm --vllm_enforce_eager"""
 
-        # Save the predictions to the JSON file
-        with open(output_file_path, 'w') as output_file:
-            json.dump(predictions, output_file)
-        print(f"Predictions saved to: {output_file_path}")
+            print("Deploy LLM.....")
+            server_process = run_server(deploy_command) # subprocess
+            time.sleep(60)  # Sleep for 60 seconds
+            print("OKE")
+
+            # Inference 
+            client = OpenAI(
+                base_url=f"http://localhost:{args.api_port}/v1",
+                api_key="token-abc123",
+            )
+
+            testset_path = f"{args.dataset_dir}/{testset}.json" 
+            with open(testset_path, 'r') as json_file:
+                test_data = json.load(json_file)
+
+            predictions = []
+            for sample in tqdm(test_data):
+                pred_sample = copy.deepcopy(sample)
+
+                completion = client.chat.completions.create(
+                    model=dpo_full_path,
+                    messages=[
+                        {"role": "user", "content": pred_sample['instruction']}
+                    ]
+                )
+                pred = completion.choices[0].message.content
+                pred_sample['output'][0] = pred
+                
+                predictions.append(pred_sample)
+
+            # Save result at "args.dataset_dir}/generated_predictions.json" 
+            output_file_path = os.path.join(args.dataset_dir, "generated_predictions.json")
+
+            # Save the predictions to the JSON file
+            with open(output_file_path, 'w') as output_file:
+                json.dump(predictions, output_file)
+            print(f"Predictions saved to: {output_file_path}")
+
+        else:
+            generate_text_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
+                --stage sft \
+                --do_predict \
+                --model_name_or_path {args.model_name_or_path} \
+                --adapter_name_or_path {dpo_adapter_path} \
+                --dataset {testset} \
+                --dataset_dir {args.dataset_dir} \
+                --template {args.template} \
+                --finetuning_type {args.finetuning_type} \
+                --output_dir {args.dataset_dir} \
+                --overwrite_cache \
+                --overwrite_output_dir \
+                --cutoff_len {args.cutoff_len} \
+                --per_device_eval_batch_size {args.per_device_eval_batch_size} \
+                --predict_with_generate \
+                --report_to none\
+                --fp16
+            """
+
+            run_cli_command(generate_text_command)
+            jsonl_to_json(f"{args.dataset_dir}/generated_predictions.jsonl", f"{args.dataset_dir}/generated_predictions.json")
+            
         # --------------------------
 
         # Add new dataset info to datset_info.json to run predict reward model
@@ -879,6 +898,8 @@ def parse_arguments():
     parser.add_argument("--gpu_ids", type=str, default="0,1", help="")
     parser.add_argument("--main_process_port", type=int, default=29505, help="Deepspeed Port")
     parser.add_argument("--api_port", type=int, default=8005, help="Deploy API port")
+    parser.add_argument("--is_using_vllm", action="store_true", help="Using vLLM to run 70B model")
+
 
     return parser.parse_args()
 
