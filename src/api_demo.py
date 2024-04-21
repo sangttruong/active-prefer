@@ -36,7 +36,14 @@ def main():
     os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu_ids
     os.environ["API_PORT"] = str(args.api_port)
 
-    chat_model = ChatModel(args.model_name_or_path, args.template, args.infer_backend, args.vllm_enforce_eager)
+    infer_args = {
+        "model_name_or_path": args.model_name_or_path,
+        "template": args.template,
+        "infer_backend": args.infer_backend,
+        "vllm_enforce_eager": args.vllm_enforce_eager
+    }
+
+    chat_model = ChatModel(infer_args)
     app = create_app(chat_model)
     print("Visit http://localhost:{}/docs for API document.".format(args.api_port))
     uvicorn.run(app, host="0.0.0.0", port=args.api_port, workers=1)

@@ -13,4 +13,4 @@ python src/api_demo.py \
     --infer_backend vllm \
     --vllm_enforce_eager \
     --gpu_ids 3,4\
-    --api_port 8005\
+    --api_port 8005
