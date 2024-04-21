@@ -297,7 +297,6 @@ class LLMStrategy:
             train_dataset, 
             cutoff_len, 
             pad_token_id, 
-            base_model_config, 
             optimizer_params, 
             create_scheduler,
             self.training_args.num_train_epochs,
@@ -306,7 +305,6 @@ class LLMStrategy:
             seed = seed,
             save_path = f"{self.training_args.output_dir}/value_head.safetensors"
         )
-
 
     
     def getNet(self, params):
