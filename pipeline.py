@@ -342,7 +342,6 @@ def main(args):
         --learning_rate {args.learning_rate} \
         --num_train_epochs 3 \
         --max_samples {args.max_samples} \
-        --val_size 0.1 \
         --ddp_timeout 1800000 \
         --plot_loss 
         """
