@@ -526,84 +526,85 @@ def main(args):
         # run_cli_command(eval_dpo_ft_command)
 
         ##########################################################
-        #### Train Reward
+        #### Update selector
         ##########################################################    
         print("Train Reward ..................................")
+        if args.method in ['max_entropy', "random"]:
+            if args.use_accelerate:
+                rm_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port} \
+                    --config_file examples/accelerate/default.yaml \
+                    src/train_bash.py \
+                    --stage rm \
+                    --do_train \
+                    --flash_attn True\
+                    --model_name_or_path {args.model_name_or_path}\
+                    --adapter_name_or_path {dpo_adapter_path}\
+                    --output_dir {reward_model_path} \
+                    --dataset {active_dataset} \
+                    --dataset_dir {args.dataset_dir} \
+                    --template {args.template} \
+                    --finetuning_type {args.finetuning_type} \
+                    --lora_target {args.lora_target} \
+                    --overwrite_cache \
+                    --overwrite_output_dir \
+                    --cutoff_len {args.cutoff_len} \
+                    --preprocessing_num_workers 16 \
+                    --per_device_train_batch_size {args.per_device_train_batch_size} \
+                    --gradient_accumulation_steps {args.gradient_accumulation_steps} \
+                    --lr_scheduler_type {args.lr_scheduler_type} \
+                    --logging_steps {args.logging_steps} \
+                    --warmup_steps {args.warmup_steps} \
+                    --save_steps {args.save_steps} \
+                    --learning_rate {args.learning_rate} \
+                    --num_train_epochs {args.num_train_epochs} \
+                    --max_samples {args.max_samples} \
+                    --ddp_timeout 1800000 \
+                    --plot_loss \
+                    --only_training_vhead True \
+                    --report_to none \
+                    --fp16
+                    """
+            else:
+                rm_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
+                    --stage rm \
+                    --do_train \
+                    --flash_attn True\
+                    --model_name_or_path {args.model_name_or_path}\
+                    --adapter_name_or_path {dpo_adapter_path}\
+                    --output_dir {reward_model_path} \
+                    --dataset {active_dataset} \
+                    --dataset_dir {args.dataset_dir} \
+                    --template {args.template} \
+                    --finetuning_type {args.finetuning_type} \
+                    --lora_target {args.lora_target} \
+                    --overwrite_cache \
+                    --overwrite_output_dir \
+                    --cutoff_len {args.cutoff_len} \
+                    --preprocessing_num_workers 16 \
+                    --per_device_train_batch_size {args.per_device_train_batch_size} \
+                    --per_device_eval_batch_size {args.per_device_eval_batch_size} \
+                    --gradient_accumulation_steps {args.gradient_accumulation_steps} \
+                    --lr_scheduler_type {args.lr_scheduler_type} \
+                    --logging_steps {args.logging_steps} \
+                    --warmup_steps {args.warmup_steps} \
+                    --save_steps {args.save_steps} \
+                    --eval_steps {args.save_steps} \
+                    --evaluation_strategy {args.evaluation_strategy} \
+                    --learning_rate {args.learning_rate} \
+                    --num_train_epochs {args.num_train_epochs} \
+                    --max_samples {args.max_samples} \
+                    --ddp_timeout 1800000 \
+                    --plot_loss \
+                    --only_training_vhead True\
+                    --report_to none\
+                    --fp16
+                    """
 
-        if args.use_accelerate:
-            rm_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port} \
-                --config_file examples/accelerate/default.yaml \
-                src/train_bash.py \
-                --stage rm \
-                --do_train \
-                --flash_attn True\
-                --model_name_or_path {args.model_name_or_path}\
-                --adapter_name_or_path {dpo_adapter_path}\
-                --output_dir {reward_model_path} \
-                --dataset {active_dataset} \
-                --dataset_dir {args.dataset_dir} \
-                --template {args.template} \
-                --finetuning_type {args.finetuning_type} \
-                --lora_target {args.lora_target} \
-                --overwrite_cache \
-                --overwrite_output_dir \
-                --cutoff_len {args.cutoff_len} \
-                --preprocessing_num_workers 16 \
-                --per_device_train_batch_size {args.per_device_train_batch_size} \
-                --gradient_accumulation_steps {args.gradient_accumulation_steps} \
-                --lr_scheduler_type {args.lr_scheduler_type} \
-                --logging_steps {args.logging_steps} \
-                --warmup_steps {args.warmup_steps} \
-                --save_steps {args.save_steps} \
-                --learning_rate {args.learning_rate} \
-                --num_train_epochs {args.num_train_epochs} \
-                --max_samples {args.max_samples} \
-                --ddp_timeout 1800000 \
-                --plot_loss \
-                --only_training_vhead True \
-                --report_to none \
-                --fp16
-                """
-        else:
-            rm_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
-                --stage rm \
-                --do_train \
-                --flash_attn True\
-                --model_name_or_path {args.model_name_or_path}\
-                --adapter_name_or_path {dpo_adapter_path}\
-                --output_dir {reward_model_path} \
-                --dataset {active_dataset} \
-                --dataset_dir {args.dataset_dir} \
-                --template {args.template} \
-                --finetuning_type {args.finetuning_type} \
-                --lora_target {args.lora_target} \
-                --overwrite_cache \
-                --overwrite_output_dir \
-                --cutoff_len {args.cutoff_len} \
-                --preprocessing_num_workers 16 \
-                --per_device_train_batch_size {args.per_device_train_batch_size} \
-                --per_device_eval_batch_size {args.per_device_eval_batch_size} \
-                --gradient_accumulation_steps {args.gradient_accumulation_steps} \
-                --lr_scheduler_type {args.lr_scheduler_type} \
-                --logging_steps {args.logging_steps} \
-                --warmup_steps {args.warmup_steps} \
-                --save_steps {args.save_steps} \
-                --eval_steps {args.save_steps} \
-                --evaluation_strategy {args.evaluation_strategy} \
-                --learning_rate {args.learning_rate} \
-                --num_train_epochs {args.num_train_epochs} \
-                --max_samples {args.max_samples} \
-                --ddp_timeout 1800000 \
-                --plot_loss \
-                --only_training_vhead True\
-                --report_to none\
-                --fp16
-                """
-
-        run_cli_command(rm_ft_command) 
+            run_cli_command(rm_ft_command) 
+        elif args.method in ['qbc']:
+            print("Updatse commitees")
         # ----------------------------------------------------------------
         eval_rm_command_output_path = f"{reward_model_path}/iter_{iter}"
-
         if args.use_accelerate_eval:
             eval_rm_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port} \
                 --config_file examples/accelerate/default.yaml \

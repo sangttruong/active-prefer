@@ -35,6 +35,8 @@ from ..utils import create_modelcard_and_push
 from .collator import PairwiseDataCollatorWithPadding
 from .metric import compute_accuracy
 from .trainer import PairwiseTrainer, OracleTrainer
+from ..utils import load_valuehead_params 
+
 # from .workflow import CustomDataset, ValueHead, set_seed
 
 from accelerate import Accelerator
@@ -301,7 +303,9 @@ class LLMStrategy:
             seed = seed,
         )
 
-    def get_dist(self, nEns=1, verbose=False):
+ 
+
+    def train_commitees(self, nEns=1, is_continues = False, verbose=False):
         # Train multiple models and return their weights and average parameter updates
         def weight_reset(layer):
             newLayer = deepcopy(layer)
@@ -330,13 +334,11 @@ class LLMStrategy:
         num_epochs = int(self.training_args.num_train_epochs)
         num_training_steps_per_epoch = len(train_dataset) 
         num_training_steps = num_epochs * num_training_steps_per_epoch
-        
-        
-        allAvs = []
-        allWeights = []
+
+        save_paths = []
 
         for m in range(nEns):
-            output_vhead = f"{self.training_args.output_dir}/qbc_{m}.safetensors"
+            v_head_path = f"{self.training_args.output_dir}/qbc_{m}.safetensors"
 
             # initialize new model and optimizer
             sample_ids = list(range(len(train_dataset)))
@@ -347,17 +349,17 @@ class LLMStrategy:
             optimizer_params.pop('params', None)     
             optimizer = torch.optim.AdamW(model.parameters(), **optimizer_params)
             scheduler = create_scheduler(num_training_steps, optimizer = optimizer)
-    
-            model =  self.v_head.apply(weight_reset).to(device)
+
+            if not is_continues:
+                model = self.v_head.apply(weight_reset).to(device)
+            else:
+                print(f"Continue training from {v_head_path}")
+                vhead_params = load_valuehead_params(v_head_path, self.model_args)
+                model.load_state_dict(vhead_params, strict=False)
+
             model, optimizer, train_dataset = accelerator.prepare(model, optimizer, train_dataset)
             model.train()
-            
-            avIterates = []
-            steps = 0 
-            k = 0
-            ek = (k + 1) * num_training_steps
-            pVec = torch.cat([torch.zeros_like(p).cpu().flatten() for p in model.parameters()])
-
+             
             # Traing loop
             for epoch in range(num_epochs):
                 epoch_loss = 0.0  # Initialize epoch loss
@@ -398,34 +400,19 @@ class LLMStrategy:
 
                     epoch_loss += loss.item()  # Accumulate the loss
 
-                    flat = torch.cat([deepcopy(p.detach().cpu()).flatten() for p in model.parameters()])
-                    pVec = pVec + flat
-                    steps += 1
-                    if steps > ek:
-                        avIterates.append(pVec / num_training_steps)
-                        pVec = torch.cat([torch.zeros_like(p).cpu().flatten() for p in model.parameters()])
-                        k += 1
-                        ek = (k + 1) * num_training_steps
 
                 # Update the learning rate after each epoch
                 scheduler.step()
 
-                print(f"Epoch {epoch+1}, Loss: {epoch_loss / len(train_dataset)}, Learning Rate: {scheduler.get_last_lr()}")
+                print(f"Epoch {epoch+1}, Loss: {epoch_loss / len(train_dataset)}")
             
-            allAvs.append(avIterates)
-            allWeights.append(torch.cat([deepcopy(p.detach().cpu()).flatten() for p in model.parameters()]))
-
             # Save model
-            save_file(model.state_dict(), output_vhead, metadata={"format": "pt"}) # save model
-            print(f"Model {m} saved to {output_vhead}")
+            save_file(model.state_dict(), v_head_path, metadata={"format": "pt"}) # save model
+            print(f"Model {m} saved to {v_head_path}")
 
-        for m in range(nEns):
-            avIterates = torch.stack(allAvs[m])
-            if k > 1: avIterates = torch.stack(allAvs[m][1:])
-            avIterates = avIterates - torch.mean(avIterates, 0)
-            allAvs[m] = avIterates
+            save_paths.append(v_head_path)
 
-        return allWeights, allAvs
+        return save_paths
 
     def getNet(self, params):
         # Construct and return a model given parameters

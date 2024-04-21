@@ -22,6 +22,7 @@ class QueryByCommittees(LLMStrategy):
         super(QueryByCommittees, self).__init__(model_args, data_args, training_args, finetuning_args, callbacks)
 
 
-    def query(self, n=100, iteration = 0):
+    def query(self, n=100, iteration = 0, nEns = 4):
         # Get predictions
-        self.get_dist(4)
+        self.train_commitees(nEns)
+        self.train_commitees(nEns, True)

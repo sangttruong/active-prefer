@@ -103,8 +103,6 @@ def load_model(
         model: "AutoModelForCausalLMWithValueHead" = AutoModelForCausalLMWithValueHead.from_pretrained(model)
         patch_valuehead_model(model)
 
-
-
         prev_vhead_path = None
         if finetuning_args.vhead_oracle_path != "":
             vhead_path = finetuning_args.vhead_oracle_path
