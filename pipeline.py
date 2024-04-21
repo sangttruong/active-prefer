@@ -454,7 +454,7 @@ def main(args):
                 --dpo_ftx 1.0
             """
 
-        run_cli_command(dpo_ft_command) 
+        # run_cli_command(dpo_ft_command) 
         # ----------------------------------------------------------------
 
         eval_dpo_ft_output_path = f"{dpo_adapter_path}/iter_{iter}"
@@ -600,7 +600,7 @@ def main(args):
                     --fp16
                     """
 
-            run_cli_command(rm_ft_command) 
+            # run_cli_command(rm_ft_command) 
         elif args.method in ['qbc']:
             print("Updatse commitees")
         # ----------------------------------------------------------------
