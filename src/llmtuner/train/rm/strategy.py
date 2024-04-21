@@ -313,7 +313,7 @@ class LLMStrategy:
         pad_token_id = self.tokenizer.pad_token_id
 
         # training data
-        train_dataset = self.get_training_dataset(is_override = True)
+        train_dataset = self.get_training_dataset(is_override = False)
 
         # training args
         num_epochs = int(self.training_args.num_train_epochs)
@@ -333,13 +333,6 @@ class LLMStrategy:
             optimizer_params.pop('params', None)     
             optimizer = torch.optim.AdamW(model.parameters(), **optimizer_params)
             scheduler = create_scheduler(num_training_steps, optimizer = optimizer)
-
-            # if not is_continues:
-            #     model = self.v_head.apply(weight_reset).to(device)
-            # else:
-            #     print(f"Continue training from {v_head_path}")
-            #     vhead_params = load_file(v_head_path)
-            #     model.load_state_dict(vhead_params, strict=False)
 
             model, optimizer, train_dataset = accelerator.prepare(model, optimizer, train_dataset)
             model.train()
@@ -364,6 +357,7 @@ class LLMStrategy:
                     chosen_input_ids = F.pad(chosen_input_ids, (0, padding_chosen), value = pad_token_id)
                     rejected_input_ids = F.pad(rejected_input_ids, (0, padding_rejected), value = pad_token_id)
 
+                    breakpoint()
                     chosen_length = (chosen_input_ids != pad_token_id).nonzero()[-1] + 1
                     rejected_length = (rejected_input_ids != pad_token_id).nonzero()[-1] + 1
                     check_divergence = (chosen_input_ids != rejected_input_ids).nonzero()
@@ -393,9 +387,6 @@ class LLMStrategy:
             # Save model
             save_file(model.state_dict(), v_head_path, metadata={"format": "pt"}) # save model
             print(f"Model {m} saved to {v_head_path}")
-
-
-        return save_paths
 
     
     def getNet(self, params):

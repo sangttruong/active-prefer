@@ -41,7 +41,7 @@ CUDA_VISIBLE_DEVICES=3,6 python src/train_bash.py \
     --num_sample_selected 30
 
 
-
+-----------------------------------------------
 export PATH=/usr/local/cuda-12.2/bin:$PATH
 
 export HF_HOME="/lfs/local/0/sttruong/env/.huggingface"
@@ -53,11 +53,3 @@ export LIBRARY_PATH=/dfs/user/sttruong/miniconda3/envs/active_rlhf/lib/python3.1
 export LD_LIBRARY_PATH=/dfs/user/sttruong/miniconda3/envs/active_rlhf/lib/python3.10/site-packages/torch/lib:/dfs/user/sttruong/miniconda3/envs/active_rlhf/lib:$LD_LIBRARY_PATH
 
 -----------------------------------------------
-export PATH=/usr/local/cuda-12.4/bin:$PATH
-export HF_HOME="/lfs/local/0/sttruong/env/.huggingface"
-export HF_DATASETS_CACHE="/lfs/local/0/sttruong/env/.huggingface/datasets"
-export TRITON_CACHE_DIR="/lfs/local/0/sttruong/.triton_1"
-
-export LIBRARY_PATH=/dfs/user/sttruong/miniconda3/envs/bosd/lib/python3.10/site-packages/torch/lib:/dfs/user/sttruong/miniconda3/envs/bosd/lib:$LIBRARY_PATH
-
-export LD_LIBRARY_PATH=/dfs/user/sttruong/miniconda3/envs/bosd/lib/python3.10/site-packages/torch/lib:/dfs/user/sttruong/miniconda3/envs/bosd/lib:$LD_LIBRARY_PATH
