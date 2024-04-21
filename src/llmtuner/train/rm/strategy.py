@@ -43,7 +43,8 @@ from accelerate import Accelerator
 from trl import AutoModelForCausalLMWithValueHead
 
 from safetensors import safe_open
-from safetensors.torch import save_file
+from safetensors.torch import save_file, load_file
+
 
 
 if TYPE_CHECKING:
@@ -353,7 +354,9 @@ class LLMStrategy:
                 model = self.v_head.apply(weight_reset).to(device)
             else:
                 print(f"Continue training from {v_head_path}")
-                vhead_params = load_valuehead_params(v_head_path, self.model_args)
+                vhead_params = load_file(v_head_path)
+
+                # vhead_params = load_valuehead_params(v_head_path, self.model_args)
                 model.load_state_dict(vhead_params, strict=False)
 
             model, optimizer, train_dataset = accelerator.prepare(model, optimizer, train_dataset)
