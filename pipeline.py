@@ -246,6 +246,34 @@ def shutdown_server(process):
         print(f"Error shutting down server: {e}")
 
 
+def find_and_kill_process(command):
+    # Construct the command to find the PID
+    breakpoint()
+    find_pid_command = f"""pgrep -af "{command}" """
+
+    # Execute the command to find the PID
+    pid_output = subprocess.check_output(find_pid_command, shell=True)
+
+    # Decode the output and split it into lines
+    pid_lines = pid_output.decode().splitlines()
+
+    # Extract the PID(s)
+    pids = [line.split()[0] for line in pid_lines]
+
+    print("PID(s) of the process:")
+    print(pids)
+
+    # Construct the command to kill the process(es)
+    if pids:
+        kill_pid_command = f"kill -9 {' '.join(pids)}"
+
+        # Execute the command to kill the process(es)
+        subprocess.run(kill_pid_command, shell=True)
+        print("Process(es) killed.")
+    else:
+        print("No matching process found.")
+
+
 def main(args):
     # Prepare dataset
     source_path = f"{args.dataset_dir}/backup_dataset_info.json"
@@ -716,7 +744,6 @@ def main(args):
 
         print("Deploy LLM.....")
         server_process = run_server(deploy_command) # subprocess
-        # run_cli_command(deploy_command) # os.system
         time.sleep(60)  # Sleep for 60 seconds
         print("OKE")
 
@@ -759,14 +786,10 @@ def main(args):
         add_new_dataset_info(args.data_info_path, dataset_name_generated, f"generated_predictions.json")
 
         # Shutdown 
-        breakpoint()
-        if server_process:
-            try:
-                # Shutdown the server
-                shutdown_server(server_process)
-            except KeyboardInterrupt:
-                print("KeyboardInterrupt received. Shutting down server.")
-                shutdown_server(server_process)
+        
+        kill_cmd = f"python src/api_demo.py --model_name_or_path {dpo_full_path} --template {template} --infer_backend vllm --vllm_enforce_eager"
+        find_and_kill_process(kill_cmd)
+
 
         # -------------
         if args.use_accelerate_eval:
