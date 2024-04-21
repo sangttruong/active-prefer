@@ -759,13 +759,14 @@ def main(args):
         add_new_dataset_info(args.data_info_path, dataset_name_generated, f"generated_predictions.json")
 
         # Shutdown 
-        # if server_process:
-        #     try:
-        #         # Shutdown the server
-        #         shutdown_server(server_process)
-        #     except KeyboardInterrupt:
-        #         print("KeyboardInterrupt received. Shutting down server.")
-        #         shutdown_server(server_process)
+        breakpoint()
+        if server_process:
+            try:
+                # Shutdown the server
+                shutdown_server(server_process)
+            except KeyboardInterrupt:
+                print("KeyboardInterrupt received. Shutting down server.")
+                shutdown_server(server_process)
 
         # -------------
         if args.use_accelerate_eval:
