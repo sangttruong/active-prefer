@@ -747,6 +747,7 @@ def main(args):
         with open(output_file_path, 'w') as output_file:
             json.dump(predictions, output_file)
         print(f"Predictions saved to: {output_file_path}")
+        # --------------------------
         
         # Add new dataset info to datset_info.json to run predict reward model
         add_new_dataset_info(args.data_info_path, dataset_name_generated, f"generated_predictions.json")
