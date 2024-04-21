@@ -9,6 +9,7 @@ import os
 import copy
 import json
 import math
+from tqdm import tqdm
 
 from scipy.stats import entropy
 
@@ -243,10 +244,6 @@ def shutdown_server(process):
         print("Server shutdown successfully.")
     except Exception as e:
         print(f"Error shutting down server: {e}")
-
-   
-    
-    
 
 
 def main(args):
@@ -699,8 +696,6 @@ def main(args):
             --export_size 2 \
             --export_legacy_format False
         """
-        # --export_hub_model_id
-
         
         # Export model
         run_cli_command(export_command) 
@@ -730,7 +725,7 @@ def main(args):
             test_data = json.load(json_file)
 
         predictions = []
-        for sample in test_data:
+        for sample in tqdm(test_data):
             pred_sample = copy.deepcopy(sample)
 
             completion = client.chat.completions.create(
