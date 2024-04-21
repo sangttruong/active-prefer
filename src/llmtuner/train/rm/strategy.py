@@ -359,20 +359,20 @@ class LLMStrategy:
                 chosen_input_ids = F.pad(chosen_input_ids, (0, padding_chosen), value = pad_token_id)
                 rejected_input_ids = F.pad(rejected_input_ids, (0, padding_rejected), value = pad_token_id)
 
+                chosen_non_zero_indices = (chosen_input_ids != pad_token_id).nonzero()
+                rejected_non_zero_indices = (rejected_input_ids != pad_token_id).nonzero()
 
-                if chosen_input_ids.nonzero()[0].size()[0] > 0:
-                    chosen_length = (chosen_input_ids != pad_token_id).nonzero()[-1] + 1
+                if chosen_non_zero_indices.numel() > 0 :
+                    chosen_length = chosen_non_zero_indices[-1] + 1
                 else:
-                    chosen_length = 0  # or any other appropriate value
+                    chosen_length = 0
 
-                if rejected_input_ids.nonzero()[0].size()[0] > 0:
-                    rejected_length = (rejected_input_ids != pad_token_id).nonzero()[-1] + 1
+                if rejected_non_zero_indices.numel() > 0:
+                    rejected_length = rejected_non_zero_indices[-1] + 1
                 else:
-                    rejected_length = 0  # or any other appropriate value
+                    rejected_length = 0
 
                 check_divergence = (chosen_input_ids != rejected_input_ids).nonzero()
-
-
 
                 if len(check_divergence) == 0:
                     end_index = chosen_length
