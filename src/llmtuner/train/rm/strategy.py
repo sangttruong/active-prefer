@@ -206,11 +206,10 @@ class LLMStrategy:
         accelerator = Accelerator()
         device = accelerator.device
 
-        if model is None:
-            model = self.v_head.to(device) 
+        model = self.v_head.to(device) 
 
         optimizer_params.pop('params', None)     
-        optimizer = torch.optim.AdamW(model, **optimizer_params)
+        optimizer = torch.optim.AdamW(model.parameters(), **optimizer_params)
         
         num_epochs = int(num_epochs)
         num_training_steps_per_epoch = len(train_dataset) 
