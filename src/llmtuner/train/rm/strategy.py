@@ -323,7 +323,7 @@ class LLMStrategy:
         pad_token_id = self.tokenizer.pad_token_id
 
         # training data
-        last_hidden_states, is_load = self.get_embedding()
+        last_hidden_states, is_load = self.get_embedding(True)
         train_dataset = CustomDataset(last_hidden_states, self.pool_dataset, is_load)  
         
         # training args
