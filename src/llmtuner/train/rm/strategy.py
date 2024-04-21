@@ -340,7 +340,7 @@ class LLMStrategy:
             # Traing loop
             for epoch in range(num_epochs):
                 epoch_loss = 0.0  # Initialize epoch loss
-                for idx in sample_ids:
+                for idx in tqdm(sample_ids):
                     example = train_dataset[idx]
                     last_hidden_state_chosen = example['last_hidden_state_chosen'].to(device)
                     last_hidden_state_rejected = example['last_hidden_state_rejected'].to(device)
@@ -357,7 +357,6 @@ class LLMStrategy:
                     chosen_input_ids = F.pad(chosen_input_ids, (0, padding_chosen), value = pad_token_id)
                     rejected_input_ids = F.pad(rejected_input_ids, (0, padding_rejected), value = pad_token_id)
 
-                    breakpoint()
                     chosen_length = (chosen_input_ids != pad_token_id).nonzero()[-1] + 1
                     rejected_length = (rejected_input_ids != pad_token_id).nonzero()[-1] + 1
                     check_divergence = (chosen_input_ids != rejected_input_ids).nonzero()
