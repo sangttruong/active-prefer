@@ -776,6 +776,9 @@ def main(args):
                 json.dump(predictions, output_file)
             print(f"Predictions saved to: {output_file_path}")
 
+            # Shutdown 
+            kill_cmd = f"python src/api_demo.py --model_name_or_path {dpo_full_path} --template {template} --infer_backend vllm --vllm_enforce_eager"
+            find_and_kill_process(kill_cmd)
         else:
             generate_text_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
                 --stage sft \
@@ -799,16 +802,8 @@ def main(args):
             run_cli_command(generate_text_command)
             jsonl_to_json(f"{args.dataset_dir}/generated_predictions.jsonl", f"{args.dataset_dir}/generated_predictions.json")
             
-        # --------------------------
-
         # Add new dataset info to datset_info.json to run predict reward model
         add_new_dataset_info(args.data_info_path, dataset_name_generated, f"generated_predictions.json")
-
-        # Shutdown 
-        
-        kill_cmd = f"python src/api_demo.py --model_name_or_path {dpo_full_path} --template {template} --infer_backend vllm --vllm_enforce_eager"
-        find_and_kill_process(kill_cmd)
-
 
         # -------------
         if args.use_accelerate_eval:
