@@ -1,14 +1,14 @@
 #!/bin/bash
 
-CUDA_VISIBLE_DEVICES=0,3 python src/train_bash.py \
+CUDA_VISIBLE_DEVICES=3,4 python src/train_bash.py \
     --stage oracle \
     --do_train \
     --model_name_or_path meta-llama/Llama-2-7b-hf \
     --dataset truthful_qa_train \
     --dataset_dir data \
     --template default \
-    --finetuning_type full \
-    --output_dir saves/LLaMA2-7B/oracle/sft \
+    --finetuning_type freeze \
+    --output_dir saves/LLaMA2-7B/oracle/test \
     --overwrite_cache \
     --overwrite_output_dir \
     --cutoff_len 1024 \
@@ -27,4 +27,5 @@ CUDA_VISIBLE_DEVICES=0,3 python src/train_bash.py \
     --max_samples 3000 \
     --val_size 0.1 \
     --ddp_timeout 1800000 \
+    --report_to none\
     --plot_loss 
