@@ -687,7 +687,7 @@ def main(args):
         # Export DPO finetuned model 
         dpo_full_path = f"{dpo_adapter_path}/full"
 
-        export_command = f""""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/export_model.py \
+        export_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/export_model.py \
             --model_name_or_path {args.model_name_or_path} \
             --adapter_name_or_path {dpo_adapter_path} \
             --export_dir {dpo_full_path} \
@@ -695,7 +695,7 @@ def main(args):
             --finetuning_type {args.finetuning_type} \
             --export_size 2 \
             --export_legacy_format False
-        """
+            """
         
         # Export model
         run_cli_command(export_command) 
@@ -712,7 +712,8 @@ def main(args):
             --infer_backend vllm \
             --vllm_enforce_eager
         """
-        server_process = run_server(deploy_command)
+        # server_process = run_server(deploy_command)
+        run_cli_command(deploy_command)
         time.sleep(120)
 
         # Inference 

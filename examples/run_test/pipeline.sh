@@ -11,7 +11,7 @@ python pipeline.py \
     --sanity_check \
     --main_process_port 29505\
     --api_port 8007\
-    --gpu_ids 6,7
+    --gpu_ids 3,4
     
     
 
