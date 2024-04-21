@@ -279,6 +279,7 @@ class LLMStrategy:
         # Train the model
         last_hidden_states, is_load = self.get_embedding()
         train_dataset = CustomDataset(last_hidden_states, self.pool_dataset, is_load)  # Only need change train_dataset for diff oracle model
+        breakpoint()
 
         # Select subset for traning by question_ids
         if question_ids:
