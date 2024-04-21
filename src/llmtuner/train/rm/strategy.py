@@ -356,9 +356,22 @@ class LLMStrategy:
                 chosen_input_ids = F.pad(chosen_input_ids, (0, padding_chosen), value = pad_token_id)
                 rejected_input_ids = F.pad(rejected_input_ids, (0, padding_rejected), value = pad_token_id)
 
-                chosen_length = (chosen_input_ids != pad_token_id).nonzero()[-1] + 1
-                rejected_length = (rejected_input_ids != pad_token_id).nonzero()[-1] + 1
+
+                # Calculate chosen_length
+                if chosen_input_ids.nonzero()[0].size > 0:
+                    chosen_length = (chosen_input_ids != pad_token_id).nonzero()[-1] + 1
+                else:
+                    chosen_length = 0  # or any other appropriate value
+
+                # Calculate rejected_length
+                if rejected_input_ids.nonzero()[0].size > 0:
+                    rejected_length = (rejected_input_ids != pad_token_id).nonzero()[-1] + 1
+                else:
+                    rejected_length = 0  # or any other appropriate value
+
+                # Check for divergence
                 check_divergence = (chosen_input_ids != rejected_input_ids).nonzero()
+
 
                 if len(check_divergence) == 0:
                     end_index = chosen_length
@@ -384,7 +397,7 @@ class LLMStrategy:
         
         # Save model
         save_file(model.state_dict(), v_head_path, metadata={"format": "pt"}) # save model
-        print(f"Model {m} saved to {v_head_path}")
+        print(f"Model saved to {v_head_path}")
 
     
     def getNet(self, params):
