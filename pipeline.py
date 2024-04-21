@@ -713,7 +713,6 @@ def main(args):
             --vllm_enforce_eager
         """
         server_process = run_server(deploy_command)
-        time.sleep(120)
 
         # Inference 
         client = OpenAI(

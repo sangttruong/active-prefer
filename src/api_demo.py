@@ -27,12 +27,13 @@ def parse_args():
     parser.add_argument("--template", type=str, required=True, help="Template to use")
     parser.add_argument("--infer_backend", type=str, required=True, help="Inference backend")
     parser.add_argument("--vllm_enforce_eager", action="store_true", help="Enforce eager execution for VLLM")
+    parser.add_argument("--gpu_ids", type=str, default="3,4", help="Enforce eager execution for VLLM")
     parser.add_argument("--api_port", type=int, default=8005, help="Port for the API server")
     return parser.parse_args()
 
 def main():
     args = parse_args()
-    os.environ["CUDA_VISIBLE_DEVICES"] = "3,4"
+    os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu_ids
     os.environ["API_PORT"] = str(args.api_port)
 
     chat_model = ChatModel(args.model_name_or_path, args.template, args.infer_backend, args.vllm_enforce_eager)
