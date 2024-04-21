@@ -127,7 +127,6 @@ def run_oracle_rm(
     oracle.train(seed=42)
     
     ##########################
-    del trainer, base_model
     gc.collect()
     torch.cuda.empty_cache()
 

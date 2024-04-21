@@ -340,7 +340,7 @@ def main(args):
         --eval_steps {args.save_steps} \
         --evaluation_strategy {args.evaluation_strategy} \
         --learning_rate {args.learning_rate} \
-        --num_train_epochs {args.num_train_epochs} \
+        --num_train_epochs 3 \
         --max_samples {args.max_samples} \
         --val_size 0.1 \
         --ddp_timeout 1800000 \
