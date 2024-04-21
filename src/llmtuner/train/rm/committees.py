@@ -49,7 +49,6 @@ class QueryByCommittees(LLMStrategy):
         device = accelerator.device
 
         model = self.v_head.to(device) 
-
         
         cutoff_len = self.data_args.cutoff_len
         pad_token_id = self.tokenizer.pad_token_id
@@ -82,8 +81,6 @@ class QueryByCommittees(LLMStrategy):
             else:
                 print(f"Continue training from {v_head_path}")
                 vhead_params = load_file(v_head_path)
-
-                # vhead_params = load_valuehead_params(v_head_path, self.model_args)
                 model.load_state_dict(vhead_params, strict=False)
 
             model, optimizer, train_dataset = accelerator.prepare(model, optimizer, train_dataset)

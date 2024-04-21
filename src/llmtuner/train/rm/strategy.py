@@ -242,6 +242,7 @@ class LLMStrategy:
                 rejected_input_ids = F.pad(rejected_input_ids, (0, padding_rejected), value = pad_token_id)
 
 
+                breakpoint()
                 chosen_length = (chosen_input_ids != pad_token_id).nonzero()[-1] + 1
                 rejected_length = (rejected_input_ids != pad_token_id).nonzero()[-1] + 1
                 check_divergence = (chosen_input_ids != rejected_input_ids).nonzero()
