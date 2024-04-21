@@ -284,6 +284,7 @@ def main(args):
 
     model_name = args.model_name_or_path.split('/')[-1]
     reward_model_path = f"saves/{model_name}/{dataset}/{args.method}/reward"
+    breakpoint()
     dpo_adapter_path = f"saves/{model_name}/{dataset}/{args.method}/dpo"
     oracle_adapter_path = f"saves/{model_name}/{dataset}/{args.method}/oracle"
     eval_metric_dir = f"saves/{model_name}/{dataset}/{args.method}"
