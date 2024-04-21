@@ -102,8 +102,8 @@ class CustomDataset(Dataset):
         
         if self.is_load:
             return {"question_id": example['id'], # string 
-                    "last_hidden_state_chosen": torch.tensor(self.embeddings_feature[f'arr_{i}'][i][0]), # tensor (ctx x 4096)
-                    "last_hidden_state_rejected": torch.tensor(self.embeddings_feature[f'arr_{i}'][i][1]),  # tensor (ctx x 4096)
+                    "last_hidden_state_chosen": torch.tensor(self.embeddings_feature[f'arr_{i}'][0]), # tensor (ctx x 4096)
+                    "last_hidden_state_rejected": torch.tensor(self.embeddings_feature[f'arr_{i}'][1]),  # tensor (ctx x 4096)
                     'chosen_ids': torch.tensor(example['chosen_ids']), # list ids
                     'rejected_ids': torch.tensor(example['rejected_ids']), # list ids
                     }
