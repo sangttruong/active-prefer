@@ -713,6 +713,7 @@ def main(args):
             --vllm_enforce_eager
         """
         server_process = run_server(deploy_command)
+        time.sleep(120)
 
         # Inference 
         client = OpenAI(
@@ -748,7 +749,7 @@ def main(args):
             json.dump(predictions, output_file)
         print(f"Predictions saved to: {output_file_path}")
         # --------------------------
-        
+
         # Add new dataset info to datset_info.json to run predict reward model
         add_new_dataset_info(args.data_info_path, dataset_name_generated, f"generated_predictions.json")
 
