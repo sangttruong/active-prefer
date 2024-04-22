@@ -451,9 +451,9 @@ def main(args):
                                 """
 
             # Check iter condition and append the specific part
-            if iter != 0:
-                selection_command += f"--adapter_name_or_path {reward_model_path}"
-
+            # if iter != 0:
+            #     selection_command += f"--adapter_name_or_path {reward_model_path}"
+            breakpoint()
             run_cli_command(selection_command) 
 
         ##########################################################
