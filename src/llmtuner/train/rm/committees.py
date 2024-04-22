@@ -189,7 +189,7 @@ class QueryByCommittees(LLMStrategy):
                     question_id = example['question_id']
                     last_hidden_state_chosen = example['last_hidden_state_chosen'][-1].to(device)
                     chosen_rewards = model(last_hidden_state_chosen)
-                    probs = F.sigmoid(chosen_rewards, dim=0)
+                    probs = F.sigmoid(chosen_rewards)
                     score = 1 if probs.item() > theshold else 0 
                     
                     if question_id not in predictions:
