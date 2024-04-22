@@ -323,7 +323,7 @@ def main(args):
         ft_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
             --stage oracle \
             --do_train \
-            --flash_attn True\
+            --flash_attn False\
             --model_name_or_path {args.model_name_or_path}\
             --output_dir {oracle_adapter_path}\
             --dataset {dataset} \
@@ -568,7 +568,7 @@ def main(args):
                     src/train_bash.py \
                     --stage rm \
                     --do_train \
-                    --flash_attn True\
+                    --flash_attn False\
                     --model_name_or_path {args.model_name_or_path}\
                     --adapter_name_or_path {dpo_adapter_path}\
                     --output_dir {reward_model_path} \
@@ -600,7 +600,7 @@ def main(args):
                 rm_ft_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
                     --stage rm \
                     --do_train \
-                    --flash_attn True\
+                    --flash_attn False\
                     --model_name_or_path {args.model_name_or_path}\
                     --adapter_name_or_path {dpo_adapter_path}\
                     --output_dir {reward_model_path} \
@@ -642,7 +642,7 @@ def main(args):
                 --config_file examples/accelerate/default.yaml \
                 src/train_bash.py \
                 --stage rm \
-                --flash_attn True\
+                --flash_attn False\
                 --model_name_or_path {args.model_name_or_path}\
                 --adapter_name_or_path {reward_model_path}\
                 --output_dir {eval_rm_command_output_path} \
@@ -677,7 +677,7 @@ def main(args):
             eval_rm_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
                 --stage rm \
                 --do_eval \
-                --flash_attn True\
+                --flash_attn False\
                 --model_name_or_path {args.model_name_or_path}\
                 --adapter_name_or_path {reward_model_path}\
                 --output_dir {eval_rm_command_output_path} \
@@ -820,7 +820,7 @@ def main(args):
                 src/train_bash.py \
                 --stage rm \
                 --do_predict \
-                --flash_attn True\
+                --flash_attn False\
                 --model_name_or_path {args.model_name_or_path} \
                 --vhead_oracle_path {oracle_adapter_path}\
                 --finetuning_type full \
@@ -835,7 +835,7 @@ def main(args):
             inference_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
                 --stage rm \
                 --do_predict \
-                --flash_attn True\
+                --flash_attn False\
                 --model_name_or_path {args.model_name_or_path} \
                 --vhead_oracle_path {oracle_adapter_path}\
                 --finetuning_type full \
