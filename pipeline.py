@@ -278,8 +278,8 @@ def main(args):
     # Prepare dataset
     source_path = f"{args.dataset_dir}/backup_dataset_info.json"
     destination_path = f"{args.dataset_dir}/dataset_info.json"
-    copy_json_file(source_path, destination_path)
-    delete_json_file(f"{args.dataset_dir}/selected_entries.json")
+    # copy_json_file(source_path, destination_path)
+    # delete_json_file(f"{args.dataset_dir}/selected_entries.json")
 
     if args.dataset_name in ['allenai/ai2_arc', 'arc', "arc_challenge_train"]:
         dataset = 'arc_challenge_train'
@@ -735,8 +735,6 @@ def main(args):
         run_cli_command(export_command) 
 
         if args.is_using_vllm:
-            
-
             # Deploy
             if "llama" in args.model_name_or_path.lower():
                 template = "llama2"
@@ -788,8 +786,6 @@ def main(args):
             kill_cmd = f"python src/api_demo.py --model_name_or_path {dpo_full_path} --template {template} --infer_backend vllm --vllm_enforce_eager"
             find_and_kill_process(kill_cmd)
         else:
-            # --model_name_or_path {args.model_name_or_path} \
-            # --adapter_name_or_path {dpo_adapter_path} \
             generate_text_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
                 --stage sft \
                 --do_predict \
@@ -798,7 +794,7 @@ def main(args):
                 --dataset_dir {args.dataset_dir} \
                 --template {args.template} \
                 --finetuning_type {args.finetuning_type} \
-                --output_dir {args.dataset_dir} \
+                --output_dir {dpo_full_path} \
                 --overwrite_cache \
                 --overwrite_output_dir \
                 --cutoff_len {args.cutoff_len} \
@@ -809,10 +805,10 @@ def main(args):
             """
 
             run_cli_command(generate_text_command)
-            jsonl_to_json(f"{args.dataset_dir}/generated_predictions.jsonl", f"{args.dataset_dir}/generated_predictions.json")
+            jsonl_to_json(f"{dpo_full_path}/generated_predictions.jsonl", f"{args.dataset_dir}/generated_predictions_{testset}.json")
             
         # Add new dataset info to datset_info.json to run predict reward model
-        add_new_dataset_info(args.data_info_path, dataset_name_generated, f"generated_predictions.json")
+        add_new_dataset_info(args.data_info_path, dataset_name_generated, f"generated_predictions__{testset}.json")
 
         # -------------
         if args.use_accelerate_eval:
@@ -877,8 +873,6 @@ def main(args):
         json.dump(active_accuracy, json_file)
     print(f"Results saved to {json_filename}")
     
-    delete_selected_info(args.data_info_path, f"{model_name}_iter")
-
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Iterative training and evaluation script")
     parser.add_argument("--template", type=str, default="default", help="Template name")

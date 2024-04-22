@@ -553,7 +553,7 @@ class LLMStrategy:
         pass
 
     def update(self, question_ids, iteration = 0):
-        selected_path = f"{self.data_args.dataset_dir}/selected_entries.json"  
+        selected_path = f"{self.data_args.dataset_dir}/selected_entries_{self.dataset}.json"  
         dataset_info_path = f"{self.data_args.dataset_dir}/dataset_info.json"
         dataset_path = f"{self.data_args.dataset_dir}/{self.dataset}.json"
 
@@ -567,7 +567,7 @@ class LLMStrategy:
                 # append new info to data_infor and store result in json file
                 new_data_info = f"{self.dataset}_iter_{iteration}"
                 data_info[new_data_info] = copy.deepcopy(data_info[self.dataset])
-                data_info[new_data_info]["file_name"] = "selected_entries.json"
+                data_info[new_data_info]["file_name"] = f"selected_entries_{self.dataset}.json"
 
                 with open(dataset_info_path, 'w') as outfile:
                     json.dump(data_info, outfile, indent=4)
