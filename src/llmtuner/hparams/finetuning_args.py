@@ -255,6 +255,11 @@ class FinetuningArguments(FreezeArguments, LoraArguments, RLHFArguments, GaloreA
         metadata={"help": "num_sample_selected each iter"},
     )    
 
+    is_compute_emb: bool = field(
+        default=True,
+        metadata={"help": "Freeze all except v_head"},
+    )
+
     def __post_init__(self):
         def split_arg(arg):
             if isinstance(arg, str):
