@@ -84,6 +84,7 @@ class QueryByCommittees(LLMStrategy):
             if not is_continues:
                 model = self.v_head.apply(weight_reset).to(device)
             else:
+                print(f"Load weight from {v_head_path}")
                 vhead_params = load_file(v_head_path)
                 model.load_state_dict(vhead_params, strict=False)
 
@@ -158,12 +159,11 @@ class QueryByCommittees(LLMStrategy):
         return save_paths
     
     def query_by_commitees(self, n=100, iteration = 0, nEns = 30, theshold = 0.5):
-
         # Assuming self.training_args.output_dir contains the directory path
         output_dir = self.training_args.output_dir
         # Check if the file exists
         if os.path.exists(os.path.join(output_dir, "qbc_0.safetensors")):
-            save_paths = self.train_commitees(nEns, True)
+            save_paths = self.train_commitees(nEns, is_continues = True)
         else:
             save_paths = self.train_commitees(nEns)
 

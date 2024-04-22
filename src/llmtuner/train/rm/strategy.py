@@ -167,23 +167,6 @@ class LLMStrategy:
         self.v_head = ValueHead(self.base_model.config)
 
         self.dataset = self.data_args.dataset
-    
-        # if self.data_args.dataset in ['allenai/ai2_arc', 'arc', "arc_challenge_train"]:
-        #     self.dataset = 'arc_challenge_train'
-        # elif self.data_args.dataset in ['truthful_qa', "truthful_qa_train"]:
-        #     self.dataset = 'truthful_qa_train'
-        # elif self.data_args.dataset in ['Rowan/hellaswag', 'hellaswag', "hellaswag_train"]:
-        #     self.dataset = 'hellaswag_train'
-        # elif self.data_args.dataset in ['winogrande', "winogrande_train"]:
-        #     self.dataset = 'winogrande_train'
-        # elif self.data_args.dataset in ['cais/mmlu', "mmlu", "mmlu_train"]:
-        #     self.dataset = 'mmlu_train'
-        # elif self.data_args.dataset in ['Anthropic/hh-rlhf', "hh-rlhf", "hh_rlhf_train"]:
-        #     self.dataset = 'hh_rlhf_train'
-        # elif self.data_args.dataset in ['allenai/reward-bench', "reward-bench", "reward_bench", "reward_bench_train"]:
-        #     self.dataset = 'reward_bench_train'
-        # else:
-        #     raise(f"Does not support {self.data_args.dataset} dataset yet")
 
     def query(self, n):
         # Select instances from the pool for labeling
@@ -273,7 +256,7 @@ class LLMStrategy:
             save_file(model.state_dict(), save_path, metadata={"format": "pt"}) # save model
             print(f"Model saved to {save_path}")
 
-    def train(self, question_ids = None, seed = 42):
+    def train(self, percentage = 0.9, num_epochs = 20):
         accelerator = Accelerator()
         device = accelerator.device
 
@@ -286,7 +269,7 @@ class LLMStrategy:
         train_dataset = self.get_training_dataset(is_override = self.finetuning_args.is_compute_emb)
 
         # training args
-        num_epochs = int(self.training_args.num_train_epochs)
+        # num_epochs = int(self.training_args.num_train_epochs)
         num_training_steps_per_epoch = len(train_dataset) 
         num_training_steps = num_epochs * num_training_steps_per_epoch
 
@@ -294,7 +277,7 @@ class LLMStrategy:
         v_head_path = f"{self.training_args.output_dir}/value_head.safetensors"
 
         # initialize new model and optimizer
-        sample_ids = list(range(len(train_dataset)))
+        sample_ids = list(range(int(len(train_dataset) * percentage)))
 
         # optimizer, scheduler
         optimizer_params = self.trainer.create_optimizer().param_groups[0]
@@ -305,7 +288,6 @@ class LLMStrategy:
 
         model, optimizer, train_dataset = accelerator.prepare(model, optimizer, train_dataset)
         model.train()
-
             
         # Traing loop
         for epoch in range(num_epochs):

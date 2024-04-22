@@ -317,7 +317,7 @@ def main(args):
 
     # Train an Oracle model O 
     
-    if args.is_compute_emb == False and os.path.exists(oracle_adapter_path):
+    if args.is_retrain_oracle == False and os.path.exists(oracle_adapter_path):
         print("Oracle trained")
     else:
         ft_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
@@ -345,7 +345,7 @@ def main(args):
             --num_train_epochs 10 \
             --max_samples {args.max_samples} \
             --ddp_timeout 1800000 \
-            --is_compute_emb {args.is_compute_emb}\
+            --is_compute_emb {args.is_retrain_oracle}\
             --plot_loss 
             """
         print(f"Training Oracle model ............................")
@@ -913,7 +913,7 @@ def parse_arguments():
     parser.add_argument("--main_process_port", type=int, default=29505, help="Deepspeed Port")
     parser.add_argument("--api_port", type=int, default=8005, help="Deploy API port")
     parser.add_argument("--is_using_vllm", action="store_true", help="Using vLLM to run 70B model")
-    parser.add_argument("--is_compute_emb", action="store_true", help="recompute emb")
+    parser.add_argument("--is_retrain_oracle", action="store_true", help="retrain oracle model")
 
     return parser.parse_args()
 
