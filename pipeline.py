@@ -315,7 +315,7 @@ def main(args):
 
     # Train an Oracle model O 
     
-    if os.path.exists(oracle_adapter_path):
+    if args.is_compute_emb == False and os.path.exists(oracle_adapter_path):
         print("Oracle trained")
     else:
         ft_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
@@ -366,7 +366,7 @@ def main(args):
                                     --dataset_dir {args.dataset_dir} \
                                     --dataset {dataset} \
                                     --template {args.template} \
-                                    --finetuning_type full \
+                                    --finetuning_type freeze \
                                     --output_dir {reward_model_path} \
                                     --overwrite_output_dir \
                                     --cutoff_len {args.cutoff_len} \
