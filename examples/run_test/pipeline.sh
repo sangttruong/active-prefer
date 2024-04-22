@@ -9,7 +9,8 @@ python pipeline.py \
     --use_accelerate\
     --percentage 0.1 \
     --main_process_port 29507\
-    --gpu_ids 0,1
+    --gpu_ids 0,1\
+    --sanity_check
 
 #### Full
 python pipeline.py \
@@ -55,6 +56,7 @@ CUDA_VISIBLE_DEVICES=3,6 python src/train_bash.py \
 -----------------------------------------------
 export PATH=/usr/local/cuda-12.2/bin:$PATH
 
+export PATH=/usr/local/cuda-12.4/bin:$PATH
 export HF_HOME="/lfs/local/0/sttruong/env/.huggingface"
 export HF_DATASETS_CACHE="/lfs/local/0/sttruong/env/.huggingface/datasets"
 export TRITON_CACHE_DIR="/lfs/local/0/sttruong/.triton_1"
