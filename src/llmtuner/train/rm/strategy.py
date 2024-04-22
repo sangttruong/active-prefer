@@ -143,7 +143,6 @@ class LLMStrategy:
 
         nearest_multiple = len(self.pool_dataset) // 8 * 8
         self.pool_dataset = self.pool_dataset.select(list(range(nearest_multiple)))
-        breakpoint()
 
         # Replace lm_head with identity
         if hasattr(self.base_model, "lm_head"):
