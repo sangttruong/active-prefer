@@ -421,7 +421,6 @@ def main(args):
             #         --num_sample_selected {num_sample_selected}
             #     """
             
-            breakpoint()
             selection_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
                                     --stage selection \
                                     --do_predict \
@@ -453,9 +452,8 @@ def main(args):
             # Check iter condition and append the specific part
             # if iter != 0:
             #     selection_command += f"--adapter_name_or_path {reward_model_path}"
-            breakpoint()
             run_cli_command(selection_command) 
-
+        continue
         ##########################################################
         #### TRAIN DPO
         ##########################################################
