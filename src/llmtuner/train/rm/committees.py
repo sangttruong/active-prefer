@@ -196,9 +196,9 @@ class QueryByCommittees(LLMStrategy):
         
         votes_entropy = {}
         for question_id, scores in predictions.items():
-            votes = Counter(scores).values()
+            votes = list(Counter(scores).values())
             # Calculate softmax of votes
-            exp_probs = np.exp(votes.values())
+            exp_probs = np.exp(votes)
             softmax_scores = exp_probs / np.sum(exp_probs)
             # Cal entropy
             entropy_value = entropy(softmax_scores, base=2)
