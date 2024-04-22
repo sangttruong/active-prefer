@@ -277,8 +277,11 @@ def find_and_kill_process(command):
 
 
 def main(args):
+
+    model_name = args.model_name_or_path.split('/')[-1]
+
     if args.dataset_name in ['allenai/ai2_arc', 'arc', "arc_challenge_train"]:
-        dataset = 'arc_challenge_train'
+        dataset = f'arc_challenge_train_{model_name}_{args.method}'
         prepare_data = f"""python data/arc/arc.py --sanity_check {args.sanity_check}"""
     elif args.dataset_name in ['truthful_qa', "truthful_qa_train"]:
         dataset = 'truthful_qa_train'
@@ -296,8 +299,8 @@ def main(args):
         prepare_data = f"""python data/hh_rlhf/hh_rlhf.py"""
         dataset = 'hh_rlhf_train'
     elif args.dataset_name in ['allenai/reward-bench', "reward-bench", "reward_bench", "reward_bench_train"]:
-        prepare_data = f"""python data/reward_bench/reward_bench.py --sanity_check {args.sanity_check}"""
-        dataset = 'reward_bench_train'
+        prepare_data = f"""python data/reward_bench/reward_bench.py --sanity_check {args.sanity_check} --model_name {model_name} --method {args.method}"""
+        dataset = f'reward_bench_train_{model_name}_{args.method}{"" if args.sanity_check else "_check"}'
     else:
         raise(f"Does not support {args.dataset_name} dataset yet")
 
@@ -306,10 +309,9 @@ def main(args):
     run_cli_command(prepare_data)
 
 
-    model_name = args.model_name_or_path.split('/')[-1]
     reward_model_path = f"saves/{model_name}/{dataset}/{args.method}/reward"
     dpo_adapter_path = f"saves/{model_name}/{dataset}/{args.method}/dpo"
-    oracle_adapter_path = f"saves/{model_name}/{dataset}/oracle" # re-use for all method
+    oracle_adapter_path = f"saves/{model_name}/{dataset}/oracle"
     eval_metric_dir = f"saves/{model_name}/{dataset}/{args.method}"
     num_sample_selected = int(count_len_dataset(f"{args.dataset_dir}/{dataset}.json") * args.percentage)
 
