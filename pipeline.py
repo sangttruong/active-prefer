@@ -251,7 +251,6 @@ def shutdown_server(process):
 
 def find_and_kill_process(command):
     # Construct the command to find the PID
-    breakpoint()
     find_pid_command = f"""pgrep -af "{command}" """
 
     # Execute the command to find the PID
@@ -278,12 +277,6 @@ def find_and_kill_process(command):
 
 
 def main(args):
-    # Prepare dataset
-    source_path = f"{args.dataset_dir}/backup_dataset_info.json"
-    destination_path = f"{args.dataset_dir}/dataset_info.json"
-    # copy_json_file(source_path, destination_path)
-    # delete_json_file(f"{args.dataset_dir}/selected_entries.json")
-
     if args.dataset_name in ['allenai/ai2_arc', 'arc', "arc_challenge_train"]:
         dataset = 'arc_challenge_train'
         prepare_data = f"""python data/arc/arc.py --sanity_check {args.sanity_check}"""
@@ -719,7 +712,6 @@ def main(args):
             elif "mistral" in args.model_name_or_path.lower():
                 template = "mistral"
 
-       
             deploy_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} API_PORT={args.api_port} python src/api_demo.py --model_name_or_path {dpo_full_path} --template {template} --infer_backend vllm --vllm_enforce_eager"""
 
             print("Deploy LLM.....")
@@ -789,6 +781,8 @@ def main(args):
         add_new_dataset_info(args.data_info_path, dataset_name_generated, f"generated_predictions_{testset}.json")
 
         # -------------
+
+        predict_rw_score_path = f"{oracle_adapter_path}/Iter_{iter}"
         if args.use_accelerate_eval:
             inference_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port} \
                 --config_file examples/accelerate/default.yaml \
@@ -817,7 +811,7 @@ def main(args):
                 --dataset_dir {args.dataset_dir} \
                 --dataset {dataset_name_generated} \
                 --template {args.template} \
-                --output_dir {oracle_adapter_path} \
+                --output_dir {predict_rw_score_path} \
                 --per_device_eval_batch_size {args.per_device_eval_batch_size} \
                 --fp16
                 """
@@ -827,10 +821,10 @@ def main(args):
         # delete_item_dataset_info(args.data_info_path, dataset_name_generated) # clean dataset_info
         # -------------------------
         # Get accuracy        
-        accuracy = calculate_accuracy(f"{oracle_adapter_path}/generated_predictions.jsonl")
+        accuracy = calculate_accuracy(f"{predict_rw_score_path}/generated_predictions.jsonl")
         
         active_accuracy.append({
-            "iter": {iter},
+            "iter": iter,
             "acc": accuracy 
         })
         print("Active accuracy:", active_accuracy)

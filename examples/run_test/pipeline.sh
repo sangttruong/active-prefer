@@ -3,15 +3,13 @@
 python pipeline.py \
     --model_name_or_path meta-llama/Llama-2-7b-hf \
     --dataset_name reward_bench_train \
-    --method random \
+    --method max_entropy \
     --num_iters 5\
     --num_train_epochs 2\
     --percentage 0.1 \
-    --use_accelerate \
     --main_process_port 29505\
     --gpu_ids 6,7\
-    --sanity_check\
-    --is_compute_emb
+    --sanity_check
 
 
 #### Full
