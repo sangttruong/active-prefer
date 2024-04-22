@@ -311,7 +311,7 @@ def main(args):
 
     reward_model_path = f"saves/{model_name}/{dataset}/{args.method}/reward"
     dpo_adapter_path = f"saves/{model_name}/{dataset}/{args.method}/dpo"
-    oracle_adapter_path = f"saves/{model_name}/{dataset}/oracle{"_check" if args.sanity_check else ""}"
+    oracle_adapter_path = f"saves/{model_name}/{dataset}/oracle{'_check' if args.sanity_check else ''}"
     eval_metric_dir = f"saves/{model_name}/{dataset}/{args.method}"
     num_sample_selected = int(count_len_dataset(f"{args.dataset_dir}/{dataset}.json") * args.percentage)
 
