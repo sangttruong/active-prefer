@@ -475,7 +475,8 @@ def main(args):
                 --max_samples {args.max_samples} \
                 --plot_loss \
                 --report_to none\
-                --dpo_ftx 1.0
+                --dpo_ftx 1.0 \
+                --fp16
             """
 
         run_cli_command(dpo_ft_command) 
@@ -862,6 +863,15 @@ def main(args):
         
     print("DONE!!!")
     print(active_accuracy)
+
+    if not os.path.exists(eval_metric_dir):
+        os.makedirs(eval_metric_dir)
+
+    json_filename = os.path.join(eval_metric_dir, "active_accuracy.json")
+    with open(json_filename, 'w') as json_file:
+        json.dump(active_accuracy, json_file)
+    print(f"Results saved to {json_filename}")
+    
     delete_selected_info(args.data_info_path, f"{model_name}_iter")
 
 def parse_arguments():

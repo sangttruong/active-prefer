@@ -29,6 +29,5 @@ CUDA_VISIBLE_DEVICES=0,1 accelerate launch \
     --num_train_epochs 3.0 \
     --max_samples 3000 \
     --val_size 0.1 \
-    --quantization_bit 4 \
     --plot_loss \
     --fp16

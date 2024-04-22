@@ -8,7 +8,6 @@ python pipeline.py \
     --num_train_epochs 2\
     --percentage 0.1 \
     --use_accelerate \
-    --sanity_check \
     --main_process_port 29505\
     --gpu_ids 6,7
     

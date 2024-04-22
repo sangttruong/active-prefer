@@ -1,0 +1,55 @@
+CUDA_VISIBLE_DEVICES=6,7 accelerate launch --main_process_port=29505\
+        --config_file examples/accelerate/default.yaml \
+        src/train_bash.py \
+        --stage dpo \
+        --do_train \
+        --model_name_or_path meta-llama/Llama-2-7b-hf \
+        --dataset_dir data \
+        --dataset reward_bench_train \
+        --template default \
+        --finetuning_type lora \
+        --lora_target q_proj,v_proj \
+        --output_dir saves/tests/dpo \
+        --overwrite_output_dir \
+        --cutoff_len 1024 \
+        --per_device_train_batch_size 2 \
+        --gradient_accumulation_steps 2 \
+        --lr_scheduler_type cosine \
+        --logging_steps 400 \
+        --warmup_steps 20 \
+        --save_steps 400 \
+        --learning_rate 5e-5 \
+        --num_train_epochs 2 \
+        --max_samples 1000 \
+        --plot_loss \
+        --dpo_ftx 1.0 \
+        --report_to none \
+        --fp16
+
+
+-------------------------------------------
+CUDA_VISIBLE_DEVICES=6,7 python src/train_bash.py \
+        --stage dpo \
+        --do_train \
+        --model_name_or_path meta-llama/Llama-2-7b-hf \
+        --dataset_dir data \
+        --dataset reward_bench_train \
+        --template default \
+        --finetuning_type lora \
+        --lora_target q_proj,v_proj \
+        --output_dir saves/tests/dpo \
+        --overwrite_output_dir \
+        --cutoff_len 1024 \
+        --per_device_train_batch_size 2 \
+        --gradient_accumulation_steps 2 \
+        --lr_scheduler_type cosine \
+        --logging_steps 400 \
+        --warmup_steps 20 \
+        --save_steps 400 \
+        --learning_rate 5e-5 \
+        --num_train_epochs 2 \
+        --max_samples 1000 \
+        --plot_loss \
+        --dpo_ftx 1.0 \
+        --report_to none \
+        --fp16
