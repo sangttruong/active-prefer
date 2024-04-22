@@ -25,10 +25,6 @@ class RandomSampling(LLMStrategy):
 
 
     def query(self, n=100, iteration = 0):
-        question_ids = list(self.pool_dataset['id'])
-        # breakpoint()
-
-        # # questions = list(entropy_vals.keys())
-        # selected_questions = random.sample(questions, n)
-
-        # self.update(question_ids=selected_questions, iteration=iteration)
+        questions = self.pool_dataset['id']
+        selected_questions = random.sample(questions, n)
+        self.update(question_ids=selected_questions, iteration=iteration)
