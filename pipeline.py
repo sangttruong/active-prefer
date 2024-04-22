@@ -421,10 +421,12 @@ def main(args):
             #         --num_sample_selected {num_sample_selected}
             #     """
             
+            breakpoint()
             selection_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
                                     --stage selection \
                                     --do_predict \
                                     --model_name_or_path {args.model_name_or_path} \
+                                    {'--adapter_name_or_path ' + reward_model_path if iter != 0 else ''}\
                                     --dataset_dir {args.dataset_dir} \
                                     --dataset {dataset} \
                                     --template {args.template} \
@@ -447,10 +449,10 @@ def main(args):
                                     --acquisition {args.method}\
                                     --num_sample_selected {num_sample_selected}
                                 """
+
             # Check iter condition and append the specific part
-            breakpoint()
             if iter != 0:
-                selection_command += f" --adapter_name_or_path {reward_model_path}"
+                selection_command += f"--adapter_name_or_path {reward_model_path}"
 
             run_cli_command(selection_command) 
 
