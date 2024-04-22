@@ -344,7 +344,7 @@ def main(args):
             --eval_steps {args.save_steps} \
             --evaluation_strategy {args.evaluation_strategy} \
             --learning_rate {args.learning_rate} \
-            --num_train_epochs 3 \
+            --num_train_epochs 10 \
             --max_samples {args.max_samples} \
             --ddp_timeout 1800000 \
             --is_compute_emb {args.is_compute_emb}\
@@ -362,14 +362,10 @@ def main(args):
         ##########################################################
         print(f"Selection ........................")
         if args.method in ['max_entropy', "random"]:
-            if args.use_accelerate_eval:
-                selection_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port}\
-                    --config_file examples/accelerate/default.yaml \
-                    src/train_bash.py \
+            if iter == 0:
+                selection_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py\
                     --stage selection \
                     --do_predict \
-                    --active_iter {iter}\
-                    --num_sample_selected {num_sample_selected} \
                     --model_name_or_path {args.model_name_or_path} \
                     --dataset_dir {args.dataset_dir} \
                     --dataset {dataset} \
@@ -388,36 +384,39 @@ def main(args):
                     --eval_steps {args.eval_steps} \
                     --evaluation_strategy {args.evaluation_strategy} \
                     --learning_rate {args.learning_rate} \
+                    --num_train_epochs {args.num_train_epochs}\
+                    --active_iter {iter}\
                     --acquisition {args.method}\
-                    --num_train_epochs {args.num_train_epochs}
+                    --num_sample_selected {num_sample_selected}
                 """
             else: 
                 selection_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py\
-                --stage selection \
-                --do_predict \
-                --model_name_or_path {args.model_name_or_path} \
-                --dataset_dir {args.dataset_dir} \
-                --dataset {dataset} \
-                --template {args.template} \
-                --finetuning_type full \
-                --output_dir {reward_model_path} \
-                --overwrite_output_dir \
-                --cutoff_len {args.cutoff_len} \
-                --per_device_train_batch_size {args.per_device_train_batch_size} \
-                --per_device_eval_batch_size {args.per_device_eval_batch_size} \
-                --gradient_accumulation_steps {args.gradient_accumulation_steps} \
-                --lr_scheduler_type {args.lr_scheduler_type} \
-                --logging_steps {args.logging_steps} \
-                --warmup_steps {args.warmup_steps} \
-                --save_steps {args.save_steps} \
-                --eval_steps {args.eval_steps} \
-                --evaluation_strategy {args.evaluation_strategy} \
-                --learning_rate {args.learning_rate} \
-                --num_train_epochs {args.num_train_epochs}\
-                --active_iter {iter}\
-                --acquisition {args.method}\
-                --num_sample_selected {num_sample_selected}
-            """
+                    --stage selection \
+                    --do_predict \
+                    --model_name_or_path {args.model_name_or_path} \
+                    --adapter_name_or_path {reward_model_path}\
+                    --dataset_dir {args.dataset_dir} \
+                    --dataset {dataset} \
+                    --template {args.template} \
+                    --finetuning_type full \
+                    --output_dir {reward_model_path} \
+                    --overwrite_output_dir \
+                    --cutoff_len {args.cutoff_len} \
+                    --per_device_train_batch_size {args.per_device_train_batch_size} \
+                    --per_device_eval_batch_size {args.per_device_eval_batch_size} \
+                    --gradient_accumulation_steps {args.gradient_accumulation_steps} \
+                    --lr_scheduler_type {args.lr_scheduler_type} \
+                    --logging_steps {args.logging_steps} \
+                    --warmup_steps {args.warmup_steps} \
+                    --save_steps {args.save_steps} \
+                    --eval_steps {args.eval_steps} \
+                    --evaluation_strategy {args.evaluation_strategy} \
+                    --learning_rate {args.learning_rate} \
+                    --num_train_epochs {args.num_train_epochs}\
+                    --active_iter {iter}\
+                    --acquisition {args.method}\
+                    --num_sample_selected {num_sample_selected}
+                """
             run_cli_command(selection_command) 
 
         ##########################################################

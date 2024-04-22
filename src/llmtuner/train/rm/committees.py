@@ -7,6 +7,7 @@ if TYPE_CHECKING:
 
     from ...hparams import DataArguments, FinetuningArguments, ModelArguments
 
+import os
 import numpy as np
 from scipy.stats import entropy
 
@@ -21,6 +22,10 @@ import torch
 import torch.nn.functional as F
 
 from safetensors.torch import save_file, load_file
+
+from tqdm import tqdm
+from collections import Counter
+
 
 class QueryByCommittees(LLMStrategy):
     def __init__(
@@ -153,9 +158,61 @@ class QueryByCommittees(LLMStrategy):
 
         return save_paths
     
-    
+    def query_by_commitees(self, n=100, iteration = 0, nEns = 10, theshold = 0.5):
 
-    def query(self, n=100, iteration = 0, nEns = 4):
+        # Assuming self.training_args.output_dir contains the directory path
+        output_dir = self.training_args.output_dir
+        # Check if the file exists
+        if os.path.exists(os.path.join(output_dir, "qbc_0.safetensors")):
+            save_paths = self.train_commitees(nEns, True)
+        else:
+            save_paths = self.train_commitees(nEns)
+
+
+        accelerator = Accelerator()
+        device = accelerator.device
+        
+        train_dataset = self.get_training_dataset(is_override = False)
+
+        model = self.v_head.to(device)
+        model.eval()
+
+        predictions = {} # id: [scores]
+        with torch.no_grad():
+            for idx in tqdm(range(len(train_dataset))):
+                for model_path in save_paths:
+                    print(f"Continue training from {model_path}")
+                    vhead_params = load_file(model_path)
+                    model.load_state_dict(vhead_params, strict=False)
+
+                    example = train_dataset[idx]
+                    question_id = example['question_id']
+                    last_hidden_state_chosen = example['last_hidden_state_chosen'][-1].to(device)
+                    chosen_rewards = model(last_hidden_state_chosen)
+                    probs = F.sigmoid(chosen_rewards, dim=0)
+                    score = 1 if probs.item() > theshold else 0 
+                    
+                    if question_id not in predictions:
+                        predictions[question_id] = [score]
+                    else:
+                        predictions[question_id].append(score)
+        
+        votes_entropy = {}
+        for question_id, scores in predictions.items():
+            votes = Counter(scores).values()
+            # Calculate softmax of votes
+            exp_probs = np.exp(votes)
+            softmax_scores = exp_probs / np.sum(exp_probs)
+            # Cal entropy
+            entropy_value = entropy(softmax_scores, base=2)
+            votes_entropy[question_id] = entropy_value
+
+        # Sort questions based on entropy
+        sorted_entropy = sorted(votes_entropy.items(), key=lambda x: x[1], reverse=True)
+        selected_questions = [question[0] for question in sorted_entropy[:n]]
+        
+        self.update(question_ids=selected_questions, iteration=iteration)
+    
+    def query(self, n=100, iteration = 0, nEns = 10):
         # Get predictions
-        self.train_commitees(nEns)
-        self.train_commitees(nEns, True)
+        return self.query_by_commitees(n, iteration, nEns)
