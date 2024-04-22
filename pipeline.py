@@ -365,61 +365,93 @@ def main(args):
         ##########################################################
         print(f"Selection ........................")
         if args.method in ['max_entropy', "random"]:
-            if iter == 0:
-                selection_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py\
-                    --stage selection \
-                    --do_predict \
-                    --model_name_or_path {args.model_name_or_path} \
-                    --dataset_dir {args.dataset_dir} \
-                    --dataset {dataset} \
-                    --template {args.template} \
-                    --finetuning_type full \
-                    --output_dir {reward_model_path} \
-                    --overwrite_output_dir \
-                    --cutoff_len {args.cutoff_len} \
-                    --per_device_train_batch_size {args.per_device_train_batch_size} \
-                    --per_device_eval_batch_size {args.per_device_eval_batch_size} \
-                    --gradient_accumulation_steps {args.gradient_accumulation_steps} \
-                    --lr_scheduler_type {args.lr_scheduler_type} \
-                    --logging_steps {args.logging_steps} \
-                    --warmup_steps {args.warmup_steps} \
-                    --save_steps {args.save_steps} \
-                    --eval_steps {args.eval_steps} \
-                    --evaluation_strategy {args.evaluation_strategy} \
-                    --learning_rate {args.learning_rate} \
-                    --num_train_epochs {args.num_train_epochs}\
-                    --active_iter {iter}\
-                    --acquisition {args.method}\
-                    --num_sample_selected {num_sample_selected}
-                """
-            else: 
-                selection_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py\
-                    --stage selection \
-                    --do_predict \
-                    --model_name_or_path {args.model_name_or_path} \
-                    --adapter_name_or_path {reward_model_path}\
-                    --dataset_dir {args.dataset_dir} \
-                    --dataset {dataset} \
-                    --template {args.template} \
-                    --finetuning_type full \
-                    --output_dir {reward_model_path} \
-                    --overwrite_output_dir \
-                    --cutoff_len {args.cutoff_len} \
-                    --per_device_train_batch_size {args.per_device_train_batch_size} \
-                    --per_device_eval_batch_size {args.per_device_eval_batch_size} \
-                    --gradient_accumulation_steps {args.gradient_accumulation_steps} \
-                    --lr_scheduler_type {args.lr_scheduler_type} \
-                    --logging_steps {args.logging_steps} \
-                    --warmup_steps {args.warmup_steps} \
-                    --save_steps {args.save_steps} \
-                    --eval_steps {args.eval_steps} \
-                    --evaluation_strategy {args.evaluation_strategy} \
-                    --learning_rate {args.learning_rate} \
-                    --num_train_epochs {args.num_train_epochs}\
-                    --active_iter {iter}\
-                    --acquisition {args.method}\
-                    --num_sample_selected {num_sample_selected}
-                """
+            # if iter == 0:
+            #     selection_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py\
+            #         --stage selection \
+            #         --do_predict \
+            #         --model_name_or_path {args.model_name_or_path} \
+            #         --dataset_dir {args.dataset_dir} \
+            #         --dataset {dataset} \
+            #         --template {args.template} \
+            #         --finetuning_type full \
+            #         --output_dir {reward_model_path} \
+            #         --overwrite_output_dir \
+            #         --cutoff_len {args.cutoff_len} \
+            #         --per_device_train_batch_size {args.per_device_train_batch_size} \
+            #         --per_device_eval_batch_size {args.per_device_eval_batch_size} \
+            #         --gradient_accumulation_steps {args.gradient_accumulation_steps} \
+            #         --lr_scheduler_type {args.lr_scheduler_type} \
+            #         --logging_steps {args.logging_steps} \
+            #         --warmup_steps {args.warmup_steps} \
+            #         --save_steps {args.save_steps} \
+            #         --eval_steps {args.eval_steps} \
+            #         --evaluation_strategy {args.evaluation_strategy} \
+            #         --learning_rate {args.learning_rate} \
+            #         --num_train_epochs {args.num_train_epochs}\
+            #         --active_iter {iter}\
+            #         --acquisition {args.method}\
+            #         --num_sample_selected {num_sample_selected}
+            #     """
+            # else: 
+            #     selection_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py\
+            #         --stage selection \
+            #         --do_predict \
+            #         --model_name_or_path {args.model_name_or_path} \
+            #         --adapter_name_or_path {reward_model_path}\
+            #         --dataset_dir {args.dataset_dir} \
+            #         --dataset {dataset} \
+            #         --template {args.template} \
+            #         --finetuning_type full \
+            #         --output_dir {reward_model_path} \
+            #         --overwrite_output_dir \
+            #         --cutoff_len {args.cutoff_len} \
+            #         --per_device_train_batch_size {args.per_device_train_batch_size} \
+            #         --per_device_eval_batch_size {args.per_device_eval_batch_size} \
+            #         --gradient_accumulation_steps {args.gradient_accumulation_steps} \
+            #         --lr_scheduler_type {args.lr_scheduler_type} \
+            #         --logging_steps {args.logging_steps} \
+            #         --warmup_steps {args.warmup_steps} \
+            #         --save_steps {args.save_steps} \
+            #         --eval_steps {args.eval_steps} \
+            #         --evaluation_strategy {args.evaluation_strategy} \
+            #         --learning_rate {args.learning_rate} \
+            #         --num_train_epochs {args.num_train_epochs}\
+            #         --active_iter {iter}\
+            #         --acquisition {args.method}\
+            #         --num_sample_selected {num_sample_selected}
+            #     """
+            
+            selection_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
+                                    --stage selection \
+                                    --do_predict \
+                                    --model_name_or_path {args.model_name_or_path} \
+                                    --dataset_dir {args.dataset_dir} \
+                                    --dataset {dataset} \
+                                    --template {args.template} \
+                                    --finetuning_type full \
+                                    --output_dir {reward_model_path} \
+                                    --overwrite_output_dir \
+                                    --cutoff_len {args.cutoff_len} \
+                                    --per_device_train_batch_size {args.per_device_train_batch_size} \
+                                    --per_device_eval_batch_size {args.per_device_eval_batch_size} \
+                                    --gradient_accumulation_steps {args.gradient_accumulation_steps} \
+                                    --lr_scheduler_type {args.lr_scheduler_type} \
+                                    --logging_steps {args.logging_steps} \
+                                    --warmup_steps {args.warmup_steps} \
+                                    --save_steps {args.save_steps} \
+                                    --eval_steps {args.eval_steps} \
+                                    --evaluation_strategy {args.evaluation_strategy} \
+                                    --learning_rate {args.learning_rate} \
+                                    --num_train_epochs {args.num_train_epochs}\
+                                    --active_iter {iter}\
+                                    --acquisition {args.method}\
+                                    --num_sample_selected {num_sample_selected}
+                                """
+            # Check iter condition and append the specific part
+            breakpoint()
+            if iter != 0:
+                selection_command += f" --adapter_name_or_path {reward_model_path}"
+
             run_cli_command(selection_command) 
 
         ##########################################################
@@ -853,12 +885,12 @@ def main(args):
         # -------------------------
         # Get accuracy        
         accuracy = calculate_accuracy(f"{oracle_adapter_path}/generated_predictions.jsonl")
-        print("Accuracy:", accuracy)
+        
         active_accuracy.append({
             "iter": {iter},
             "acc": accuracy 
         })
-        
+        print("Active accuracy:", active_accuracy)
         save_eval_metric_path = f"{eval_metric_dir}/accuracy_results_{iter}.json"
         save_eval_metric(save_eval_metric_path, accuracy, iter)
 
