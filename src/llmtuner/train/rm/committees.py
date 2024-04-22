@@ -84,7 +84,6 @@ class QueryByCommittees(LLMStrategy):
             if not is_continues:
                 model = self.v_head.apply(weight_reset).to(device)
             else:
-                print(f"Continue training from {v_head_path}")
                 vhead_params = load_file(v_head_path)
                 model.load_state_dict(vhead_params, strict=False)
 
@@ -168,7 +167,6 @@ class QueryByCommittees(LLMStrategy):
         else:
             save_paths = self.train_commitees(nEns)
 
-
         accelerator = Accelerator()
         device = accelerator.device
         
@@ -181,7 +179,6 @@ class QueryByCommittees(LLMStrategy):
         with torch.no_grad():
             for idx in tqdm(range(len(train_dataset))):
                 for model_path in save_paths:
-                    print(f"Continue training from {model_path}")
                     vhead_params = load_file(model_path)
                     model.load_state_dict(vhead_params, strict=False)
 
@@ -201,7 +198,7 @@ class QueryByCommittees(LLMStrategy):
         for question_id, scores in predictions.items():
             votes = Counter(scores).values()
             # Calculate softmax of votes
-            exp_probs = np.exp(votes)
+            exp_probs = np.exp(votes.values())
             softmax_scores = exp_probs / np.sum(exp_probs)
             # Cal entropy
             entropy_value = entropy(softmax_scores, base=2)
