@@ -119,6 +119,9 @@ def add_new_dataset_info(dataset_info_path, name, path):
     with open(dataset_info_path, 'r') as file:
         data = json.load(file)
 
+    if name in data:
+        del data[name]  # Remove the existing entry if it exists
+
     template = data['template']
     data[name] = copy.deepcopy(template)
     data[name]['file_name'] = path
@@ -808,7 +811,7 @@ def main(args):
             jsonl_to_json(f"{dpo_full_path}/generated_predictions.jsonl", f"{args.dataset_dir}/generated_predictions_{testset}.json")
             
         # Add new dataset info to datset_info.json to run predict reward model
-        add_new_dataset_info(args.data_info_path, dataset_name_generated, f"generated_predictions__{testset}.json")
+        add_new_dataset_info(args.data_info_path, dataset_name_generated, f"generated_predictions_{testset}.json")
 
         # -------------
         if args.use_accelerate_eval:
@@ -846,8 +849,7 @@ def main(args):
             
         print(f"Inference Oracle model ............................")
         run_cli_command(inference_oracle_command)
-        delete_item_dataset_info(args.data_info_path, dataset_name_generated) # clean dataset_info
-
+        # delete_item_dataset_info(args.data_info_path, dataset_name_generated) # clean dataset_info
         # -------------------------
         # Get accuracy        
         accuracy = calculate_accuracy(f"{oracle_adapter_path}/generated_predictions.jsonl")

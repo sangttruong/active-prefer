@@ -572,7 +572,7 @@ class LLMStrategy:
                 with open(dataset_info_path, 'w') as outfile:
                     json.dump(data_info, outfile, indent=4)
 
-                print("Updated dataset info has been stored in", dataset_info_path)
+                print(f"{new_data_info} updated in {dataset_info_path}")
 
 
 def select_entries_by_ids(dataset_path, question_ids, seleted_path):
