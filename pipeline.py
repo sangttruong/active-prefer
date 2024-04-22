@@ -313,42 +313,45 @@ def main(args):
     model_name = args.model_name_or_path.split('/')[-1]
     reward_model_path = f"saves/{model_name}/{dataset}/{args.method}/reward"
     dpo_adapter_path = f"saves/{model_name}/{dataset}/{args.method}/dpo"
-    oracle_adapter_path = f"saves/{model_name}/{dataset}/{args.method}/oracle"
+    oracle_adapter_path = f"saves/{model_name}/{dataset}/oracle" # re-use for all method
     eval_metric_dir = f"saves/{model_name}/{dataset}/{args.method}"
     num_sample_selected = int(count_len_dataset(f"{args.dataset_dir}/{dataset}.json") * args.percentage)
 
     # Train an Oracle model O 
-    ft_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
-        --stage oracle \
-        --do_train \
-        --flash_attn True\
-        --model_name_or_path {args.model_name_or_path}\
-        --output_dir {oracle_adapter_path}\
-        --dataset {dataset} \
-        --dataset_dir {args.dataset_dir} \
-        --template {args.template} \
-        --finetuning_type freeze \
-        --overwrite_output_dir \
-        --cutoff_len {args.cutoff_len} \
-        --per_device_train_batch_size {args.per_device_train_batch_size} \
-        --per_device_eval_batch_size {args.per_device_eval_batch_size} \
-        --gradient_accumulation_steps {args.gradient_accumulation_steps} \
-        --lr_scheduler_type {args.lr_scheduler_type} \
-        --logging_steps {args.logging_steps} \
-        --warmup_steps {args.warmup_steps} \
-        --save_steps {args.save_steps} \
-        --eval_steps {args.save_steps} \
-        --evaluation_strategy {args.evaluation_strategy} \
-        --learning_rate {args.learning_rate} \
-        --num_train_epochs 3 \
-        --max_samples {args.max_samples} \
-        --ddp_timeout 1800000 \
-        --is_compute_emb {args.is_compute_emb}\
-        --plot_loss 
-        """
     
-    print(f"Training Oracle model ............................")
-    run_cli_command(ft_oracle_command)
+    if os.path.exists(oracle_adapter_path):
+        print("Oracle trained")
+    else:
+        ft_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
+            --stage oracle \
+            --do_train \
+            --flash_attn True\
+            --model_name_or_path {args.model_name_or_path}\
+            --output_dir {oracle_adapter_path}\
+            --dataset {dataset} \
+            --dataset_dir {args.dataset_dir} \
+            --template {args.template} \
+            --finetuning_type freeze \
+            --overwrite_output_dir \
+            --cutoff_len {args.cutoff_len} \
+            --per_device_train_batch_size {args.per_device_train_batch_size} \
+            --per_device_eval_batch_size {args.per_device_eval_batch_size} \
+            --gradient_accumulation_steps {args.gradient_accumulation_steps} \
+            --lr_scheduler_type {args.lr_scheduler_type} \
+            --logging_steps {args.logging_steps} \
+            --warmup_steps {args.warmup_steps} \
+            --save_steps {args.save_steps} \
+            --eval_steps {args.save_steps} \
+            --evaluation_strategy {args.evaluation_strategy} \
+            --learning_rate {args.learning_rate} \
+            --num_train_epochs 3 \
+            --max_samples {args.max_samples} \
+            --ddp_timeout 1800000 \
+            --is_compute_emb {args.is_compute_emb}\
+            --plot_loss 
+            """
+        print(f"Training Oracle model ............................")
+        run_cli_command(ft_oracle_command)
     
     active_accuracy = []
     # active pipeline     

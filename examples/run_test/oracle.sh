@@ -24,7 +24,7 @@ CUDA_VISIBLE_DEVICES=3,4 python src/train_bash.py \
     --evaluation_strategy steps \
     --learning_rate 5e-5 \
     --num_train_epochs 3.0 \
-    --max_samples 3000 \
+    --max_samples 100 \
     --val_size 0.1 \
     --ddp_timeout 1800000 \
     --report_to none\

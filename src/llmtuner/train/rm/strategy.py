@@ -143,6 +143,7 @@ class LLMStrategy:
 
         nearest_multiple = len(self.pool_dataset) // 8 * 8
         self.pool_dataset = self.pool_dataset.select(list(range(nearest_multiple)))
+        breakpoint()
 
         # Replace lm_head with identity
         if hasattr(self.base_model, "lm_head"):
@@ -413,7 +414,7 @@ class LLMStrategy:
         self.v_head.eval()
         predictions = []
         with torch.no_grad():
-            for idx in range(len(train_dataset)):
+            for idx in tqdm(range(len(train_dataset))):
                 example = train_dataset[idx]
                 last_hidden_state_chosen = example['last_hidden_state_chosen'][-1].to(device)
                 last_hidden_state_rejected = example['last_hidden_state_rejected'][-1].to(device)
@@ -442,7 +443,7 @@ class LLMStrategy:
         self.v_head.eval()
         predictions = []
         with torch.no_grad():
-            for idx in range(len(train_dataset)):
+            for idx in tqdm(range(len(train_dataset))):
                 example = train_dataset[idx]
 
                 last_hidden_state_chosen = example['last_hidden_state_chosen'][-1].to(device)

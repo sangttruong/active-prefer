@@ -9,6 +9,7 @@ if TYPE_CHECKING:
 
 import numpy as np
 from scipy.stats import entropy
+from tqdm import tqdm
 
 class EntropySampling(LLMStrategy):
     def __init__(
@@ -27,19 +28,29 @@ class EntropySampling(LLMStrategy):
         predictions = self.predict_prob()  # list of predictions
 
         # Calculate entropy for each question
-        entropy_vals = {}
-        for prediction in predictions:
+        scores_vals = {}
+        for prediction in tqdm(predictions):
             question_id = prediction['question_id']
             chosen_prob = prediction['chosen_rewards']
             rejected_prob = prediction['rejected_rewards']
-            softmax_scores = np.array([chosen_prob, rejected_prob])
+
+            if question_id in scores_vals:
+                scores_vals[question_id].append(rejected_prob)
+            else:
+                scores_vals[question_id] = [chosen_prob, rejected_prob]
+
+        entropy_values = {}
+        for question_id, prob_list in scores_vals.items():
+            # Calculate softmax scores
+            exp_probs = np.exp(prob_list)
+            softmax_scores = exp_probs / np.sum(exp_probs)
+            
+            # Calculate entropy
             entropy_value = entropy(softmax_scores, base=2)
-            entropy_vals[question_id] = entropy_value
+            entropy_values[question_id] = entropy_value
 
         # Sort questions based on entropy
-        sorted_entropy = sorted(entropy_vals.items(), key=lambda x: x[1], reverse=True)
-
-        # Select top n questions based on entropy
+        sorted_entropy = sorted(entropy_values.items(), key=lambda x: x[1], reverse=True)
         selected_questions = [question[0] for question in sorted_entropy[:n]]
         
         self.update(question_ids=selected_questions, iteration=iteration)

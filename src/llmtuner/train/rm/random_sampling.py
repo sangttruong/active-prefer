@@ -10,6 +10,7 @@ if TYPE_CHECKING:
 import numpy as np
 from scipy.stats import entropy
 import random
+from tqdm import tqdm
 
 class RandomSampling(LLMStrategy):
     def __init__(
@@ -24,20 +25,10 @@ class RandomSampling(LLMStrategy):
 
 
     def query(self, n=100, iteration = 0):
-        # Get predictions
-        predictions = self.predict_prob()  # list of predictions
+        question_ids = list(self.pool_dataset['id'])
+        # breakpoint()
 
-        # Calculate entropy for each question
-        entropy_vals = {}
-        for prediction in predictions:
-            question_id = prediction['question_id']
-            chosen_prob = prediction['chosen_rewards']
-            rejected_prob = prediction['rejected_rewards']
-            softmax_scores = np.array([chosen_prob, rejected_prob])
-            entropy_value = entropy(softmax_scores, base=2)
-            entropy_vals[question_id] = entropy_value
+        # # questions = list(entropy_vals.keys())
+        # selected_questions = random.sample(questions, n)
 
-        questions = list(entropy_vals.keys())
-        selected_questions = random.sample(questions, n)
-
-        self.update(question_ids=selected_questions, iteration=iteration)
+        # self.update(question_ids=selected_questions, iteration=iteration)

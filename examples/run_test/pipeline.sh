@@ -1,5 +1,5 @@
 
-
+#### Test
 python pipeline.py \
     --model_name_or_path meta-llama/Llama-2-7b-hf \
     --dataset_name reward_bench_train \
@@ -9,8 +9,23 @@ python pipeline.py \
     --percentage 0.1 \
     --use_accelerate \
     --main_process_port 29505\
-    --gpu_ids 6,7
-    
+    --gpu_ids 6,7\
+    --sanity_check\
+    --is_compute_emb
+
+
+#### Full
+python pipeline.py \
+    --model_name_or_path meta-llama/Llama-2-7b-hf \
+    --dataset_name reward_bench_train \
+    --method random \
+    --num_iters 5\
+    --num_train_epochs 2\
+    --percentage 0.1 \
+    --use_accelerate \
+    --main_process_port 29505\
+    --gpu_ids 6,7\
+    --is_compute_emb
     
 
 CUDA_VISIBLE_DEVICES=3,6 python src/train_bash.py \
