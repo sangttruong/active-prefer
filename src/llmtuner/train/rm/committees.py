@@ -158,7 +158,7 @@ class QueryByCommittees(LLMStrategy):
 
         return save_paths
     
-    def query_by_commitees(self, n=100, iteration = 0, nEns = 10, theshold = 0.5):
+    def query_by_commitees(self, n=100, iteration = 0, nEns = 30, theshold = 0.5):
 
         # Assuming self.training_args.output_dir contains the directory path
         output_dir = self.training_args.output_dir

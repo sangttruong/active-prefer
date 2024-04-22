@@ -387,7 +387,36 @@ def main(args):
                                 """
 
             run_cli_command(selection_command) 
-        
+        elif args.method in ['qbc']:
+            selection_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
+                                    --stage selection \
+                                    --do_predict \
+                                    --model_name_or_path {args.model_name_or_path} \
+                                    {'--adapter_name_or_path ' + reward_model_path if iter != 0 else ''}\
+                                    --dataset_dir {args.dataset_dir} \
+                                    --dataset {dataset} \
+                                    --template {args.template} \
+                                    --finetuning_type freeze \
+                                    --output_dir {reward_model_path} \
+                                    --overwrite_output_dir \
+                                    --cutoff_len {args.cutoff_len} \
+                                    --per_device_train_batch_size {args.per_device_train_batch_size} \
+                                    --per_device_eval_batch_size {args.per_device_eval_batch_size} \
+                                    --gradient_accumulation_steps {args.gradient_accumulation_steps} \
+                                    --lr_scheduler_type {args.lr_scheduler_type} \
+                                    --logging_steps {args.logging_steps} \
+                                    --warmup_steps {args.warmup_steps} \
+                                    --save_steps {args.save_steps} \
+                                    --eval_steps {args.eval_steps} \
+                                    --evaluation_strategy {args.evaluation_strategy} \
+                                    --learning_rate {args.learning_rate} \
+                                    --num_train_epochs {args.num_train_epochs}\
+                                    --active_iter {iter}\
+                                    --acquisition {args.method}\
+                                    --num_sample_selected {num_sample_selected}
+                                """
+
+            run_cli_command(selection_command) 
         ##########################################################
         #### TRAIN DPO
         ##########################################################
