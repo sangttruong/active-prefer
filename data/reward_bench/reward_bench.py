@@ -47,7 +47,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description="Iterative training and evaluation script")
     parser.add_argument("--sanity_check", type=str, default="False", help="Test")
     parser.add_argument("--model_name", type=str, default="llama2", help="Test")
-    parser.add_argument("--dataset_info_path", type=str, default="data/datset_info.json", help="Test")
+    parser.add_argument("--dataset_info_path", type=str, default="data/dataset_info.json", help="Test")
     parser.add_argument("--method", type=str, default="random", help="Test")
 
     return parser.parse_args()

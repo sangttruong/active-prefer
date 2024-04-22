@@ -6,6 +6,7 @@ python pipeline.py \
     --method qbc \
     --num_iters 5\
     --num_train_epochs 2\
+    --use_accelerate\
     --percentage 0.1 \
     --main_process_port 29510\
     --gpu_ids 2,3\
