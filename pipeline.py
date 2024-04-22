@@ -347,7 +347,7 @@ def main(args):
         """
     
     print(f"Training Oracle model ............................")
-    run_cli_command(ft_oracle_command)
+    # run_cli_command(ft_oracle_command)
     
     active_accuracy = []
     # active pipeline     
