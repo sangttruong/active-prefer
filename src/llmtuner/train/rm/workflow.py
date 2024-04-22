@@ -111,8 +111,6 @@ def run_rm(
     del trainer, model
     gc.collect()
     torch.cuda.empty_cache()
-    
-
 
 def run_oracle_rm(
     model_args: "ModelArguments",
