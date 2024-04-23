@@ -249,6 +249,11 @@ class FinetuningArguments(FreezeArguments, LoraArguments, RLHFArguments, GaloreA
         default=0,
         metadata={"help": "Iteration ith"},
     )
+    
+    num_oracle: int = field(
+        default=1,
+        metadata={"help": "number of oracle model"},
+    )    
 
     num_sample_selected: int = field(
         default=1000,

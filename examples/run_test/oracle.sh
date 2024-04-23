@@ -1,31 +1,26 @@
-#!/bin/bash
-
-CUDA_VISIBLE_DEVICES=6,7 python src/train_bash.py \
+CUDA_VISIBLE_DEVICES=3,0 python src/train_bash.py \
     --stage oracle \
     --do_train \
+    --flash_attn False\
     --model_name_or_path meta-llama/Llama-2-7b-hf \
-    --dataset reward_bench_train \
     --dataset_dir data \
+    --dataset  reward_bench_train_Llama-2-7b-hf_max_entropy_check\
     --template default \
     --finetuning_type freeze \
-    --output_dir saves/LLaMA2-7B/oracle/test \
-    --overwrite_cache \
+    --output_dir saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy\
     --overwrite_output_dir \
     --cutoff_len 1024 \
-    --preprocessing_num_workers 16 \
-    --per_device_train_batch_size 1 \
-    --per_device_eval_batch_size 4 \
-    --gradient_accumulation_steps 2 \
+    --per_device_train_batch_size 2 \
+    --per_device_eval_batch_size 2 \
+    --gradient_accumulation_steps 4 \
     --lr_scheduler_type cosine \
-    --logging_steps 10 \
+    --logging_steps 400 \
     --warmup_steps 20 \
-    --save_steps 100 \
-    --eval_steps 100 \
+    --save_steps 400 \
+    --eval_steps 4000 \
     --evaluation_strategy steps \
     --learning_rate 5e-5 \
-    --num_train_epochs 3.0 \
-    --max_samples 100 \
-    --val_size 0.1 \
-    --ddp_timeout 1800000 \
-    --report_to none\
-    --plot_loss 
+    --num_train_epochs 10\
+    --is_compute_emb True\
+    --num_oracle 30
+    -

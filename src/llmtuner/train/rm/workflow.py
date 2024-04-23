@@ -39,7 +39,7 @@ from .strategy import LLMStrategy
 from .entropy_sampling import EntropySampling
 from .random_sampling import RandomSampling
 from .committees import QueryByCommittees
-
+from .oracle import Oracle
 
 def run_rm(
     model_args: "ModelArguments",
@@ -120,9 +120,10 @@ def run_oracle_rm(
     callbacks: Optional[List["TrainerCallback"]] = None,
     seed = 42,
 ):
-
-    oracle = LLMStrategy(model_args, data_args, training_args,  finetuning_args, callbacks)
-    oracle.train()
+    
+    
+    oracle = Oracle(model_args, data_args, training_args,  finetuning_args, callbacks)
+    oracle.train_eval_oracle(n = finetuning_args.num_oracle, percentage = 0.9)
     
     ##########################
     gc.collect()
