@@ -123,7 +123,7 @@ class Oracle(LLMStrategy):
         return epoch_loss / len(train_ids)
         
 
-    def evaluate_oracle(self, model, emb_dataset, test_ids, ith, theshold = 0.5):
+    def evaluate_oracle(self, model, emb_dataset, test_ids, ith, threshold = 0.5):
         output_dir = self.training_args.output_dir
 
         print(f"Eval.............")
@@ -145,7 +145,7 @@ class Oracle(LLMStrategy):
                 last_hidden_state_chosen = example['last_hidden_state_chosen'][-1].to(device)
                 chosen_rewards = model(last_hidden_state_chosen)
                 probs = F.sigmoid(chosen_rewards)
-                score = 1 if probs.item() > theshold else 0 
+                score = 1 if probs.item() > threshold else 0 
                 
                 predictions.append(score)
         
@@ -180,7 +180,7 @@ class Oracle(LLMStrategy):
             model = self.v_head.apply(weight_reset).to(device)
         
             loss = self.train_oracle(model, emb_dataset, train_ids, v_head_path, m)
-            acc = self.evaluate_oracle(self, model, emb_dataset, test_ids, m, theshold = 0.5)
+            acc = self.evaluate_oracle(model, emb_dataset, test_ids, m, threshold = 0.5)
 
             metrics.append({
                 "model_id": m,
