@@ -1,0 +1,53 @@
+CUDA_VISIBLE_DEVICES=6,1 python src/train_bash.py \
+                                    --stage selection \
+                                    --do_predict \
+                                    --model_name_or_path meta-llama/Llama-2-7b-hf \
+                                    --dataset_dir data \
+                                    --dataset  reward_bench_train_Llama-2-7b-hf_qbc_check\
+                                    --template default \
+                                    --finetuning_type freeze \
+                                    --output_dir saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_random/random \
+                                    --overwrite_output_dir \
+                                    --cutoff_len 1024 \
+                                    --per_device_train_batch_size 2 \
+                                    --per_device_eval_batch_size 2 \
+                                    --gradient_accumulation_steps 4 \
+                                    --lr_scheduler_type cosine \
+                                    --logging_steps 400 \
+                                    --warmup_steps 20 \
+                                    --save_steps 400 \
+                                    --eval_steps 4000 \
+                                    --evaluation_strategy steps \
+                                    --learning_rate 5e-5 \
+                                    --num_train_epochs 3\
+                                    --active_iter 0\
+                                    --acquisition qbc\
+                                    --num_sample_selected 10
+
+--------------------------------------------------------------
+CUDA_VISIBLE_DEVICES=0,1 python src/train_bash.py \
+                                    --stage selection \
+                                    --do_predict \
+                                    --model_name_or_path meta-llama/Llama-2-7b-hf \
+                                    --adapter_name_or_path saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_random/random\
+                                    --dataset_dir data \
+                                    --dataset reward_bench_train_Llama-2-7b-hf_qbc_check \
+                                    --template default \
+                                    --finetuning_type freeze \
+                                    --output_dir saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_random/random \
+                                    --overwrite_output_dir \
+                                    --cutoff_len 1024 \
+                                    --per_device_train_batch_size 2 \
+                                    --per_device_eval_batch_size 2 \
+                                    --gradient_accumulation_steps 4 \
+                                    --lr_scheduler_type cosine \
+                                    --logging_steps 400 \
+                                    --warmup_steps 20 \
+                                    --save_steps 400 \
+                                    --eval_steps 4000 \
+                                    --evaluation_strategy steps \
+                                    --learning_rate 5e-5 \
+                                    --num_train_epochs 3\
+                                    --active_iter 1\
+                                    --acquisition qbc\
+                                    --num_sample_selected 100

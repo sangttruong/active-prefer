@@ -162,7 +162,7 @@ class QueryByCommittees(LLMStrategy):
         # Assuming self.training_args.output_dir contains the directory path
         output_dir = self.training_args.output_dir
         # Check if the file exists
-        if os.path.exists(os.path.join(output_dir, "qbc_0.safetensors")):
+        if os.path.exists(os.path.join(output_dir, f"qbc_{nEns-1}.safetensors")):
             save_paths = self.train_commitees(nEns, is_continues = True)
         else:
             save_paths = self.train_commitees(nEns)
