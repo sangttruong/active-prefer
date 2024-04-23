@@ -504,6 +504,7 @@ class LLMStrategy:
         else:
             self.base_model.eval()
             # ------------------------------------------------------
+            print("Begin complute emb..........")
             dataloader = self.trainer.get_test_dataloader(self.pool_dataset)
             predict_results = []
             idx = 0

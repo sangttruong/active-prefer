@@ -193,7 +193,7 @@ class Oracle(LLMStrategy):
         return total_chosens / len(test_ids)
 
     
-    def train_eval_oracle(self, nEns, is_compute_emb, percentage = 0.9, ):
+    def train_eval_oracle(self, nEns, is_compute_emb, percentage = 0.9, threshold = 0.5):
         # Train multiple models and return their weights and average parameter updates
         def weight_reset(layer):
             newLayer = deepcopy(layer)
@@ -205,7 +205,6 @@ class Oracle(LLMStrategy):
         device = accelerator.device
         
         # training data
-        print(f"Recompute emb...............")
         emb_dataset = self.get_training_dataset(is_override = is_compute_emb)
         
         metrics = []
@@ -219,9 +218,11 @@ class Oracle(LLMStrategy):
 
             # reinit model    
             model = self.v_head.apply(weight_reset).to(device)
-        
+            
+            print(f"Trainig oracle {m}th ...................")
             loss = self.train_oracle(model, emb_dataset, train_ids, v_head_path, m)
-            acc = self.evaluate_oracle(model, emb_dataset, test_ids, m, threshold = 0.5)
+            print(f"Eval oracle {m}th ...................")
+            acc = self.evaluate_oracle(model, emb_dataset, test_ids, m, threshold = threshold)
 
             metrics.append({
                 "model_id": m,
