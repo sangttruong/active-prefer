@@ -26,7 +26,7 @@ CUDA_VISIBLE_DEVICES=3,0 python src/train_bash.py \
 
 
 --------------------------------------------
-CUDA_VISIBLE_DEVICES=2,6 python src/train_bash.py \
+CUDA_VISIBLE_DEVICES=6 python src/train_bash.py \
     --stage oracle \
     --do_train \
     --flash_attn False\

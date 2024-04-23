@@ -87,6 +87,9 @@ class Oracle(LLMStrategy):
         cutoff_len = self.data_args.cutoff_len
         pad_token_id = self.tokenizer.pad_token_id
 
+        model, optimizer, train_dataset = accelerator.prepare(model, optimizer, train_dataset)
+
+
         # Traing loop
         for epoch in range(num_epochs):
             epoch_loss = 0.0  # Initialize epoch loss
