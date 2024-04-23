@@ -80,8 +80,8 @@ class Oracle(LLMStrategy):
         num_training_steps = num_epochs * num_training_steps_per_epoch
 
         # optimizer, scheduler
-        optimizer_params = self.trainer.create_optimizer().param_groups[0]
-        create_scheduler = self.trainer.create_scheduler
+        optimizer_params = deepcopy(self.trainer.create_optimizer().param_groups[0])
+        create_scheduler = deepcopy(self.trainer.create_scheduler)
         optimizer_params.pop('params', None)     
         optimizer = torch.optim.AdamW(model.parameters(), **optimizer_params)
         scheduler = create_scheduler(num_training_steps, optimizer = optimizer)
