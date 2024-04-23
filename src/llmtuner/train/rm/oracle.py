@@ -24,10 +24,38 @@ import torch.nn.functional as F
 
 from safetensors.torch import save_file, load_file
 
+from matplotlib import pyplot as plt
 from tqdm import tqdm
 from collections import Counter
 import json
 
+
+def plot_oracle_acc(metrics, output_dir):
+    # Extract accuracy values from the metrics
+    accuracies = [metric["Accuracy"] for metric in metrics]
+
+    # Calculate mean and variance of accuracy
+    mean_accuracy = np.mean(accuracies)
+    variance_accuracy = np.var(accuracies)
+
+    # Plot the image
+    plt.figure(figsize=(8, 6))
+    plt.hist(accuracies, bins=20, color='skyblue', edgecolor='black', alpha=0.7)
+    plt.axvline(x=mean_accuracy, color='red', linestyle='--', label=f'Mean: {mean_accuracy:.2f}')
+    plt.xlabel('Accuracy')
+    plt.ylabel('Frequency')
+    plt.title('Distribution of Model Accuracies')
+    plt.legend()
+    plt.grid(True)
+
+    # Annotate mean and variance on the plot
+    plt.annotate(f'Mean Accuracy: {mean_accuracy:.2f}', xy=(0.5, 0.9), xycoords='axes fraction', ha='center', fontsize=12)
+    plt.annotate(f'Variance of Accuracy: {variance_accuracy:.2f}', xy=(0.5, 0.85), xycoords='axes fraction', ha='center', fontsize=12)
+
+    plt.savefig(f'{output_dir}/accuracy_histogram.png')
+
+    print(f"Mean Accuracy: {mean_accuracy:.2f}")
+    print(f"Variance of Accuracy: {variance_accuracy:.2f}")
 
 class Oracle(LLMStrategy):
     def __init__(
@@ -194,7 +222,10 @@ class Oracle(LLMStrategy):
         with open(output_file, 'w') as json_file:
             json.dump(metrics, json_file, indent=4)
 
+
+        plot_oracle_acc(metrics, self.training_args.output_dir)
         print(f"Metrics saved to {output_file}")
+        
              
 
 
