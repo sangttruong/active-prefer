@@ -59,6 +59,7 @@ class QueryByCommittees(LLMStrategy):
         pad_token_id = self.tokenizer.pad_token_id
 
         # training data
+        print(f"Recompute emb...............")
         train_dataset = self.get_training_dataset(is_override = True)
 
         # training args
@@ -162,11 +163,13 @@ class QueryByCommittees(LLMStrategy):
         # Assuming self.training_args.output_dir contains the directory path
         output_dir = self.training_args.output_dir
         # Check if the file exists
+        print(f"Update comitees ..................")
         if os.path.exists(os.path.join(output_dir, f"qbc_{nEns-1}.safetensors")):
             save_paths = self.train_commitees(nEns, is_continues = True)
         else:
             save_paths = self.train_commitees(nEns)
 
+        print(f"Voting.............")
         accelerator = Accelerator()
         device = accelerator.device
         

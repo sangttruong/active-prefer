@@ -342,7 +342,7 @@ def main(args):
             --eval_steps {args.save_steps} \
             --evaluation_strategy {args.evaluation_strategy} \
             --learning_rate {args.learning_rate} \
-            --num_train_epochs 10 \
+            --num_train_epochs {10*args.num_train_epochs}\\
             --max_samples {args.max_samples} \
             --ddp_timeout 1800000 \
             --is_compute_emb {args.is_retrain_oracle}\
@@ -382,7 +382,7 @@ def main(args):
                                     --eval_steps {args.eval_steps} \
                                     --evaluation_strategy {args.evaluation_strategy} \
                                     --learning_rate {args.learning_rate} \
-                                    --num_train_epochs {args.num_train_epochs}\
+                                    --num_train_epochs {3*args.num_train_epochs}\
                                     --active_iter {iter}\
                                     --acquisition {args.method}\
                                     --num_sample_selected {num_sample_selected}
@@ -412,7 +412,7 @@ def main(args):
                                     --eval_steps {args.eval_steps} \
                                     --evaluation_strategy {args.evaluation_strategy} \
                                     --learning_rate {args.learning_rate} \
-                                    --num_train_epochs {args.num_train_epochs}\
+                                    --num_train_epochs {3*args.num_train_epochs}\
                                     --active_iter {iter}\
                                     --acquisition {args.method}\
                                     --num_sample_selected {num_sample_selected}

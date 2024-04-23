@@ -25,7 +25,7 @@ CUDA_VISIBLE_DEVICES=6,1 python src/train_bash.py \
                                     --num_sample_selected 10
 
 --------------------------------------------------------------
-CUDA_VISIBLE_DEVICES=0,1 python src/train_bash.py \
+CUDA_VISIBLE_DEVICES=6,1 python src/train_bash.py \
                                     --stage selection \
                                     --do_predict \
                                     --model_name_or_path meta-llama/Llama-2-7b-hf \
@@ -50,4 +50,4 @@ CUDA_VISIBLE_DEVICES=0,1 python src/train_bash.py \
                                     --num_train_epochs 3\
                                     --active_iter 1\
                                     --acquisition qbc\
-                                    --num_sample_selected 100
+                                    --num_sample_selected 10
