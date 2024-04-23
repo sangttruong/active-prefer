@@ -152,7 +152,7 @@ class Oracle(LLMStrategy):
         return sum(predictions) / len(predictions)
 
     
-    def train_eval_oracle(self, nEns=1,  percentage = 0.9):
+    def train_eval_oracle(self, nEns=1, percentage = 0.9):
         # Train multiple models and return their weights and average parameter updates
         def weight_reset(layer):
             newLayer = deepcopy(layer)
