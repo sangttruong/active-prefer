@@ -87,8 +87,7 @@ class Oracle(LLMStrategy):
         cutoff_len = self.data_args.cutoff_len
         pad_token_id = self.tokenizer.pad_token_id
 
-        model, optimizer, train_dataset = accelerator.prepare(model, optimizer, train_dataset)
-
+        model, optimizer, emb_dataset = accelerator.prepare(model, optimizer, emb_dataset)
 
         # Traing loop
         for epoch in range(num_epochs):
@@ -167,7 +166,9 @@ class Oracle(LLMStrategy):
         if os.path.exists(os.path.join(output_dir, f"oracle_{ith}.safetensors")):
             vhead_params = load_file(os.path.join(output_dir, f"oracle_{ith}.safetensors"))
             model.load_state_dict(vhead_params, strict=False)
-        
+
+        model, emb_dataset = accelerator.prepare(model, emb_dataset)
+
         predictions = []
         total_chosens = 0
         with torch.no_grad():
