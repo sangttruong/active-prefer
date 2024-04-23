@@ -166,18 +166,31 @@ class Oracle(LLMStrategy):
             model.load_state_dict(vhead_params, strict=False)
         
         predictions = []
+        total_chosens = 0
         with torch.no_grad():
             for idx in tqdm(test_ids):   
                 example = emb_dataset[idx]
                 question_id = example['question_id']
                 last_hidden_state_chosen = example['last_hidden_state_chosen'][-1].to(device)
-                chosen_rewards = model(last_hidden_state_chosen)
-                probs = F.sigmoid(chosen_rewards)
-                score = 1 if probs.item() > threshold else 0 
                 
-                predictions.append(score)
+                chosen_rewards = model(last_hidden_state_chosen)
+
+                probs = F.sigmoid(chosen_rewards)
+                pred = 1 if probs.item() > threshold else 0 
+                total_chosens += pred
+                
+                predictions.append({
+                    "id": question_id,
+                    "prob": probs,
+                    "chosen": pred
+                })
+
+        # Write predictions to a JSON file
+        output_file = f"{output_dir}/prediction_oracle_{ith}.json"
+        with open(output_file, 'w') as f:
+            json.dump(predictions, f)
         
-        return sum(predictions) / len(predictions)
+        return total_chosens / len(test_ids)
 
     
     def train_eval_oracle(self, nEns=1, percentage = 0.9):
