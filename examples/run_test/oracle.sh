@@ -1,4 +1,4 @@
-CUDA_VISIBLE_DEVICES=3,0 python src/train_bash.py \
+CUDA_VISIBLE_DEVICES=6 python src/train_bash.py \
     --stage oracle \
     --do_train \
     --flash_attn False\
@@ -21,15 +21,14 @@ CUDA_VISIBLE_DEVICES=3,0 python src/train_bash.py \
     --evaluation_strategy steps \
     --learning_rate 5e-5 \
     --num_train_epochs 3\
-    --is_compute_emb True\
-    --num_oracle 10
+    --is_compute_emb False\
+    --num_oracle 2
 
 
 --------------------------------------------
 CUDA_VISIBLE_DEVICES=6 python src/train_bash.py \
     --stage oracle \
-    --do_train \
-    --flash_attn False\
+    --flash_attn True\
     --model_name_or_path meta-llama/Llama-2-7b-hf \
     --dataset_dir data \
     --dataset  reward_bench_train_Llama-2-7b-hf_max_entropy\
@@ -47,7 +46,7 @@ CUDA_VISIBLE_DEVICES=6 python src/train_bash.py \
     --save_steps 400 \
     --eval_steps 4000 \
     --evaluation_strategy steps \
-    --learning_rate 5e-3 \
-    --num_train_epochs 20\
+    --learning_rate 5e-4 \
+    --num_train_epochs 10\
     --is_compute_emb False\
-    --num_oracle 3
+    --num_oracle 10

@@ -21,6 +21,8 @@ from copy import deepcopy
 from torch import nn
 import torch
 import torch.nn.functional as F
+from torch.utils.data import DataLoader
+
 
 from safetensors.torch import save_file, load_file
 
@@ -100,15 +102,14 @@ class Oracle(LLMStrategy):
                 rejected_input_ids = example['rejected_ids']
 
                 optimizer.zero_grad()
-                chosen_rewards = model(last_hidden_state_chosen) # [1024, 1]
-                rejected_rewards = model(last_hidden_state_rejected) # [1024, 1]
+                chosen_rewards = model(last_hidden_state_chosen) #
+                rejected_rewards = model(last_hidden_state_rejected) # 
 
                 # Calculate loss
                 padding_chosen = max(0, cutoff_len - len(chosen_input_ids))
                 padding_rejected = max(0, cutoff_len - len(rejected_input_ids))
                 chosen_input_ids = F.pad(chosen_input_ids, (0, padding_chosen), value = pad_token_id)
                 rejected_input_ids = F.pad(rejected_input_ids, (0, padding_rejected), value = pad_token_id)
-
 
                 chosen_non_zero_indices = (chosen_input_ids != pad_token_id).nonzero()
                 rejected_non_zero_indices = (rejected_input_ids != pad_token_id).nonzero()
@@ -139,7 +140,6 @@ class Oracle(LLMStrategy):
                 optimizer.step()
 
                 epoch_loss += loss.item()  # Accumulate the loss
-
 
             # Update the learning rate after each epoch
             scheduler.step()
@@ -185,7 +185,7 @@ class Oracle(LLMStrategy):
                 
                 predictions.append({
                     "id": question_id,
-                    "prob": probs,
+                    "prob": probs.item(),
                     "chosen": pred
                 })
 
