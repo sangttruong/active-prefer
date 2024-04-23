@@ -123,7 +123,7 @@ def run_oracle_rm(
     
     
     oracle = Oracle(model_args, data_args, training_args,  finetuning_args, callbacks)
-    oracle.train_eval_oracle(finetuning_args.num_oracle, percentage = 0.9)
+    oracle.train_eval_oracle(finetuning_args.num_oracle, finetuning_args.is_compute_emb, percentage = 0.9)
     
     ##########################
     gc.collect()

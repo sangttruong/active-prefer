@@ -47,7 +47,7 @@ CUDA_VISIBLE_DEVICES=3,0 python src/train_bash.py \
     --save_steps 400 \
     --eval_steps 4000 \
     --evaluation_strategy steps \
-    --learning_rate 5e-5 \
+    --learning_rate 5e-3 \
     --num_train_epochs 20\
-    --is_compute_emb True\
-    --num_oracle 30
+    --is_compute_emb False\
+    --num_oracle 3

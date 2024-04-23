@@ -193,7 +193,7 @@ class Oracle(LLMStrategy):
         return total_chosens / len(test_ids)
 
     
-    def train_eval_oracle(self, nEns=1, percentage = 0.9):
+    def train_eval_oracle(self, nEns, is_compute_emb, percentage = 0.9, ):
         # Train multiple models and return their weights and average parameter updates
         def weight_reset(layer):
             newLayer = deepcopy(layer)
@@ -206,7 +206,7 @@ class Oracle(LLMStrategy):
         
         # training data
         print(f"Recompute emb...............")
-        emb_dataset = self.get_training_dataset(is_override = True)
+        emb_dataset = self.get_training_dataset(is_override = is_compute_emb)
         
         metrics = []
         for m in range(nEns):            
