@@ -55,6 +55,13 @@ CUDA_VISIBLE_DEVICES=3,6 python src/train_bash.py \
 
 
 -----------------------------------------------
+ssh hyperturing1
+sang 
+cd active_preference/LLaMA-Factory/
+
+init_conda
+conda activate active_rlhf
+
 export PATH=/usr/local/cuda-12.2/bin:$PATH
 
 

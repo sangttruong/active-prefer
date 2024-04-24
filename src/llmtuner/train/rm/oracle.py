@@ -88,7 +88,6 @@ class Oracle(LLMStrategy):
 
         optimizer = torch.optim.AdamW(model.parameters(), lr = self.training_args.learning_rate)
         scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_training_steps)
-        # scheduler = lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
 
         cutoff_len = self.data_args.cutoff_len
         pad_token_id = self.tokenizer.pad_token_id
