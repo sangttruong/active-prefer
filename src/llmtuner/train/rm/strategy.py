@@ -94,6 +94,8 @@ class CustomDataset(Dataset):
         self.dataset = dataset
         self.is_load = is_load
 
+        breakpoint()
+
     def __len__(self):
         return len(self.dataset)
 
