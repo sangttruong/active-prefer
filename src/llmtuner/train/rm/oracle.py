@@ -232,8 +232,9 @@ class Oracle(LLMStrategy):
         
         dataloader = DataLoader(emb_dataset, batch_size=4, collate_fn=collate_fn)
         for batch in dataloader:
-            breakpoint()
-            print(batch)
+            break
+    
+        breakpoint()
         
         metrics = []
         for m in range(nEns):            
