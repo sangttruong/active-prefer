@@ -137,19 +137,18 @@ class LLMStrategy:
 
         self.tokenizer = load_tokenizer(model_args)
         self.pool_dataset = get_dataset(self.tokenizer, model_args, data_args, training_args, stage="rm")
-        if not self.finetuning_args.is_compute_emb:
-            self.base_model = load_model(self.tokenizer, model_args, finetuning_args, False, add_valuehead=False)
-        self.data_collator = PairwiseDataCollatorWithPadding(self.tokenizer, pad_to_multiple_of=8)
-        self.callbacks = callbacks
-
-        
         nearest_multiple = len(self.pool_dataset) // 8 * 8
         self.pool_dataset = self.pool_dataset.select(list(range(nearest_multiple)))
+        
+        if not self.finetuning_args.is_compute_emb:
+            self.base_model = load_model(self.tokenizer, model_args, finetuning_args, False, add_valuehead=False)
+            self.data_collator = PairwiseDataCollatorWithPadding(self.tokenizer, pad_to_multiple_of=8)
+            self.callbacks = callbacks
 
-        # Replace lm_head with identity
-        if hasattr(self.base_model, "lm_head"):
-            self.base_model.lm_head = torch.nn.Identity()
-    
+            # Replace lm_head with identity
+            if hasattr(self.base_model, "lm_head"):
+                self.base_model.lm_head = torch.nn.Identity()
+
         # Update arguments
         training_args.remove_unused_columns = False  
 
@@ -287,7 +286,7 @@ class LLMStrategy:
         create_scheduler = self.trainer.create_scheduler
         optimizer_params.pop('params', None)     
         optimizer = torch.optim.AdamW(model.parameters(), **optimizer_params)
-        scheduler = create_scheduler(num_training_steps, optimizer = optimizer)
+        # scheduler = create_scheduler(num_training_steps, optimizer = optimizer)
 
         model, optimizer, train_dataset = accelerator.prepare(model, optimizer, train_dataset)
         model.train()
@@ -345,7 +344,7 @@ class LLMStrategy:
 
 
             # Update the learning rate after each epoch
-            scheduler.step()
+            # scheduler.step()
 
             print(f"Epoch {epoch+1}, Loss: {epoch_loss / len(train_dataset)}")
         
