@@ -23,6 +23,7 @@ import torch
 import torch.nn.functional as F
 import torch.optim.lr_scheduler as lr_scheduler
 from torch.utils.data import DataLoader
+from torch.nn.utils.rnn import pad_sequence
 
 
 from safetensors.torch import save_file, load_file
@@ -60,6 +61,22 @@ def plot_oracle_acc(metrics, output_dir):
     print(f"Mean Accuracy: {mean_accuracy:.2f}")
     print(f"Variance of Accuracy: {variance_accuracy:.2f}")
 
+def collate_fn(batch):
+    # Extract tensors from batch
+    question_ids = [item["question_id"] for item in batch]
+    last_hidden_state_chosen = [item["last_hidden_state_chosen"] for item in batch]
+    last_hidden_state_rejected = [item["last_hidden_state_rejected"] for item in batch]
+    chosen_ids = [item["chosen_ids"] for item in batch]
+    rejected_ids = [item["rejected_ids"] for item in batch]
+
+    return {
+        "question_id": question_ids,
+        "last_hidden_state_chosen": last_hidden_state_chosen,
+        "last_hidden_state_rejected": last_hidden_state_rejected,
+        "chosen_ids": chosen_ids,
+        "rejected_ids": rejected_ids,
+    }
+
 class Oracle(LLMStrategy):
     def __init__(
         self, 
@@ -84,13 +101,6 @@ class Oracle(LLMStrategy):
         num_epochs = int(self.training_args.num_train_epochs)
         num_training_steps_per_epoch = len(train_ids) 
         num_training_steps = num_epochs * num_training_steps_per_epoch
-
-        # optimizer, scheduler
-        # optimizer_params = deepcopy(self.trainer.create_optimizer().param_groups[0])
-        # create_scheduler = deepcopy(self.trainer.create_scheduler)
-        # optimizer_params.pop('params', None)     
-        # optimizer = torch.optim.AdamW(model.parameters(), **optimizer_params)
-        # scheduler = create_scheduler(num_training_steps, optimizer = optimizer)
 
         optimizer = torch.optim.AdamW(model.parameters(), lr = self.training_args.learning_rate)
         scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_training_steps)
@@ -219,6 +229,11 @@ class Oracle(LLMStrategy):
         
         # training data
         emb_dataset = self.get_training_dataset(is_override = is_compute_emb)
+        
+        dataloader = DataLoader(emb_dataset, batch_size=4, collate_fn=collate_fn)
+        for batch in dataloader:
+            breakpoint
+            print(batch)
         
         metrics = []
         for m in range(nEns):            
