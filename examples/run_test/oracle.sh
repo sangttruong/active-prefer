@@ -46,12 +46,12 @@ CUDA_VISIBLE_DEVICES=2,3 python src/train_bash.py \
     --save_steps 400 \
     --eval_steps 4000 \
     --evaluation_strategy steps \
-    --learning_rate 5e-4 \
+    --learning_rate 5e-2 \
     --num_train_epochs 10\
     --is_compute_emb False\
     --num_oracle 10
 
-
+--------------------------------------------------------------
 
 CUDA_VISIBLE_DEVICES=2,3 accelerate launch src/train_bash.py \
     --stage oracle \
@@ -73,7 +73,7 @@ CUDA_VISIBLE_DEVICES=2,3 accelerate launch src/train_bash.py \
     --save_steps 400 \
     --eval_steps 4000 \
     --evaluation_strategy steps \
-    --learning_rate 5e-4 \
+    --learning_rate 5e-2 \
     --num_train_epochs 10\
     --is_compute_emb False\
     --num_oracle 10
