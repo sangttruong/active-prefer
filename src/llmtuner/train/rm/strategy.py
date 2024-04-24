@@ -132,7 +132,8 @@ class LLMStrategy:
     ):
         self.tokenizer = load_tokenizer(model_args)
         self.pool_dataset = get_dataset(self.tokenizer, model_args, data_args, training_args, stage="rm")
-        self.base_model = load_model(self.tokenizer, model_args, finetuning_args, False, add_valuehead=False)
+        if not self.finetuning_args.is_compute_emb:
+            self.base_model = load_model(self.tokenizer, model_args, finetuning_args, False, add_valuehead=False)
         self.data_collator = PairwiseDataCollatorWithPadding(self.tokenizer, pad_to_multiple_of=8)
         self.callbacks = callbacks
 
@@ -152,7 +153,8 @@ class LLMStrategy:
         training_args.remove_unused_columns = False  
 
         # Initialize our Trainer
-        self.trainer = PairwiseTrainer(
+        if not self.finetuning_args.is_compute_emb:
+            self.trainer = PairwiseTrainer(
             model=self.base_model,
             args=self.training_args,
             finetuning_args=self.finetuning_args,
