@@ -21,6 +21,7 @@ from copy import deepcopy
 from torch import nn
 import torch
 import torch.nn.functional as F
+import torch.optim.lr_scheduler as lr_scheduler
 from torch.utils.data import DataLoader
 
 
@@ -69,6 +70,11 @@ class Oracle(LLMStrategy):
         callbacks: Optional[List["TrainerCallback"]] = None,
     ):
         super(Oracle, self).__init__(model_args, data_args, training_args, finetuning_args, callbacks)
+        self.oracle_init()
+
+    def oracle_init(self):
+        if not self.finetuning_args.is_compute_emb:
+            del self.trainer, self.base_model
 
     def train_oracle(self, model, emb_dataset, train_ids, v_head_path, model_ith):
         accelerator = Accelerator()
@@ -80,11 +86,14 @@ class Oracle(LLMStrategy):
         num_training_steps = num_epochs * num_training_steps_per_epoch
 
         # optimizer, scheduler
-        optimizer_params = deepcopy(self.trainer.create_optimizer().param_groups[0])
-        create_scheduler = deepcopy(self.trainer.create_scheduler)
-        optimizer_params.pop('params', None)     
-        optimizer = torch.optim.AdamW(model.parameters(), **optimizer_params)
-        scheduler = create_scheduler(num_training_steps, optimizer = optimizer)
+        # optimizer_params = deepcopy(self.trainer.create_optimizer().param_groups[0])
+        # create_scheduler = deepcopy(self.trainer.create_scheduler)
+        # optimizer_params.pop('params', None)     
+        # optimizer = torch.optim.AdamW(model.parameters(), **optimizer_params)
+        # scheduler = create_scheduler(num_training_steps, optimizer = optimizer)
+
+        optimizer = torch.optim.AdamW(model.parameters(), lr = self.training_args.learning_rate)
+        scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_training_steps)
 
         cutoff_len = self.data_args.cutoff_len
         pad_token_id = self.tokenizer.pad_token_id
