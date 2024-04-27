@@ -140,21 +140,19 @@ class LLMStrategy:
         nearest_multiple = len(self.pool_dataset) // 8 * 8
         self.pool_dataset = self.pool_dataset.select(list(range(nearest_multiple)))
         
-        if not self.finetuning_args.is_compute_emb:
-            self.base_model = load_model(self.tokenizer, model_args, finetuning_args, False, add_valuehead=False)
-            self.data_collator = PairwiseDataCollatorWithPadding(self.tokenizer, pad_to_multiple_of=8)
-            self.callbacks = callbacks
+        self.base_model = load_model(self.tokenizer, model_args, finetuning_args, False, add_valuehead=False)
+        self.data_collator = PairwiseDataCollatorWithPadding(self.tokenizer, pad_to_multiple_of=8)
+        self.callbacks = callbacks
 
-            # Replace lm_head with identity
-            if hasattr(self.base_model, "lm_head"):
-                self.base_model.lm_head = torch.nn.Identity()
+        # Replace lm_head with identity
+        if hasattr(self.base_model, "lm_head"):
+            self.base_model.lm_head = torch.nn.Identity()
 
         # Update arguments
         training_args.remove_unused_columns = False  
 
         # Initialize our Trainer
-        if not self.finetuning_args.is_compute_emb:
-            self.trainer = PairwiseTrainer(
+        self.trainer = PairwiseTrainer(
             model=self.base_model,
             args=self.training_args,
             finetuning_args=self.finetuning_args,
