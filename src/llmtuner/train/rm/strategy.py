@@ -496,7 +496,6 @@ class LLMStrategy:
         # filename = f"{self.training_args.output_dir}/last_hidden_states.npy"
         filename = f"{self.training_args.output_dir}/last_hidden_states.npz"
         # Check if the file exists
-        breakpoint()
         if is_override == False and os.path.isfile(filename):
             # np_last_hidden_states = np.load(filename)
             data = np.load(filename)
