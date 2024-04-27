@@ -1,0 +1,63 @@
+CUDA_VISIBLE_DEVICES=3,4,5,6 accelerate launch --main_process_port=29505\
+  --config_file examples/accelerate/default.yaml \
+  src/train_bash.py \
+  --stage rm \
+  --do_train True \
+  --model_name_or_path meta-llama/Llama-2-7b-hf \
+  --use_fast_tokenizer True \
+  --finetuning_type lora \
+  --template llama2 \
+  --flash_attn False \
+  --dataset_dir data \
+  --dataset reward_bench_train \
+  --preprocessing_num_workers 32 \
+  --cutoff_len 4096 \
+  --num_train_epochs 10.0 \
+  --per_device_train_batch_size 2 \
+  --gradient_accumulation_steps 32 \
+  --learning_rate 1.5e-4 \
+  --lr_scheduler_type cosine \
+  --max_grad_norm 1.0 \
+  --weight_decay 0.001 \
+  --logging_steps 5 \
+  --warmup_ratio 0.02 \
+  --lora_rank 256 \
+  --lora_alpha 512 \
+  --lora_dropout 0.1 \
+  --lora_target q_proj,k_proj,v_proj,o_proj \
+  --output_dir saves/oracle_lora_256\
+  --plot_loss True \
+  --report_to none
+
+
+----------------------------
+CUDA_VISIBLE_DEVICES=1,2 accelerate launch --main_process_port=29507\
+  --config_file examples/accelerate/default.yaml \
+  src/train_bash.py \
+  --stage rm \
+  --do_train True \
+  --model_name_or_path meta-llama/Llama-2-7b-hf \
+  --use_fast_tokenizer True \
+  --finetuning_type lora \
+  --template llama2 \
+  --flash_attn True \
+  --fp16\
+  --dataset_dir data \
+  --dataset reward_bench_train \
+  --cutoff_len 1024 \
+  --num_train_epochs 10 \
+  --per_device_train_batch_size 2 \
+  --gradient_accumulation_steps 64 \
+  --learning_rate 1.5e-4 \
+  --lr_scheduler_type cosine \
+  --max_grad_norm 1.0 \
+  --weight_decay 0.001 \
+  --logging_steps 5 \
+  --warmup_ratio 0.02 \
+  --save_steps 100 \
+  --lora_rank 8 \
+  --lora_dropout 0.1 \
+  --lora_target q_proj,k_proj,v_proj,o_proj \
+  --output_dir saves/oracle_lora_v256_v2\
+  --plot_loss True \
+  --report_to none

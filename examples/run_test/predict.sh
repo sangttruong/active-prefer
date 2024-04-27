@@ -1,4 +1,4 @@
-CUDA_VISIBLE_DEVICES=2,6 accelerate launch \
+CUDA_VISIBLE_DEVICES=6,7 accelerate launch \
     --config_file examples/accelerate/single_config.yaml \
     src/train_bash.py \
     --stage sft \
