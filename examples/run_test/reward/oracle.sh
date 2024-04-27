@@ -4,10 +4,10 @@ CUDA_VISIBLE_DEVICES=6 python src/train_bash.py \
     --flash_attn False\
     --model_name_or_path meta-llama/Llama-2-7b-hf \
     --dataset_dir data \
-    --dataset  reward_bench_train_Llama-2-7b-hf_max_entropy_check\
+    --dataset  reward_bench_train\
     --template default \
     --finetuning_type freeze \
-    --output_dir saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy\
+    --output_dir saves/test/multi_oracle\
     --overwrite_output_dir \
     --cutoff_len 1024 \
     --per_device_train_batch_size 2 \
@@ -77,4 +77,4 @@ CUDA_VISIBLE_DEVICES=8,9 accelerate launch \
     --learning_rate 5e-5 \
     --num_train_epochs 10\
     --is_compute_emb True\
-    --num_oracle 10\
+    --num_oracle 10

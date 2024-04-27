@@ -111,7 +111,7 @@ class Oracle(LLMStrategy):
                 # Calculate loss
                 # padding_chosen = max(0, cutoff_len - len(chosen_input_ids))
                 # padding_rejected = max(0, cutoff_len - len(rejected_input_ids))
-                padding_len = abs(len(chosen_input_ids), len(rejected_input_ids))
+                padding_len = abs(len(chosen_input_ids) - len(rejected_input_ids))
                 if len(chosen_input_ids) > len(rejected_input_ids): 
                     rejected_input_ids = F.pad(rejected_input_ids, (0, padding_len), value = pad_token_id)
                 elif len(chosen_input_ids) < len(rejected_input_ids):
