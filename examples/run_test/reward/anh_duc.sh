@@ -47,7 +47,7 @@ CUDA_VISIBLE_DEVICES=4,5,6,7 accelerate launch --main_process_port=29507\
   --cutoff_len 1024 \
   --num_train_epochs 10 \
   --per_device_train_batch_size 2 \
-  --gradient_accumulation_steps 64 \
+  --gradient_accumulation_steps 32 \
   --learning_rate 1.5e-4 \
   --lr_scheduler_type cosine \
   --max_grad_norm 1.0 \
@@ -55,9 +55,10 @@ CUDA_VISIBLE_DEVICES=4,5,6,7 accelerate launch --main_process_port=29507\
   --logging_steps 5 \
   --warmup_ratio 0.02 \
   --save_steps 100 \
-  --lora_rank 8 \
+  --lora_rank 16 \
   --lora_dropout 0.1 \
   --lora_target q_proj,k_proj,v_proj,o_proj \
   --output_dir saves/oracle_lora_v256_v2\
+  --overwrite_output_dir\
   --plot_loss True \
   --report_to none

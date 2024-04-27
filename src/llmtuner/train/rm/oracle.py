@@ -109,10 +109,13 @@ class Oracle(LLMStrategy):
                 rejected_rewards = model(last_hidden_state_rejected) # 
 
                 # Calculate loss
-                padding_chosen = max(0, cutoff_len - len(chosen_input_ids))
-                padding_rejected = max(0, cutoff_len - len(rejected_input_ids))
-                chosen_input_ids = F.pad(chosen_input_ids, (0, padding_chosen), value = pad_token_id)
-                rejected_input_ids = F.pad(rejected_input_ids, (0, padding_rejected), value = pad_token_id)
+                # padding_chosen = max(0, cutoff_len - len(chosen_input_ids))
+                # padding_rejected = max(0, cutoff_len - len(rejected_input_ids))
+                padding_len = abs(len(chosen_input_ids), len(rejected_input_ids))
+                if len(chosen_input_ids) > len(rejected_input_ids): 
+                    rejected_input_ids = F.pad(rejected_input_ids, (0, padding_len), value = pad_token_id)
+                elif len(chosen_input_ids) < len(rejected_input_ids):
+                    chosen_input_ids = F.pad(chosen_input_ids, (0, padding_len), value = pad_token_id)
 
                 chosen_non_zero_indices = (chosen_input_ids != pad_token_id).nonzero()
                 rejected_non_zero_indices = (rejected_input_ids != pad_token_id).nonzero()
