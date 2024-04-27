@@ -74,9 +74,10 @@ class Oracle(LLMStrategy):
         self.oracle_init()
 
     def oracle_init(self):
-        if not self.finetuning_args.is_compute_emb:
-            del self.trainer, self.base_model
-
+        # if not self.finetuning_args.is_compute_emb:
+        #     del self.trainer, self.base_model
+        pass
+    
     def train_oracle(self, model, emb_dataset, train_ids, v_head_path, model_ith):
         accelerator = Accelerator()
         device = accelerator.device

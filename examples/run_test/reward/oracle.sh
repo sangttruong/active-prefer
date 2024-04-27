@@ -76,5 +76,5 @@ CUDA_VISIBLE_DEVICES=8,9 accelerate launch \
     --evaluation_strategy steps \
     --learning_rate 5e-5 \
     --num_train_epochs 10\
-    --is_compute_emb True\
+    --is_compute_emb False\
     --num_oracle 10
