@@ -1,9 +1,9 @@
-CUDA_VISIBLE_DEVICES=1,2 accelerate launch --main_process_port=29505\
+CUDA_VISIBLE_DEVICES=1,2 accelerate launch --main_process_port=29506\
     --config_file examples/accelerate/default.yaml \
     src/train_bash.py \
     --stage rm \
     --do_train \
-    --model_name_or_path meta-llama/Llama-2-70b-hf  \
+    --model_name_or_path meta-llama/Llama-2-7b-hf  \
     --flash_attn True\
     --dataset reward_bench_train \
     --dataset_dir data \
@@ -21,10 +21,10 @@ CUDA_VISIBLE_DEVICES=1,2 accelerate launch --main_process_port=29505\
     --eval_steps 10000 \
     --learning_rate 1.5e-4 \
     --num_train_epochs 1\
+    --max_samples 20\
     --ddp_timeout 1800000 \
     --plot_loss \
     --report_to none\
-    --push_to_hub\
     --fp16
 
 =============================================================

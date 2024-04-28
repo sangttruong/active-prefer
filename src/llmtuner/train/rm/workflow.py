@@ -82,8 +82,10 @@ def run_rm(
         train_result = trainer.train(resume_from_checkpoint=training_args.resume_from_checkpoint)
         if finetuning_args.finetuning_type == 'freeze':
             v_head_state_dict = model.v_head.state_dict()
-            v_head_path = f"training_args.output_dir/value_head.safetensors"
-            save_file(v_head_state_dict, v_head_path, metadata={"format": "pt"}) # save model
+            # v_head_path = f"training_args.output_dir/value_head.safetensors"
+            # save_file(v_head_state_dict, v_head_path, metadata={"format": "pt"}) # save model
+            v_head_path = f"training_args.output_dir/value_head.pt"
+            torch.save(v_head_state_dict, v_head_path)
             print(f"Model v_head saved to {v_head_path}")
         else:
             trainer.save_model()
