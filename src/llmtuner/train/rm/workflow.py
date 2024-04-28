@@ -93,6 +93,7 @@ def run_rm(
             
             state_dict = trainer.accelerator.get_state_dict(trainer.deepspeed)
             # Save only the v_head part of the state_dict
+            breakpoint()
             v_head_state_dict = state_dict['v_head']
             trainer._save(v_head_path, state_dict=v_head_state_dict)
 
