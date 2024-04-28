@@ -84,6 +84,7 @@ def run_rm(
             model_cpu = model.cpu() ## Moving model to CPU for serialization
 
             v_head_state_dict = model_cpu.v_head.state_dict()
+            breakpoint()
             # v_head_path = f"training_args.output_dir/value_head.safetensors"
             # save_file(v_head_state_dict, v_head_path, metadata={"format": "pt"}) # save model
             
