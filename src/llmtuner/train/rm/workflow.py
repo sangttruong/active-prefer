@@ -80,7 +80,13 @@ def run_rm(
     # Training
     if training_args.do_train:
         train_result = trainer.train(resume_from_checkpoint=training_args.resume_from_checkpoint)
-        trainer.save_model()
+        if finetuning_args.finetuning_type == 'freeze':
+            v_head_state_dict = model.v_head.state_dict()
+            v_head_path = f"training_args.output_dir/value_head.safetensors"
+            save_file(v_head_state_dict, v_head_path, metadata={"format": "pt"}) # save model
+            print(f"Model v_head saved to {v_head_path}")
+        else:
+            trainer.save_model()
         if training_args.should_save:
             fix_valuehead_checkpoint(model, training_args.output_dir, training_args.save_safetensors)
         trainer.log_metrics("train", train_result.metrics)
@@ -108,9 +114,7 @@ def run_rm(
     # Create model card
     create_modelcard_and_push(trainer, model_args, data_args, training_args, finetuning_args)
 
-    del trainer, model
-    gc.collect()
-    torch.cuda.empty_cache()
+
 
 def run_oracle_rm(
     model_args: "ModelArguments",

@@ -66,19 +66,18 @@ CUDA_VISIBLE_DEVICES=6,7 accelerate launch \
 
 -------------------
 # Eval Lora
-    
-CUDA_VISIBLE_DEVICES=1,2 accelerate launch \
+CUDA_VISIBLE_DEVICES=8,9 accelerate launch --main_process_port 29510 \
     --config_file examples/accelerate/single_config.yaml \
     src/train_bash.py \
     --stage rm \
     --do_eval \
     --model_name_or_path meta-llama/Llama-2-7b-hf \
-    --adapter_name_or_path saves/oracle_lora_v256 \
+    --adapter_name_or_path saves/oracle_lora_v256_v2 \
     --flash_attn False\
     --dataset reward_bench_test \
     --dataset_dir data \
     --template default \
-    --output_dir saves/oracle_lora_v256\
+    --output_dir saves/oracle_lora_v256_v2\
     --overwrite_output_dir \
     --cutoff_len 1024 \
     --per_device_eval_batch_size 2 \
