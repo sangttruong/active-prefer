@@ -278,23 +278,23 @@ def main(args):
     model_name = args.model_name_or_path.split('/')[-1]
 
     if args.dataset_name in ['allenai/ai2_arc', 'arc', "arc_challenge_train"]:
-        dataset = f'arc_challenge_train_{model_name}_{args.method}'
-        prepare_data = f"""python data/arc/arc.py --sanity_check {args.sanity_check}"""
+        prepare_data = f"""python data/arc/arc.py --sanity_check {args.sanity_check} --model_name {model_name} --method {args.method}"""
+        dataset = f'arc_challenge_train_{model_name}_{args.method}{"_check" if args.sanity_check else ""}'
     elif args.dataset_name in ['truthful_qa', "truthful_qa_train"]:
-        dataset = 'truthful_qa_train'
-        prepare_data = f"""python data/truthful_qa/truthful_qa.py --sanity_check {args.sanity_check}"""
+        prepare_data = f"""python data/truthful_qa/truthful_qa.py --sanity_check {args.sanity_check} --model_name {model_name} --method {args.method}"""
+        dataset = f'truthful_qa_train_{model_name}_{args.method}{"_check" if args.sanity_check else ""}'
     elif args.dataset_name in ['Rowan/hellaswag', 'hellaswag', "hellaswag_train"]:
-        prepare_data = f"""python data/hellaswag/hellaswag.py --sanity_check {args.sanity_check}"""
-        dataset = 'hellaswag_train'
+        prepare_data = f"""python data/hellaswag/hellaswag.py --sanity_check {args.sanity_check} --model_name {model_name} --method {args.method}"""
+        dataset = f'hellaswag_train_{model_name}_{args.method}{"_check" if args.sanity_check else ""}'
     elif args.dataset_name in ['winogrande', "winogrande_train"]:
-        prepare_data = f"""python data/winogrande/winogrande.py --sanity_check {args.sanity_check}"""
-        dataset = 'winogrande_train'
+        prepare_data = f"""python data/winogrande/winogrande.py --sanity_check {args.sanity_check} --model_name {model_name} --method {args.method}"""
+        dataset = f'winogrande_train_{model_name}_{args.method}{"_check" if args.sanity_check else ""}'
     elif args.dataset_name in ['cais/mmlu', "mmlu", "mmlu_train"]:
-        prepare_data = f"""python data/mmlu/mmlu.py --sanity_check {args.sanity_check}"""
-        dataset = 'mmlu_train'
+        prepare_data = f"""python data/mmlu/mmlu.py --sanity_check {args.sanity_check} --model_name {model_name} --method {args.method}"""
+        dataset = f'mmlu_train_{model_name}_{args.method}{"_check" if args.sanity_check else ""}'
     elif args.dataset_name in ['Anthropic/hh-rlhf', "hh-rlhf", "hh_rlhf" "hh_rlhf_train"]:
-        prepare_data = f"""python data/hh_rlhf/hh_rlhf.py"""
-        dataset = 'hh_rlhf_train'
+        prepare_data = f"""python data/hh_rlhf/hh_rlhf.py --sanity_check {args.sanity_check} --model_name {model_name} --method {args.method}"""
+        dataset = f'hh_rlhf_train_{model_name}_{args.method}{"_check" if args.sanity_check else ""}'
     elif args.dataset_name in ['allenai/reward-bench', "reward-bench", "reward_bench", "reward_bench_train"]:
         prepare_data = f"""python data/reward_bench/reward_bench.py --sanity_check {args.sanity_check} --model_name {model_name} --method {args.method}"""
         dataset = f'reward_bench_train_{model_name}_{args.method}{"_check" if args.sanity_check else ""}'

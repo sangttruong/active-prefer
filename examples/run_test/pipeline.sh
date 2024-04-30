@@ -10,9 +10,9 @@ python pipeline.py \
     --flash_attn \
     --percentage 0.1 \
     --main_process_port 29507\
-    --gpu_ids 2,6\
+    --gpu_ids 4,5\
     --sanity_check\
-    --type_of_oracle lora\
+    --type_of_oracle lora
 
 #### Full
 python pipeline.py \
