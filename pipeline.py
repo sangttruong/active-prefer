@@ -273,61 +273,6 @@ def find_and_kill_process(command):
     else:
         print("No matching process found.")
 
-
-def get_run_command(**kwargs):
-    # Default values
-    default_args = {
-        "gpu_ids": "0",
-        "model_name_or_path": "meta-llama/Llama-2-7b-hf",
-        "dataset_dir": "data/",
-        "template": "default",
-        "cutoff_len": 100,
-        "per_device_train_batch_size": 4,
-        "per_device_eval_batch_size": 4,
-        "gradient_accumulation_steps": 32,
-        "lr_scheduler_type": "linear",
-        "logging_steps": 10,
-        "warmup_steps": 1000,
-        "save_steps": 100000,
-        "learning_rate": 5e-5,
-        "num_train_epochs": 3,
-        "max_samples": 100000,
-    }
-
-    # Update default_args with kwargs
-    default_args.update(kwargs)
-
-    # Constructing the command string
-    ft_oracle_command = f"""CUDA_VISIBLE_DEVICES={default_args['gpu_ids']} python src/train_bash.py \
-        --stage oracle \
-        --do_train \
-        --flash_attn {args.flash_attn} \
-        --model_name_or_path {default_args['model_name_or_path']} \
-        --output_dir {default_args['output_dir']} \
-        --dataset {default_args['dataset']} \
-        --dataset_dir {default_args['dataset_dir']} \
-        --template {default_args['template']} \
-        --finetuning_type freeze \
-        --overwrite_output_dir \
-        --cutoff_len {default_args['cutoff_len']} \
-        --per_device_train_batch_size {default_args['per_device_train_batch_size']} \
-        --per_device_eval_batch_size {default_args['per_device_eval_batch_size']} \
-        --gradient_accumulation_steps {default_args['gradient_accumulation_steps']} \
-        --lr_scheduler_type {default_args['lr_scheduler_type']} \
-        --logging_steps {default_args['logging_steps']} \
-        --warmup_steps {default_args['warmup_steps']} \
-        --save_steps {default_args['save_steps']} \
-        --eval_steps {default_args['save_steps']} \
-        --evaluation_strategy {default_args['evaluation_strategy']} \
-        --learning_rate {default_args['learning_rate']} \
-        --num_train_epochs {10*default_args['num_train_epochs']} \
-        --max_samples {default_args['max_samples']} \
-        --ddp_timeout 1800000 \
-        --is_compute_emb {default_args['is_retrain_oracle']} \
-        --plot_loss 
-        """
-    return ft_oracle_command
-
 def main(args):
 
     model_name = args.model_name_or_path.split('/')[-1]
@@ -368,12 +313,11 @@ def main(args):
     num_sample_selected = int(count_len_dataset(f"{args.dataset_dir}/{dataset}.json") * args.percentage)
 
     # Train an Oracle model O 
-    
     if args.is_retrain_oracle == False and os.path.exists(oracle_adapter_path):
         print("Oracle trained")
-    else:
+    elif args.type_of_oracle == 'lora':
         ft_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
-            --stage oracle \
+            --stage rm  \
             --do_train \
             --flash_attn {args.flash_attn}\
             --model_name_or_path {args.model_name_or_path}\
@@ -381,24 +325,50 @@ def main(args):
             --dataset {dataset} \
             --dataset_dir {args.dataset_dir} \
             --template {args.template} \
-            --finetuning_type freeze \
+            --finetuning_type {args.finetuning_type} \
+            --lora_target {args.lora_target} \
             --overwrite_output_dir \
             --cutoff_len {args.cutoff_len} \
             --per_device_train_batch_size {args.per_device_train_batch_size} \
-            --per_device_eval_batch_size {args.per_device_eval_batch_size} \
             --gradient_accumulation_steps {args.gradient_accumulation_steps} \
             --lr_scheduler_type {args.lr_scheduler_type} \
             --logging_steps {args.logging_steps} \
             --warmup_steps {args.warmup_steps} \
             --save_steps {args.save_steps} \
-            --eval_steps {args.save_steps} \
-            --evaluation_strategy {args.evaluation_strategy} \
             --learning_rate {args.learning_rate} \
-            --num_train_epochs {10*args.num_train_epochs}\\
+            --num_train_epochs {5*args.num_train_epochs}\
             --max_samples {args.max_samples} \
-            --ddp_timeout 1800000 \
             --is_compute_emb {args.is_retrain_oracle}\
-            --plot_loss 
+            --plot_loss \
+            --fp16
+            """
+        print(f"Training Oracle model ............................")
+        run_cli_command(ft_oracle_command)
+    else:
+        ft_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
+            --stage rm  \
+            --do_train \
+            --flash_attn {args.flash_attn}\
+            --model_name_or_path {args.model_name_or_path}\
+            --output_dir {oracle_adapter_path}\
+            --dataset {dataset} \
+            --dataset_dir {args.dataset_dir} \
+            --template {args.template} \
+            --finetuning_type freeze\
+            --overwrite_output_dir \
+            --cutoff_len {args.cutoff_len} \
+            --per_device_train_batch_size {args.per_device_train_batch_size} \
+            --gradient_accumulation_steps {args.gradient_accumulation_steps} \
+            --lr_scheduler_type {args.lr_scheduler_type} \
+            --logging_steps {args.logging_steps} \
+            --warmup_steps {args.warmup_steps} \
+            --save_steps {args.save_steps} \
+            --learning_rate {args.learning_rate} \
+            --num_train_epochs {5*args.num_train_epochs}\
+            --max_samples {args.max_samples} \
+            --is_compute_emb {args.is_retrain_oracle}\
+            --plot_loss \
+            --fp16
             """
         print(f"Training Oracle model ............................")
         run_cli_command(ft_oracle_command)
@@ -439,7 +409,6 @@ def main(args):
                 --acquisition {args.method}\
                 --num_sample_selected {num_sample_selected}
             """
-
             run_cli_command(selection_command) 
         elif args.method in ['qbc']:
             selection_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
@@ -652,14 +621,15 @@ def main(args):
 
         predict_rw_score_path = f"{oracle_adapter_path}/Iter_{iter}"
         if args.use_accelerate:
-            inference_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port} \
+            if args.type_of_oracle == 'lora':
+                inference_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port} \
                 --config_file examples/accelerate/single_config.yaml \
                 src/train_bash.py \
                 --stage rm \
                 --do_predict \
                 --flash_attn {args.flash_attn}\
                 --model_name_or_path {args.model_name_or_path} \
-                --vhead_oracle_path {oracle_adapter_path}\
+                --adapter_name_or_path {oracle_adapter_path}\
                 --dataset_dir {args.dataset_dir} \
                 --dataset {dataset_name_generated} \
                 --template {args.template} \
@@ -667,6 +637,22 @@ def main(args):
                 --per_device_eval_batch_size {args.per_device_eval_batch_size} \
                 --fp16
                 """
+            else:
+                inference_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port} \
+                    --config_file examples/accelerate/single_config.yaml \
+                    src/train_bash.py \
+                    --stage rm \
+                    --do_predict \
+                    --flash_attn {args.flash_attn}\
+                    --model_name_or_path {args.model_name_or_path} \
+                    --vhead_oracle_path {oracle_adapter_path}\
+                    --dataset_dir {args.dataset_dir} \
+                    --dataset {dataset_name_generated} \
+                    --template {args.template} \
+                    --output_dir {oracle_adapter_path} \
+                    --per_device_eval_batch_size {args.per_device_eval_batch_size} \
+                    --fp16
+                    """
         
             
         print(f"Inference Oracle model ............................")
@@ -736,7 +722,8 @@ def parse_arguments():
     parser.add_argument("--api_port", type=int, default=8005, help="Deploy API port")
     parser.add_argument("--is_using_vllm", action="store_true", help="Using vLLM to run 70B model")
     parser.add_argument("--flash_attn", action="store_true", help="Using Flash attention")
-    parser.add_argument("--is_retrain_oracle", action="store_true", help="retrain oracle model")
+    parser.add_argument("--is_retrain_oracle", action="store_true", help="retrain oracle model if using custom trainer for oracle")
+    parser.add_argument("--type_of_oracle", type=str, default="lora", help="Type of training Oracle: lora or v_head")
 
     return parser.parse_args()
 

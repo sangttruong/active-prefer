@@ -7,11 +7,12 @@ python pipeline.py \
     --num_iters 5\
     --num_train_epochs 2\
     --use_accelerate\
+    --flash_attn \
     --percentage 0.1 \
     --main_process_port 29507\
     --gpu_ids 2,6\
     --sanity_check\
-    --is_retrain_oracle
+    --type_of_oracle lora\
 
 #### Full
 python pipeline.py \
