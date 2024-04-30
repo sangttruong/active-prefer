@@ -491,33 +491,33 @@ class LLMStrategy:
         # Predict probabilities using dropout but return individual dropout iterations
         pass
 
-    def get_embedding(self, is_override = False):
-        # Get embeddings from the penultimate layer of the network
-        # filename = f"{self.training_args.output_dir}/last_hidden_states.npy"
-        filename = f"{self.training_args.output_dir}/last_hidden_states.npz"
-        # Check if the file exists
-        if is_override == False and os.path.isfile(filename):
-            # np_last_hidden_states = np.load(filename)
-            data = np.load(filename)
-            print(f"Loaded array from {filename}")
-            return data, True
-        else:
-            self.base_model.eval()
-            # ------------------------------------------------------
-            print("Begin complute emb..........")
-            dataloader = self.trainer.get_test_dataloader(self.pool_dataset)
-            predict_results = []
-            idx = 0
-            with torch.no_grad():
-                for batch in tqdm(dataloader):
-                    emb = self.base_model(**batch)
-                    batch_size, ctx, dim = emb[0].shape
-                    emb = emb[0].reshape(batch_size // 2, 2, ctx, dim)
-                    emb = emb.cpu()
-                    flatten = list(emb)
-                    predict_results.extend(flatten)
+def get_embedding(self, is_override = False):
+    # Get embeddings from the penultimate layer of the network
+    # filename = f"{self.training_args.output_dir}/last_hidden_states.npy"
+    filename = f"{self.training_args.output_dir}/last_hidden_states.npz"
+    # Check if the file exists
+    if is_override == False and os.path.isfile(filename):
+        # np_last_hidden_states = np.load(filename)
+        data = np.load(filename)
+        print(f"Loaded array from {filename}")
+        return data, True
+    else:
+        self.base_model.eval()
+        # ------------------------------------------------------
+        print("Begin complute emb..........")
+        dataloader = self.trainer.get_test_dataloader(self.pool_dataset)
+        predict_results = []
+        idx = 0
+        with torch.no_grad():
+            for batch in tqdm(dataloader):
+                emb = self.base_model(**batch)
+                batch_size, ctx, dim = emb[0].shape
+                emb = emb[0].reshape(batch_size // 2, 2, ctx, dim)
+                emb = emb.cpu()
+                flatten = list(emb)
+                predict_results.extend(flatten)
 
-            np.savez(filename, *predict_results)
+        np.savez(filename, *predict_results)
 
         # last_hidden_states = torch.tensor(np_last_hidden_states)  # Using torch.tensor()
         return predict_results, False
