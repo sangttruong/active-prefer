@@ -21,7 +21,7 @@ CUDA_VISIBLE_DEVICES=2 python src/train_bash.py \
     --evaluation_strategy steps \
     --learning_rate 5e-5 \
     --num_train_epochs 1\
-    --is_compute_emb True\
+    --is_compute_emb False\
     --num_oracle 1
 
 
