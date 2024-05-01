@@ -128,7 +128,6 @@ def main():
     train_dataset = train_dataset.map(
         preprocess_function,
         batched=True,
-        num_proc=script_args.num_proc,
     )
     train_dataset = train_dataset.filter(
         lambda x: len(x["input_ids_chosen"]) <= script_args.seq_length
