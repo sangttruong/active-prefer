@@ -530,11 +530,23 @@ class LLMStrategy:
                 for batch in tqdm(dataloader):
                     # emb = self.base_model(**batch).logits[:, -1, :] #(bz, ctx, 4096)
                     breakpoint()
-                    emb = self.base_model.model(**batch).last_hidden_state[:, -1, :] #(bz,4096)
-                    batch_size, dim = emb.shape
+                    emb = self.base_model.model(**batch).last_hidden_state #(bz, ctx, 4096)
+                    bz, ctx , _ = emb.shape
                     emb = emb.cpu()
-                    chosen_emb = [np.array(subarray) for subarray in emb[:batch_size//2]]
-                    rejected = [np.array(subarray) for subarray in emb[batch_size//2:]]
+                    # find item != 2, set 1
+                    mask = torch.zeros((bz, ctx))
+                    last_token_emb  = (batch['input_ids'] != 2).sum(-1) - 1 
+                    for r, c in enumerate(last_token_emb):
+                        mask[r, c] = 1
+                    # chosen_last_token_emb = last_token_emb[:batch_size//2]
+                    # rejected_last_token_emb = last_token_emb[batch_size//2:]
+
+                    # Mul
+                    emb_mul = emb * mask
+                    # Sum
+                    last_emb = emb_mul.sum(1)
+                    chosen_emb = [np.array(subarray) for subarray in last_emb[:bz//2]]
+                    rejected = [np.array(subarray) for subarray in last_emb[bz//2:]]
                     vector_output["chosen"].extend(chosen_emb)
                     vector_output["rejected"].extend(rejected)
 

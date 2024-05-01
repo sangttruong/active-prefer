@@ -1,8 +1,8 @@
-CUDA_VISIBLE_DEVICES=2 python src/train_bash.py \
+CUDA_VISIBLE_DEVICES=3 python src/train_bash.py \
     --stage oracle \
     --do_train \
     --flash_attn True\
-    --model_name_or_path meta-llama/Llama-2-13b-hf \
+    --model_name_or_path meta-llama/Llama-2-7b-hf \
     --dataset_dir data \
     --dataset  reward_bench_train\
     --template default \
@@ -21,7 +21,7 @@ CUDA_VISIBLE_DEVICES=2 python src/train_bash.py \
     --evaluation_strategy steps \
     --learning_rate 5e-5 \
     --num_train_epochs 1\
-    --is_compute_emb False\
+    --is_compute_emb True\
     --num_oracle 1
 
 
