@@ -535,7 +535,7 @@ class LLMStrategy:
                     emb = emb.cpu()
                     # find item != 2, set 1
                     mask = torch.zeros((bz, ctx))
-                    last_token_emb  = (batch['input_ids'] != 2).sum(-1) - 1 
+                    last_token_emb  = ((batch['input_ids'] != 2).sum(-1) - 1).tolist() 
                     for r, c in enumerate(last_token_emb):
                         mask[r, c] = 1
                     # chosen_last_token_emb = last_token_emb[:batch_size//2]
