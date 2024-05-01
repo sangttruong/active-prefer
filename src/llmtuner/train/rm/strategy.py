@@ -41,6 +41,8 @@ from ..utils import load_valuehead_params
 
 from accelerate import Accelerator
 from trl import AutoModelForCausalLMWithValueHead
+from datasets import Dataset
+
 
 from safetensors import safe_open
 from safetensors.torch import save_file, load_file
@@ -116,15 +118,15 @@ class CustomDataset(Dataset):
             return {"question_id": example['id'], # string 
                     "last_hidden_state_chosen": torch.tensor(self.embeddings_feature[f'arr_{i}'][0]), # tensor (ctx x 4096)
                     "last_hidden_state_rejected": torch.tensor(self.embeddings_feature[f'arr_{i}'][1]),  # tensor (ctx x 4096)
-                    'chosen_ids': torch.tensor(example['chosen_ids']), # list ids
-                    'rejected_ids': torch.tensor(example['rejected_ids']), # list ids
+                    # 'chosen_ids': torch.tensor(example['chosen_ids']), # list ids
+                    # 'rejected_ids': torch.tensor(example['rejected_ids']), # list ids
                     }
         else:
             return {"question_id": example['id'], # string 
                     "last_hidden_state_chosen": self.embeddings_feature[i][0].clone(), # tensor (ctx x 4096)
                     "last_hidden_state_rejected": self.embeddings_feature[i][1].clone(),  # tensor (ctx x 4096)
-                    'chosen_ids': torch.tensor(example['chosen_ids']), # list ids
-                    'rejected_ids': torch.tensor(example['rejected_ids']), # list ids
+                    # 'chosen_ids': torch.tensor(example['chosen_ids']), # list ids
+                    # 'rejected_ids': torch.tensor(example['rejected_ids']), # list ids
                     }
 
 def set_seed(seed):
@@ -511,15 +513,14 @@ class LLMStrategy:
         # Check if the file exists
         if is_override == False and os.path.isfile(filename):
             # np_last_hidden_states = np.load(filename)
-            data = pickle.load(open(f"{filename}.pkl", 'rb'))
+            train_ds = pickle.load(open(f"{filename}.pkl", 'rb'))
+            train_df = Dataset.from_dict(train_ds)
             print(f"Loaded data from {filename}")
         else:
             self.base_model.eval()
             # ------------------------------------------------------
             print("Begin complute emb..........")
             dataloader = self.trainer.get_test_dataloader(self.pool_dataset)
-            predict_results = []
-            idx = 0
             vector_output = {
                 "chosen": [],
                 "rejected": []
@@ -532,13 +533,13 @@ class LLMStrategy:
                     vector_output["chosen"].append(emb[:batch_size//2])
                     vector_output["rejected"].append(emb[batch_size//2:])
             
-            # last_hidden_states = torch.tensor(np_last_hidden_states)  # Using torch.tensor()
             save_to_pkl(vector_output, f"{filename}.pkl")
+            train_df = Dataset.from_dict(vector_output)
 
+        return train_df
 
     def get_training_dataset(self, is_override):
-        last_hidden_states, is_load = self.get_embedding(is_override)
-        train_dataset = CustomDataset(last_hidden_states, self.pool_dataset, is_load)  
+        train_dataset = self.get_embedding(is_override)
         return train_dataset
         
     # gradient embedding for badge (assumes cross-entropy loss)
