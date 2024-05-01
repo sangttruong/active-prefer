@@ -160,8 +160,8 @@ class LLMStrategy:
         self.callbacks = callbacks
 
         # Replace lm_head with identity
-        if hasattr(self.base_model, "lm_head"):
-            self.base_model.lm_head = torch.nn.Identity()
+        # if hasattr(self.base_model, "lm_head"):
+        #     self.base_model.lm_head = torch.nn.Identity()
 
         # Update arguments
         training_args.remove_unused_columns = False  
