@@ -512,7 +512,6 @@ class LLMStrategy:
         filename = f"{self.training_args.output_dir}/last_hidden_states"
         # Check if the file exists
         if is_override == False and os.path.isfile(filename):
-            # np_last_hidden_states = np.load(filename)
             train_ds = pickle.load(open(f"{filename}.pkl", 'rb'))
             train_df = Dataset.from_dict(train_ds)
             print(f"Loaded data from {filename}")
@@ -530,8 +529,8 @@ class LLMStrategy:
                     emb = self.base_model(**batch).logits[:, -1, :] #(bz,4096)
                     batch_size, dim = emb.shape
                     emb = emb.cpu()
-                    vector_output["chosen"].append(emb[:batch_size//2])
-                    vector_output["rejected"].append(emb[batch_size//2:])
+                    vector_output["chosen"].extend(emb[:batch_size//2].flatten())
+                    vector_output["rejected"].extend(emb[batch_size//2:].flatten())
             
             save_to_pkl(vector_output, f"{filename}.pkl")
             train_df = Dataset.from_dict(vector_output)

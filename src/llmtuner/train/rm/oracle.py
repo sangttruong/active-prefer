@@ -80,8 +80,8 @@ class Oracle(LLMStrategy):
         pass
     
     def train_oracle(self, emb_dataset, train_ids, v_head_path, model_ith):
-        X = emb_dataset
-        
+        X1 = emb_dataset['chosen']
+        X1 = emb_dataset['rejected']        
         Y = 
         LogisticRegression
         
@@ -137,7 +137,6 @@ class Oracle(LLMStrategy):
         emb_dataset = self.get_training_dataset(is_override = is_compute_emb)
         breakpoint()
 
-        
         metrics = []
         for m in range(nEns):            
             v_head_path = f"{self.training_args.output_dir}/oracle_{m}.safetensors"
@@ -150,7 +149,7 @@ class Oracle(LLMStrategy):
             # reinit model    
             
             print(f"Trainig oracle {m}th ...................")
-            loss = self.train_oracle(model, emb_dataset, train_ids, v_head_path, m)
+            loss = self.train_oracle(emb_dataset, v_head_path, m)
             # 
             print(f"Eval oracle {m}th ...................")
             # acc = self.evaluate_oracle(model, emb_dataset, test_ids, m, threshold = threshold)
