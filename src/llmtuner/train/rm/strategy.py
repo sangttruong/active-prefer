@@ -18,7 +18,7 @@ import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 from torch.nn import functional as F
 import gc
-
+import pickle
 import os 
 import numpy as np
 import random
@@ -51,6 +51,18 @@ if TYPE_CHECKING:
     from transformers import Seq2SeqTrainingArguments, TrainerCallback
 
     from ...hparams import DataArguments, FinetuningArguments, ModelArguments
+
+
+def save_to_json(data, name):
+    jsonString = json.dumps(data, indent=4)
+    jsonFile = open(name, "w")
+    jsonFile.write(jsonString)
+    jsonFile.close()
+
+def save_to_pkl(data, name):
+    pklFile = open(name, "wb")
+    pickle.dump(data, pklFile)
+    pklFile.close()
 
 
 class ValueHead(nn.Module):
@@ -494,14 +506,13 @@ class LLMStrategy:
 def get_embedding(self, is_override = False):
     # Get embeddings from the penultimate layer of the network
     # filename = f"{self.training_args.output_dir}/last_hidden_states.npy"
-    model_name = self.training_args.model_name_or_path.split("/")[-1]
-    filename = f"{self.training_args.output_dir}/last_hidden_states_{model_name}_{self.data_args.dataset}.npz"
+    
+    filename = f"{self.training_args.output_dir}/last_hidden_states"
     # Check if the file exists
     if is_override == False and os.path.isfile(filename):
         # np_last_hidden_states = np.load(filename)
-        data = np.load(filename)
-        print(f"Loaded array from {filename}")
-        return data, True
+        data = pickle.load(open(f"{filename}.pkl", 'rb'))
+        print(f"Loaded data from {filename}")
     else:
         self.base_model.eval()
         # ------------------------------------------------------
@@ -509,19 +520,24 @@ def get_embedding(self, is_override = False):
         dataloader = self.trainer.get_test_dataloader(self.pool_dataset)
         predict_results = []
         idx = 0
+        vector_output = {
+            "chosen": [],
+            "rejected": []
+        }
         with torch.no_grad():
             for batch in tqdm(dataloader):
-                emb = self.base_model(**batch)
+                emb = self.base_model(**batch).last_hidden_state[0][-1] #(bz,1,4096)
                 batch_size, ctx, dim = emb[0].shape
                 emb = emb[0].reshape(batch_size // 2, 2, ctx, dim)
                 emb = emb.cpu()
-                flatten = list(emb)
-                predict_results.extend(flatten)
-
-        np.savez(filename, *predict_results)
-
+                # flatten = list(emb)
+                # predict_results.extend(flatten)
+                vector_output["chosen"].append(emb[:batch_size//2])
+                vector_output["rejected"].append(emb[batch_size//2:])
+        
         # last_hidden_states = torch.tensor(np_last_hidden_states)  # Using torch.tensor()
-        return predict_results, False
+        save_to_pkl(vector_output, f"{filename}.pkl")
+
 
     def get_training_dataset(self, is_override):
         last_hidden_states, is_load = self.get_embedding(is_override)
