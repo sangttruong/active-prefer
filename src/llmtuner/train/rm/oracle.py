@@ -218,7 +218,6 @@ class Oracle(LLMStrategy):
         # training data
         emb_dataset = self.get_training_dataset(is_override = is_compute_emb)
         
-        
         metrics = []
         for m in range(nEns):            
             v_head_path = f"{self.training_args.output_dir}/oracle_{m}.safetensors"
