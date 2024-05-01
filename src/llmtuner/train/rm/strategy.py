@@ -529,7 +529,7 @@ class LLMStrategy:
             with torch.no_grad():
                 for batch in tqdm(dataloader):
                     # emb = self.base_model(**batch).logits[:, -1, :] #(bz,4096)
-                    emb = self.base_model.model(**batch).logits[:, -1, :] #(bz,4096)
+                    emb = self.base_model.model(**batch) #(bz,4096)
                     breakpoint()
                     batch_size, dim = emb.shape
                     emb = emb.cpu()
