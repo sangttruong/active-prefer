@@ -1,6 +1,6 @@
 # Deepspeed
 
-CUDA_VISIBLE_DEVICES=3,4,6 accelerate launch --main_process_port=29505\
+CUDA_VISIBLE_DEVICES=3,4 accelerate launch --main_process_port=29505\
     --config_file examples/accelerate/default.yaml \
     src/train_bash.py\
     --stage oracle \
