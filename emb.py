@@ -87,8 +87,8 @@ def main():
     model = AutoModelForCausalLM.from_pretrained(
         script_args.model_name,
         # quantization_config=quantization_config,
-        # device_map=device_map,
-        # trust_remote_code=script_args.trust_remote_code
+        device_map = {"": Accelerator().local_process_index},
+        trust_remote_code=script_args.trust_remote_code
     )
     model.config.use_cache = False
     model.config.pretraining_tp = 1
