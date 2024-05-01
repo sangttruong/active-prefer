@@ -87,7 +87,7 @@ class Oracle(LLMStrategy):
         X = X1 - X2
         y = np.zeros(len(X))
 
-        chosen_index = np.random.choice(len(X), size=int(0.5 * len(X)), replace=False, random_state=random_state)
+        chosen_index = np.random.choice(len(X), size=int(0.5 * len(X)), replace=False)
         for idx in chosen_index:    
             X[idx] = -X[idx]
             y[idx] = 1
