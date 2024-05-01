@@ -1,6 +1,6 @@
 # Deepspeed
 
-CUDA_VISIBLE_DEVICES=1,3 accelerate launch --main_process_port=29505\
+CUDA_VISIBLE_DEVICES=3 accelerate launch --main_process_port=29505\
     --config_file examples/accelerate/default.yaml \
     src/train_bash.py\
     --stage oracle \
@@ -14,8 +14,8 @@ CUDA_VISIBLE_DEVICES=1,3 accelerate launch --main_process_port=29505\
     --output_dir saves/Llama-2-70b-hf \
     --overwrite_output_dir \
     --cutoff_len 1024 \
-    --per_device_train_batch_size 2 \
-    --per_device_eval_batch_size 2 \
+    --per_device_train_batch_size 1 \
+    --per_device_eval_batch_size 1 \
     --gradient_accumulation_steps 4 \
     --lr_scheduler_type cosine \
     --logging_steps 400 \

@@ -28,6 +28,8 @@ import torch.optim.lr_scheduler as lr_scheduler
 from torch.utils.data import DataLoader
 from torch.nn.utils.rnn import pad_sequence
 
+import deepspeed
+
 
 from safetensors.torch import save_file, load_file
 
@@ -74,11 +76,12 @@ class Oracle(LLMStrategy):
         callbacks: Optional[List["TrainerCallback"]] = None,
     ):
         super(Oracle, self).__init__(model_args, data_args, training_args, finetuning_args, callbacks)
-        self.oracle_init()
+        self.oracle_init(model_args, data_args, training_args, finetuning_args, callbacks)
 
-    def oracle_init(self):
+    def oracle_init(self,model_args, data_args, training_args, finetuning_args, callbacks):
         # if not self.finetuning_args.is_compute_emb:
         #     del self.trainer, self.base_model
+
         pass
     
     def train_oracle(self, emb_dataset, val_size= 0.1, random_state = 0):
