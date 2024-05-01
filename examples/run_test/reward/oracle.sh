@@ -7,7 +7,7 @@ CUDA_VISIBLE_DEVICES=3 python src/train_bash.py \
     --dataset  reward_bench_train\
     --template default \
     --finetuning_type freeze \
-    --output_dir saves/Llama-2-13b-hf \
+    --output_dir saves/Llama-2-7b-hf \
     --overwrite_output_dir \
     --cutoff_len 1024 \
     --per_device_train_batch_size 2 \
@@ -21,8 +21,8 @@ CUDA_VISIBLE_DEVICES=3 python src/train_bash.py \
     --evaluation_strategy steps \
     --learning_rate 5e-5 \
     --num_train_epochs 1\
-    --is_compute_emb True\
-    --num_oracle 1
+    --is_compute_emb False\
+    --num_oracle 10
 
 
 --------------------------------------------

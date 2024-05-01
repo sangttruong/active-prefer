@@ -95,7 +95,7 @@ class Oracle(LLMStrategy):
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=val_size, random_state=random_state)
 
         # Fitting the logistic regression model
-        model = LogisticRegression(random_state=random_state, max_iter=5000)
+        model = LogisticRegression(random_state=random_state, max_iter=500)
         model.fit(X_train, y_train)
 
         # Once the model is trained, you can evaluate its performance on the test set
@@ -111,7 +111,7 @@ class Oracle(LLMStrategy):
         emb_dataset = self.get_training_dataset(is_override = is_compute_emb)
 
         metrics = []
-        for m in range(nEns):                        
+        for m in tqdm(range(nEns)):                        
             print(f"Trainig oracle {m}th ...................")
             val_acc = self.train_oracle(emb_dataset, val_size, random_state=m)
 

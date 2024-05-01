@@ -84,9 +84,7 @@ def run_rm(
             model_cpu = model.cpu() ## Moving model to CPU for serialization
 
             v_head_state_dict = model_cpu.v_head.state_dict()
-            # breakpoint()
             v_head_path = f"{training_args.output_dir}/value_head.safetensors"
-
             
             state_dict = trainer.accelerator.get_state_dict(trainer.deepspeed)
 
