@@ -494,7 +494,8 @@ class LLMStrategy:
 def get_embedding(self, is_override = False):
     # Get embeddings from the penultimate layer of the network
     # filename = f"{self.training_args.output_dir}/last_hidden_states.npy"
-    filename = f"{self.training_args.output_dir}/last_hidden_states.npz"
+    model_name = self.training_args.model_name_or_path.split("/")[-1]
+    filename = f"{self.training_args.output_dir}/last_hidden_states_{model_name}_{self.data_args.dataset}.npz"
     # Check if the file exists
     if is_override == False and os.path.isfile(filename):
         # np_last_hidden_states = np.load(filename)

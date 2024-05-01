@@ -12,7 +12,7 @@ python pipeline.py \
     --main_process_port 29507\
     --gpu_ids 4,5\
     --sanity_check\
-    --type_of_oracle lora
+    --type_of_oracle vhead
 
 #### Full
 python pipeline.py \

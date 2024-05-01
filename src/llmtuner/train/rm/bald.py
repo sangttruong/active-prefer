@@ -27,7 +27,7 @@ from tqdm import tqdm
 from collections import Counter
 
 
-class QueryByCommittees(LLMStrategy):
+class BALD(LLMStrategy):
     def __init__(
         self, 
         model_args: "ModelArguments",
@@ -36,7 +36,7 @@ class QueryByCommittees(LLMStrategy):
         finetuning_args: "FinetuningArguments",
         callbacks: Optional[List["TrainerCallback"]] = None,
     ):
-        super(QueryByCommittees, self).__init__(model_args, data_args, training_args, finetuning_args, callbacks)
+        super(BALD, self).__init__(model_args, data_args, training_args, finetuning_args, callbacks)
 
     def train_commitees(self, nEns=1, is_continues = False, verbose=False):
         # Train multiple models and return their weights and average parameter updates

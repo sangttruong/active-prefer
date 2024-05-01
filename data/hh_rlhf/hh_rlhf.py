@@ -1,6 +1,7 @@
 from datasets import load_dataset, Dataset
 import pandas as pd
 import json
+import copy
 
 def convert_multiple_choice_to_prompt(dataset, json_file_path):
     new_samples = []
