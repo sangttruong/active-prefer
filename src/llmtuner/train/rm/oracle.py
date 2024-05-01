@@ -84,8 +84,8 @@ class Oracle(LLMStrategy):
     def train_oracle(self, emb_dataset, val_size= 0.1, random_state = 0):
         X1 = np.array(emb_dataset['chosen'])
         X2 = np.array(emb_dataset['rejected'])        
-        X = X1 - X2
-        y = np.ones(len(X))
+        X = X1 - X2 # chosen - rejected
+        y = np.ones(len(X)) # chosen = 1
 
         chosen_index = np.random.choice(len(X), size=int(0.5 * len(X)), replace=False)
         for idx in chosen_index:    
