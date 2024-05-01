@@ -202,3 +202,6 @@ def main():
     accuracy = model.score(X_test, y_test)
     print("Accuracy on test set:", accuracy)
 
+
+if __name__ == '__main__':
+    main()
