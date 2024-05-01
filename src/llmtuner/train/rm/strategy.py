@@ -528,9 +528,9 @@ class LLMStrategy:
             }
             with torch.no_grad():
                 for batch in tqdm(dataloader):
-                    # emb = self.base_model(**batch).logits[:, -1, :] #(bz,4096)
-                    emb = self.base_model.model(**batch) #(bz,4096)
                     breakpoint()
+                    # emb = self.base_model(**batch).logits[:, -1, :] #(bz, ctx, 4096)
+                    emb = self.base_model.model(**batch).last_hidden_state[:, -1, :] #(bz,4096)
                     batch_size, dim = emb.shape
                     emb = emb.cpu()
                     chosen_emb = [np.array(subarray) for subarray in emb[:batch_size//2]]
