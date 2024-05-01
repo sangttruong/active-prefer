@@ -109,7 +109,7 @@ class Oracle(LLMStrategy):
         metrics = []
         for m in range(nEns):                        
             print(f"Trainig oracle {m}th ...................")
-            val_acc = self.train_oracle(emb_dataset, m, val_size)
+            val_acc = self.train_oracle(emb_dataset, m, val_size, random_state=m)
 
             metrics.append({
                 "model_id": m,
