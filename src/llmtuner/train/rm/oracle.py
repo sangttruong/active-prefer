@@ -87,6 +87,11 @@ class Oracle(LLMStrategy):
         X = X1 - X2
         y = np.zeros(len(X))
 
+        chosen_index = np.random.choice(len(X), size=int(0.5 * len(X)), replace=False)
+        for idx in chosen_index:
+            X[idx] = -X[idx]
+            y[idx] = 1
+
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=val_size, random_state=random_state)
 
         # Fitting the logistic regression model
@@ -104,7 +109,6 @@ class Oracle(LLMStrategy):
         # Train multiple models and return their weights and average parameter updates
         # training data
         emb_dataset = self.get_training_dataset(is_override = is_compute_emb)
-        breakpoint()
 
         metrics = []
         for m in range(nEns):                        
