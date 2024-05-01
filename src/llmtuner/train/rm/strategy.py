@@ -529,14 +529,21 @@ class LLMStrategy:
                 "rejected": []
             }
 
-            ds_engine, _, _, _ = deepspeed.initialize(self.base_mode)
-  
+            # ds_engine, _, _, _ = deepspeed.initialize(self.base_model)
+
+            # Initialize the DeepSpeed-Inference engine
+            ds_engine = deepspeed.init_inference(self.base_model,
+                                            tensor_parallel={"tp_size": 2},
+                                            dtype=torch.half,
+                                            replace_with_kernel_inject=True)
+            # model = ds_engine.module
+            # output = model('Input String')
 
             with torch.no_grad():
                 for batch in tqdm(dataloader):
                     # emb = self.base_model.model(**batch).last_hidden_state #(bz, ctx, 4096)
                     emb = ds_engine(batch)
-                    
+
                     bz, ctx , _ = emb.shape
                     emb = emb.cpu()
                     # find item != 2, set 1
