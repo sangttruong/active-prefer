@@ -530,8 +530,10 @@ class LLMStrategy:
                     batch_size, dim = emb.shape
                     emb = emb.cpu()
                     breakpoint()
-                    vector_output["chosen"].extend(emb[:batch_size//2].flatten().tolist())
-                    vector_output["rejected"].extend(emb[batch_size//2:].flatten().tolist())
+                    chosen_emb = [np.array(subarray) for subarray in emb[:batch_size//2]]
+                    rejected = [np.array(subarray) for subarray in emb[batch_size//2:]]
+                    vector_output["chosen"].extend(chosen_emb)
+                    vector_output["rejected"].extend(rejected)
 
             # Stack 
             vector_output["chosen"] = np.stack(vector_output["chosen"], axis = 0)
