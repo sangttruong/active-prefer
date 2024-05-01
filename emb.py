@@ -113,8 +113,8 @@ def main():
             "attention_mask_rejected": [],
         }
         for prompt, chosen, rejected in zip(examples["prompt"], examples["chosen"], examples["rejected"]):
-            tokenized_chosen = tokenizer(prompt + chosen, truncation=True)
-            tokenized_rejected = tokenizer(prompt + rejected, truncation=True)
+            tokenized_chosen = tokenizer(prompt + chosen, truncation=True)  # TODO: template
+            tokenized_rejected = tokenizer(prompt + rejected, truncation=True) # TODO: template
 
             new_examples["input_ids_chosen"].append(tokenized_chosen["input_ids"])
             new_examples["attention_mask_chosen"].append(tokenized_chosen["attention_mask"])
