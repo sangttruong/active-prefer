@@ -534,15 +534,15 @@ class LLMStrategy:
                     emb = emb.cpu()
                     # find item != 2, set 1
                     mask = torch.zeros((bz, ctx))
-                    last_token_emb  = ((batch['input_ids'] != 2).sum(-1) - 1).tolist() 
-                    for row, col in enumerate(last_token_emb):
+                    last_token_index  = ((batch['input_ids'] != 2).sum(-1) - 1).tolist() 
+                    for row, col in enumerate(last_token_index):
                         mask[row, col] = 1
                     # Mul
                     emb_mul = emb * mask.unsqueeze(-1)
                     # Sum
-                    last_emb = emb_mul.sum(1)
-                    chosen_emb = [np.array(subarray) for subarray in last_emb[:bz//2]]
-                    rejected = [np.array(subarray) for subarray in last_emb[bz//2:]]
+                    last_token_emb = emb_mul.sum(1)
+                    chosen_emb = [np.array(subarray) for subarray in last_token_emb[:bz//2]]
+                    rejected = [np.array(subarray) for subarray in last_token_emb[bz//2:]]
                     vector_output["chosen"].extend(chosen_emb)
                     vector_output["rejected"].extend(rejected)
 
