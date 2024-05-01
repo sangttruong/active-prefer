@@ -85,12 +85,12 @@ class Oracle(LLMStrategy):
         X1 = np.array(emb_dataset['chosen'])
         X2 = np.array(emb_dataset['rejected'])        
         X = X1 - X2
-        y = np.zeros(len(X))
+        y = np.ones(len(X))
 
         chosen_index = np.random.choice(len(X), size=int(0.5 * len(X)), replace=False)
         for idx in chosen_index:    
             X[idx] = -X[idx]
-            y[idx] = 1
+            y[idx] = 0 # chosen label
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=val_size, random_state=random_state)
 
