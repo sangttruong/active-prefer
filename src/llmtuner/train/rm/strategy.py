@@ -526,13 +526,9 @@ class LLMStrategy:
             }
             with torch.no_grad():
                 for batch in tqdm(dataloader):
-                    emb = self.base_model(**batch) #(bz,1,4096)
-                    breakpoint()
-                    batch_size, ctx, dim = emb[0].shape
-                    emb = emb[0].reshape(batch_size // 2, 2, ctx, dim)
+                    emb = self.base_model(**batch).logits[:, -1, :] #(bz,4096)
+                    batch_size, dim = emb.shape
                     emb = emb.cpu()
-                    # flatten = list(emb)
-                    # predict_results.extend(flatten)
                     vector_output["chosen"].append(emb[:batch_size//2])
                     vector_output["rejected"].append(emb[batch_size//2:])
             
