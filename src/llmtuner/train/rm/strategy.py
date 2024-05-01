@@ -531,7 +531,7 @@ class LLMStrategy:
             # ds_engine, _, _, _ = deepspeed.initialize(self.base_model)
 
             # Initialize the DeepSpeed-Inference engine
-            ds_engine = deepspeed.init_inference(self.base_model)
+            ds_engine = deepspeed.init_inference(self.base_model.model)
 
             with torch.no_grad():
                 for batch in tqdm(dataloader):
