@@ -530,9 +530,13 @@ class LLMStrategy:
                     batch_size, dim = emb.shape
                     emb = emb.cpu()
                     breakpoint()
-                    vector_output["chosen"].extend(emb[:batch_size//2].flatten())
-                    vector_output["rejected"].extend(emb[batch_size//2:].flatten())
-            
+                    vector_output["chosen"].extend(emb[:batch_size//2].flatten().tolist())
+                    vector_output["rejected"].extend(emb[batch_size//2:].flatten().tolist())
+
+            # Stack 
+            vector_output["chosen"] = np.stack(vector_output["chosen"], axis = 0)
+            vector_output["rejected"] = np.stack(vector_output["rejected"], axis = 0)
+
             save_to_pkl(vector_output, f"{filename}.pkl")
             train_df = Dataset.from_dict(vector_output)
 

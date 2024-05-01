@@ -1,4 +1,4 @@
-CUDA_VISIBLE_DEVICES=4 python src/train_bash.py \
+CUDA_VISIBLE_DEVICES=0 python src/train_bash.py \
     --stage oracle \
     --do_train \
     --flash_attn True\
