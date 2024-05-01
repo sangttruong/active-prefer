@@ -538,11 +538,8 @@ class LLMStrategy:
                     last_token_emb  = ((batch['input_ids'] != 2).sum(-1) - 1).tolist() 
                     for row, col in enumerate(last_token_emb):
                         mask[row, col] = 1
-                    # chosen_last_token_emb = last_token_emb[:batch_size//2]
-                    # rejected_last_token_emb = last_token_emb[batch_size//2:]
-
                     # Mul
-                    emb_mul = emb * mask
+                    emb_mul = emb * mask.unsqueeze(-1)
                     # Sum
                     last_emb = emb_mul.sum(1)
                     chosen_emb = [np.array(subarray) for subarray in last_emb[:bz//2]]
