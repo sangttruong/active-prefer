@@ -80,11 +80,11 @@ class Oracle(LLMStrategy):
         pass
     
     def train_oracle(self, emb_dataset, train_ids, v_head_path, model_ith):
-        X1 = emb_dataset['chosen']
-        X1 = emb_dataset['rejected']        
-        Y = 
-        LogisticRegression
-        
+        # X1 = emb_dataset['chosen']
+        # X1 = emb_dataset['rejected']        
+        # Y = 
+        # LogisticRegression
+        pass
 
     def evaluate_oracle(self, model, emb_dataset, test_ids, ith, threshold = 0.5):
         output_dir = self.training_args.output_dir
