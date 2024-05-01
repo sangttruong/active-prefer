@@ -14,6 +14,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 import pickle 
 from datasets import Dataset
 import numpy as np
+import os
 
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
@@ -46,7 +47,7 @@ class ScriptArguments:
 
     use_peft: Optional[bool] = field(default=False, metadata={"help": "Wether to use PEFT or not to train adapters"})
 
-    num_proc: Optional[int] = field(default=8, metadata={"help": "Number of processors used for preprocessing dataset"})
+    num_proc: Optional[int] = field(default=16, metadata={"help": "Number of processors used for preprocessing dataset"})
 
     saving_freq: Optional[int] = field(default=1000, metadata={"help": "Saving frequency of vector dataset"})
     #####################
@@ -66,28 +67,28 @@ def main():
     parser = HfArgumentParser(ScriptArguments)
     script_args, _ = parser.parse_args_into_dataclasses(return_remaining_strings=True)
 
-    # Step 1: Load the model
-    if script_args.load_in_8bit and script_args.load_in_4bit:
-        raise ValueError("You can't load the model in 8 bits and 4 bits at the same time")
-    elif script_args.load_in_8bit or script_args.load_in_4bit:
-        quantization_config = BitsAndBytesConfig(
-            load_in_8bit=script_args.load_in_8bit,
-            load_in_4bit=script_args.load_in_4bit,
-            bnb_4bit_quant_type='nf4',
-            bnb_4bit_compute_dtype=torch.bfloat16,
-            bnb_4bit_use_double_quant=False,
-        )
-        # Copy the model to each device
-        device_map = {"": Accelerator().local_process_index}
-    else:
-        device_map = {"":0}
-        quantization_config = None
+    # # Step 1: Load the model
+    # if script_args.load_in_8bit and script_args.load_in_4bit:
+    #     raise ValueError("You can't load the model in 8 bits and 4 bits at the same time")
+    # elif script_args.load_in_8bit or script_args.load_in_4bit:
+    #     quantization_config = BitsAndBytesConfig(
+    #         load_in_8bit=script_args.load_in_8bit,
+    #         load_in_4bit=script_args.load_in_4bit,
+    #         bnb_4bit_quant_type='nf4',
+    #         bnb_4bit_compute_dtype=torch.bfloat16,
+    #         bnb_4bit_use_double_quant=False,
+    #     )
+    #     # Copy the model to each device
+    #     device_map = {"": Accelerator().local_process_index}
+    # else:
+    #     device_map = {"":0}
+    #     quantization_config = None
 
     model = AutoModelForCausalLM.from_pretrained(
         script_args.model_name,
-        quantization_config=quantization_config,
-        device_map=device_map,
-        trust_remote_code=script_args.trust_remote_code
+        # quantization_config=quantization_config,
+        # device_map=device_map,
+        # trust_remote_code=script_args.trust_remote_code
     )
     model.config.use_cache = False
     model.config.pretraining_tp = 1
@@ -135,49 +136,37 @@ def main():
         and len(x["input_ids_rejected"]) <= script_args.seq_length
     )
 
-    # if script_args.eval_split == "none":
-    #     eval_dataset = None
-    # else:
-    #     eval_dataset = load_dataset(script_args.dataset_name, split=script_args.eval_split)
-
-    #     eval_dataset = eval_dataset.map(
-    #         preprocess_function,
-    #         batched=True,
-    #         num_proc=script_args.num_proc,
-    #     )
-    #     eval_dataset = eval_dataset.filter(
-    #         lambda x: len(x["input_ids_chosen"]) <= script_args.seq_length
-    #         and len(x["input_ids_rejected"]) <= script_args.seq_length
-    #     )    
-
-
-
     vector_output = {
         "chosen": [],
         "rejected": []
     }
     TOTAL_TRAIN = len(train_dataset)
-    print("Processing training set....")
-    for idx, sample in tqdm(enumerate(train_dataset)):
-        input_ids = torch.tensor([sample['input_ids_chosen']], device=model.device)
-        input_mask = torch.tensor([sample['attention_mask_chosen']], device=model.device)
-        with torch.no_grad():
-            embeddings = model.model(input_ids=input_ids,
-                                    attention_mask=input_mask).last_hidden_state[0][-1] # Get last token emb
-        vector_output["chosen"].append(embeddings.cpu().numpy().tolist())
+    
+    if os.path.isfile(f"reward-bench-embedding-train.pkl"):
+        print("Load emb from reward-bench-embedding-train.pkl")
+    else:
+        print("Compute emb....")
+        for idx, sample in tqdm(enumerate(train_dataset)):
+            input_ids = torch.tensor([sample['input_ids_chosen']], device=model.device)
+            input_mask = torch.tensor([sample['attention_mask_chosen']], device=model.device)
+            with torch.no_grad():
+                embeddings = model.model(input_ids=input_ids,
+                                        attention_mask=input_mask).last_hidden_state[0][-1] # Get last token emb
+            vector_output["chosen"].append(embeddings.cpu().numpy().tolist())
 
 
-        input_ids = torch.tensor([sample['input_ids_rejected']], device=model.device)
-        input_mask = torch.tensor([sample['attention_mask_rejected']], device=model.device)
-        with torch.no_grad():
-            embeddings = model.model(input_ids=input_ids,
-                                    attention_mask=input_mask).last_hidden_state[0][-1] # Get last token emb
-        vector_output["rejected"].append(embeddings.cpu().numpy().tolist())
+            input_ids = torch.tensor([sample['input_ids_rejected']], device=model.device)
+            input_mask = torch.tensor([sample['attention_mask_rejected']], device=model.device)
+            with torch.no_grad():
+                embeddings = model.model(input_ids=input_ids,
+                                        attention_mask=input_mask).last_hidden_state[0][-1] # Get last token emb
+            vector_output["rejected"].append(embeddings.cpu().numpy().tolist())
 
-        if (idx + 1) == TOTAL_TRAIN or (idx + 1) % script_args.saving_freq == 0:
-            save_to_pkl(vector_output, "reward-bench-embedding-train.pkl")
+            if (idx + 1) == TOTAL_TRAIN or (idx + 1) % script_args.saving_freq == 0:
+                save_to_pkl(vector_output, "reward-bench-embedding-train.pkl")
 
 
+    print(f"Begin training................")
     train_ds = pickle.load(open("reward-bench-embedding-train.pkl", 'rb'))
     train_df = Dataset.from_dict(train_ds)
     
