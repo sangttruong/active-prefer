@@ -42,6 +42,7 @@ from ..utils import load_valuehead_params
 from accelerate import Accelerator
 from trl import AutoModelForCausalLMWithValueHead
 from datasets import Dataset
+from datasets import load_dataset
 
 
 from safetensors import safe_open
@@ -505,13 +506,14 @@ class LLMStrategy:
         # Predict probabilities using dropout but return individual dropout iterations
         pass
 
-    def get_embedding(self, is_override = False):
+    def get_embedding(self, is_override = False, hf_emb_path = None):
         # Get embeddings from the penultimate layer of the network
-        # filename = f"{self.training_args.output_dir}/last_hidden_states.npy"
-        
         filename = f"{self.training_args.output_dir}/last_hidden_states"
         # Check if the file exists
-        if is_override == False and os.path.isfile(filename):
+
+        if hf_emb_path is not None:
+            train_df = load_dataset(hf_emb_path)
+        if is_override == False and os.path.isfile(f"{filename}.pkl"):
             train_ds = pickle.load(open(f"{filename}.pkl", 'rb'))
             train_df = Dataset.from_dict(train_ds)
             print(f"Loaded data from {filename}")

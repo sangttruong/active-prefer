@@ -1,13 +1,13 @@
-CUDA_VISIBLE_DEVICES=0 python src/train_bash.py \
+CUDA_VISIBLE_DEVICES=2 python src/train_bash.py \
     --stage oracle \
     --do_train \
     --flash_attn True\
-    --model_name_or_path meta-llama/Llama-2-7b-hf \
+    --model_name_or_path meta-llama/Llama-2-13b-hf \
     --dataset_dir data \
     --dataset  reward_bench_train\
     --template default \
     --finetuning_type freeze \
-    --output_dir saves\
+    --output_dir saves/Llama-2-13b-hf \
     --overwrite_output_dir \
     --cutoff_len 1024 \
     --per_device_train_batch_size 2 \
