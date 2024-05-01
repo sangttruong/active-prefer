@@ -536,7 +536,7 @@ class LLMStrategy:
             with torch.no_grad():
                 for batch in tqdm(dataloader):
                     # emb = self.base_model.model(**batch).last_hidden_state #(bz, ctx, 4096)
-                    emb = ds_engine(batch)
+                    emb = ds_engine(**batch)
 
                     bz, ctx , _ = emb.shape
                     emb = emb.cpu()
