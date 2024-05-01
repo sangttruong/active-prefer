@@ -87,15 +87,15 @@ class Oracle(LLMStrategy):
         X = X1 - X2
         y = np.zeros(len(X))
 
-        chosen_index = np.random.choice(len(X), size=int(0.5 * len(X)), replace=False)
-        for idx in chosen_index:
+        chosen_index = np.random.choice(len(X), size=int(0.5 * len(X)), replace=False, random_state=random_state)
+        for idx in chosen_index:    
             X[idx] = -X[idx]
             y[idx] = 1
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=val_size, random_state=random_state)
 
         # Fitting the logistic regression model
-        model = LogisticRegression(random_state=random_state)
+        model = LogisticRegression(random_state=random_state, max_iter=5000)
         model.fit(X_train, y_train)
 
         # Once the model is trained, you can evaluate its performance on the test set
