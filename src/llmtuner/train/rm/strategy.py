@@ -529,6 +529,7 @@ class LLMStrategy:
                     emb = self.base_model(**batch).logits[:, -1, :] #(bz,4096)
                     batch_size, dim = emb.shape
                     emb = emb.cpu()
+                    breakpoint()
                     vector_output["chosen"].extend(emb[:batch_size//2].flatten())
                     vector_output["rejected"].extend(emb[batch_size//2:].flatten())
             

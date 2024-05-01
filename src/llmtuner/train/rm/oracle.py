@@ -11,6 +11,8 @@ import os
 import numpy as np
 from scipy.stats import entropy
 import random
+
+from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
 
@@ -79,93 +81,45 @@ class Oracle(LLMStrategy):
         #     del self.trainer, self.base_model
         pass
     
-    def train_oracle(self, emb_dataset, train_ids, v_head_path, model_ith):
-        # X1 = emb_dataset['chosen']
-        # X1 = emb_dataset['rejected']        
-        # Y = 
-        # LogisticRegression
-        pass
+    def train_oracle(self, emb_dataset, val_size= 0.1, random_state = 0):
+        X1 = np.array(emb_dataset['chosen'])
+        X2 = np.array(emb_dataset['rejected'])        
+        X = X1 - X2
+        y = np.zeros(len(X))
 
-    def evaluate_oracle(self, model, emb_dataset, test_ids, ith, threshold = 0.5):
-        output_dir = self.training_args.output_dir
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=val_size, random_state=random_state)
 
-        print(f"Eval.............")
-        accelerator = Accelerator()
-        device = accelerator.device
+        # Fitting the logistic regression model
+        model = LogisticRegression(random_state=random_state)
+        model.fit(X_train, y_train)
 
-        model = model.to(device)
-        model.eval()
+        # Once the model is trained, you can evaluate its performance on the test set
+        accuracy = model.score(X_test, y_test)
+        print("Accuracy on test set:", accuracy)
 
-        if os.path.exists(os.path.join(output_dir, f"oracle_{ith}.safetensors")):
-            vhead_params = load_file(os.path.join(output_dir, f"oracle_{ith}.safetensors"))
-            model.load_state_dict(vhead_params, strict=False)
-
-        model, emb_dataset = accelerator.prepare(model, emb_dataset)
-
-        predictions = []
-        total_chosens = 0
-        with torch.no_grad():
-            for idx in tqdm(test_ids):   
-                example = emb_dataset[idx]
-                question_id = example['question_id']
-                last_hidden_state_chosen = example['last_hidden_state_chosen'][-1].to(device)
-                
-                chosen_rewards = model(last_hidden_state_chosen)
-
-                probs = F.sigmoid(chosen_rewards)
-                pred = 1 if probs.item() > threshold else 0 
-                total_chosens += pred
-                
-                predictions.append({
-                    "id": question_id,
-                    "prob": probs.item(),
-                    "chosen": pred
-                })
-
-        # Write predictions to a JSON file
-        output_file = f"{output_dir}/prediction_oracle_{ith}.json"
-        with open(output_file, 'w') as f:
-            json.dump(predictions, f)
+        return accuracy
         
-        return total_chosens / len(test_ids)
-
     
-    def train_eval_oracle(self, nEns, is_compute_emb, percentage = 0.9, threshold = 0.5):
+    def train_eval_oracle(self, nEns, is_compute_emb, val_size = 0.1):
         # Train multiple models and return their weights and average parameter updates
-        
         # training data
         emb_dataset = self.get_training_dataset(is_override = is_compute_emb)
         breakpoint()
 
         metrics = []
-        for m in range(nEns):            
-            v_head_path = f"{self.training_args.output_dir}/oracle_{m}.safetensors"
-
-            # emb_dataset_length = len(emb_dataset)
-            # sample_ids = random.sample(range(emb_dataset_length), emb_dataset_length)
-            # train_ids = sample_ids[:int(emb_dataset_length * percentage)]
-            # test_ids = sample_ids[int(emb_dataset_length * percentage):]
-
-            # reinit model    
-            
+        for m in range(nEns):                        
             print(f"Trainig oracle {m}th ...................")
-            loss = self.train_oracle(emb_dataset, v_head_path, m)
-            # 
-            print(f"Eval oracle {m}th ...................")
-            # acc = self.evaluate_oracle(model, emb_dataset, test_ids, m, threshold = threshold)
+            val_acc = self.train_oracle(emb_dataset, m, val_size)
 
-            # metrics.append({
-            #     "model_id": m,
-            #     "loss": loss,
-            #     "Accuracy": acc,
-            #     "model_path": v_head_path,
-            # })
-            # print(metrics)
+            metrics.append({
+                "model_id": m,
+                "Accuracy": val_acc,
+            })
+            print(metrics)
 
         output_file = f"{self.training_args.output_dir}/committees_{nEns}_oracle_model.json"
         with open(output_file, 'w') as json_file:
             json.dump(metrics, json_file, indent=4)
-
 
         plot_oracle_acc(metrics, self.training_args.output_dir)
         print(f"Metrics saved to {output_file}")
