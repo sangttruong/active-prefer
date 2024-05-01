@@ -135,20 +135,20 @@ def main():
         and len(x["input_ids_rejected"]) <= script_args.seq_length
     )
 
-    if script_args.eval_split == "none":
-        eval_dataset = None
-    else:
-        eval_dataset = load_dataset(script_args.dataset_name, split=script_args.eval_split)
+    # if script_args.eval_split == "none":
+    #     eval_dataset = None
+    # else:
+    #     eval_dataset = load_dataset(script_args.dataset_name, split=script_args.eval_split)
 
-        eval_dataset = eval_dataset.map(
-            preprocess_function,
-            batched=True,
-            num_proc=script_args.num_proc,
-        )
-        eval_dataset = eval_dataset.filter(
-            lambda x: len(x["input_ids_chosen"]) <= script_args.seq_length
-            and len(x["input_ids_rejected"]) <= script_args.seq_length
-        )    
+    #     eval_dataset = eval_dataset.map(
+    #         preprocess_function,
+    #         batched=True,
+    #         num_proc=script_args.num_proc,
+    #     )
+    #     eval_dataset = eval_dataset.filter(
+    #         lambda x: len(x["input_ids_chosen"]) <= script_args.seq_length
+    #         and len(x["input_ids_rejected"]) <= script_args.seq_length
+    #     )    
 
 
 
