@@ -156,8 +156,7 @@ class LLMStrategy:
         nearest_multiple = len(self.pool_dataset) // 8 * 8
         self.pool_dataset = self.pool_dataset.select(list(range(nearest_multiple)))
         
-        with deepspeed.zero.Init():
-            self.base_model = load_model(self.tokenizer, model_args, finetuning_args, False, add_valuehead=False)
+        self.base_model = load_model(self.tokenizer, model_args, finetuning_args, False, add_valuehead=False)
         self.data_collator = PairwiseDataCollatorWithPadding(self.tokenizer, pad_to_multiple_of=8)
         self.callbacks = callbacks
 
