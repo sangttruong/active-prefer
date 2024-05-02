@@ -55,7 +55,7 @@ def run_rm(
 
 
     # only train v_head
-    if training_args.do_train and finetuning_args.only_training_vhead:
+    if training_args.do_train:
         for name, param in model.named_parameters():
             if 'v_head' in name:
                 param.requires_grad = True

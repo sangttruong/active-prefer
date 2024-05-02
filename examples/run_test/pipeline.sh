@@ -5,14 +5,13 @@ python pipeline.py \
     --dataset_name reward_bench_train \
     --method max_entropy \
     --num_iters 5\
-    --num_train_epochs 2\
+    --num_train_epochs 1\
     --use_accelerate\
     --flash_attn \
     --percentage 0.1 \
     --type_of_oracle vhead\
     --main_process_port 29510\
-    --gpu_ids 1,3\
-    --is_retrain_oracle\
+    --gpu_ids 0,1\
     --sanity_check 
 
 #### Full

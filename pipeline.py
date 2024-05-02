@@ -470,7 +470,7 @@ def main(args):
                 --fp16
                 """
 
-        run_cli_command(dpo_ft_command) 
+        # run_cli_command(dpo_ft_command) 
         # ------------------------------------------------------------------- 
         # Export DPO finetuned model 
         dpo_full_path = f"{dpo_adapter_path}/full"
@@ -519,7 +519,6 @@ def main(args):
                     --save_steps {args.save_steps} \
                     --learning_rate {args.learning_rate} \
                     --num_train_epochs {args.num_train_epochs} \
-                    --max_samples {args.max_samples} \
                     --plot_loss \
                     --report_to none \
                     --fp16
