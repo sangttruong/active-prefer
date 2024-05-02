@@ -29,7 +29,7 @@ import torch.optim.lr_scheduler as lr_scheduler
 from torch.utils.data import DataLoader
 from torch.nn.utils.rnn import pad_sequence
 
-import deepspeed
+# import deepspeed
 
 
 from safetensors.torch import save_file, load_file

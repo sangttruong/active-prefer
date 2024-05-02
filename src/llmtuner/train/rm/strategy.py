@@ -48,7 +48,9 @@ from datasets import load_dataset
 from safetensors import safe_open
 from safetensors.torch import save_file, load_file
 
-import deepspeed
+# import deepspeed
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
 
 
 if TYPE_CHECKING:
@@ -184,7 +186,7 @@ class LLMStrategy:
         )
 
         # Model
-        self.v_head = ValueHead(self.base_model.config)
+        # self.v_head = ValueHead(self.base_model.config)
 
         self.dataset = self.data_args.dataset
 
@@ -192,183 +194,49 @@ class LLMStrategy:
         # Select instances from the pool for labeling
         pass
 
-    def _train_model(
-        self,
-        train_dataset, 
-        cutoff_len, 
-        pad_token_id, 
-        optimizer_params, 
-        create_scheduler, 
-        num_epochs,
-        model = None,
-        sample_ids = None,
-        seed = 42,
-        save_path=None,  
-    ):
+    def _train_vhead(self, emb_dataset, val_size= 0.1, random_state = 0):
+        X1 = np.array(emb_dataset['chosen'])
+        X2 = np.array(emb_dataset['rejected'])        
+        X = X1 - X2 # chosen - rejected
+        y = np.ones(len(X)) # chosen = 1
 
-        set_seed(seed)  # Set seed for reproducibility   
-        
-        accelerator = Accelerator()
-        device = accelerator.device
+        chosen_index = np.random.choice(len(X), size=int(0.5 * len(X)), replace=False)
+        for idx in chosen_index:    
+            X[idx] = -X[idx]
+            y[idx] = 0 # chosen label
 
-        model = model.to(device) 
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=val_size, random_state=random_state)
 
-        optimizer_params.pop('params', None)     
-        optimizer = torch.optim.AdamW(model.parameters(), **optimizer_params)
-        
-        num_epochs = int(num_epochs)
-        num_training_steps_per_epoch = len(train_dataset) 
-        num_training_steps = num_epochs * num_training_steps_per_epoch
-        if sample_ids is None:
-            sample_ids = list(range(len(train_dataset)))
-        
-        scheduler = create_scheduler(num_training_steps, optimizer = optimizer)
+        # Fitting the logistic regression model
+        model = LogisticRegression(random_state=random_state, max_iter=500)
+        model.fit(X_train, y_train)
 
-        model, optimizer, train_dataset = accelerator.prepare(model, optimizer, train_dataset)
+        # Once the model is trained, you can evaluate its performance on the test set
+        accuracy = model.score(X_test, y_test)
+        print("Accuracy on test set:", accuracy)
 
-        model.train()
-        for epoch in range(num_epochs):
-            epoch_loss = 0.0  # Initialize epoch loss
-            for idx in sample_ids:
-                example = train_dataset[idx]
-                last_hidden_state_chosen = example['last_hidden_state_chosen'].to(device)
-                last_hidden_state_rejected = example['last_hidden_state_rejected'].to(device)
-                chosen_input_ids = example['chosen_ids']
-                rejected_input_ids = example['rejected_ids']
+        # Save the model to a file
+        output_path = f"{self.training_args.output_dir}/vhead_selector.pkl"
+        with open(output_path, 'wb') as f:
+            pickle.dump(model, f)
 
-                optimizer.zero_grad()
-                chosen_rewards = model(last_hidden_state_chosen) # [1024, 1]
-                rejected_rewards = model(last_hidden_state_rejected) # [1024, 1]
+        return accuracy
 
-                # Calculate loss
-                padding_chosen = max(0, cutoff_len - len(chosen_input_ids))
-                padding_rejected = max(0, cutoff_len - len(rejected_input_ids))
-                chosen_input_ids = F.pad(chosen_input_ids, (0, padding_chosen), value = pad_token_id)
-                rejected_input_ids = F.pad(rejected_input_ids, (0, padding_rejected), value = pad_token_id)
+    def train(self, is_compute_emb, val_size = 0.1):
+        emb_dataset = self.get_training_dataset(is_override = is_compute_emb)
 
-                chosen_length = (chosen_input_ids != pad_token_id).nonzero()[-1] + 1
-                rejected_length = (rejected_input_ids != pad_token_id).nonzero()[-1] + 1
-                check_divergence = (chosen_input_ids != rejected_input_ids).nonzero()
+        metrics = []
+        print(f"Trainig selector  ...................")
+        val_acc = self._train_vhead(emb_dataset, val_size)
 
-                if len(check_divergence) == 0:
-                    end_index = chosen_length
-                    div_index = end_index - 1
-                else:
-                    end_index = max(chosen_length, rejected_length)
-                    div_index = check_divergence[0]
+        metrics.append({
+            "Accuracy": val_acc,
+        })
+        print(metrics)
 
-                chosen_trunc_rewards = chosen_rewards[div_index:end_index]
-                rejected_trunc_rewards = rejected_rewards[div_index:end_index]
-                loss = -torch.nn.functional.logsigmoid(chosen_trunc_rewards - rejected_trunc_rewards).mean()
-
-                loss.backward()
-                optimizer.step()
-
-                epoch_loss += loss.item()  # Accumulate the loss
-                
-            # Update the learning rate after each epoch
-            scheduler.step()
-
-            print(f"Epoch {epoch+1}, Loss: {epoch_loss / len(train_dataset)}, Learning Rate: {scheduler.get_last_lr()}")
-        
-        # Save parameters if save_params is provided
-        if save_path:
-            save_file(model.state_dict(), save_path, metadata={"format": "pt"}) # save model
-            print(f"Model saved to {save_path}")
-
-    def train(self, percentage = 0.9, num_epochs = 20):
-        accelerator = Accelerator()
-        device = accelerator.device
-
-        model = self.v_head.to(device) 
-        
-        cutoff_len = self.data_args.cutoff_len
-        pad_token_id = self.tokenizer.pad_token_id
-
-        # training data
-        train_dataset = self.get_training_dataset(is_override = self.finetuning_args.is_compute_emb)
-
-        # training args
-        # num_epochs = int(self.training_args.num_train_epochs)
-        num_training_steps_per_epoch = len(train_dataset) 
-        num_training_steps = num_epochs * num_training_steps_per_epoch
-
-
-        v_head_path = f"{self.training_args.output_dir}/value_head.safetensors"
-
-        # initialize new model and optimizer
-        sample_ids = list(range(int(len(train_dataset) * percentage)))
-
-        # optimizer, scheduler
-        optimizer_params = self.trainer.create_optimizer().param_groups[0]
-        create_scheduler = self.trainer.create_scheduler
-        optimizer_params.pop('params', None)     
-        optimizer = torch.optim.AdamW(model.parameters(), **optimizer_params)
-        # scheduler = create_scheduler(num_training_steps, optimizer = optimizer)
-
-        model, optimizer, train_dataset = accelerator.prepare(model, optimizer, train_dataset)
-        model.train()
-            
-        # Traing loop
-        for epoch in range(num_epochs):
-            epoch_loss = 0.0  # Initialize epoch loss
-            for idx in tqdm(sample_ids):
-                example = train_dataset[idx]
-                last_hidden_state_chosen = example['last_hidden_state_chosen'].to(device)
-                last_hidden_state_rejected = example['last_hidden_state_rejected'].to(device)
-                chosen_input_ids = example['chosen_ids']
-                rejected_input_ids = example['rejected_ids']
-
-                optimizer.zero_grad()
-                chosen_rewards = model(last_hidden_state_chosen) # [1024, 1]
-                rejected_rewards = model(last_hidden_state_rejected) # [1024, 1]
-
-                # Calculate loss
-                padding_chosen = max(0, cutoff_len - len(chosen_input_ids))
-                padding_rejected = max(0, cutoff_len - len(rejected_input_ids))
-                chosen_input_ids = F.pad(chosen_input_ids, (0, padding_chosen), value = pad_token_id)
-                rejected_input_ids = F.pad(rejected_input_ids, (0, padding_rejected), value = pad_token_id)
-
-                chosen_non_zero_indices = (chosen_input_ids != pad_token_id).nonzero()
-                rejected_non_zero_indices = (rejected_input_ids != pad_token_id).nonzero()
-
-                if chosen_non_zero_indices.numel() > 0 :
-                    chosen_length = chosen_non_zero_indices[-1] + 1
-                else:
-                    chosen_length = 0
-
-                if rejected_non_zero_indices.numel() > 0:
-                    rejected_length = rejected_non_zero_indices[-1] + 1
-                else:
-                    rejected_length = 0
-
-                check_divergence = (chosen_input_ids != rejected_input_ids).nonzero()
-
-                if len(check_divergence) == 0:
-                    end_index = chosen_length
-                    div_index = end_index - 1
-                else:
-                    end_index = max(chosen_length, rejected_length)
-                    div_index = check_divergence[0]
-
-                chosen_trunc_rewards = chosen_rewards[div_index:end_index]
-                rejected_trunc_rewards = rejected_rewards[div_index:end_index]
-                loss = -torch.nn.functional.logsigmoid(chosen_trunc_rewards - rejected_trunc_rewards).mean()
-
-                loss.backward()
-                optimizer.step()
-
-                epoch_loss += loss.item()  # Accumulate the loss
-
-
-            # Update the learning rate after each epoch
-            # scheduler.step()
-
-            print(f"Epoch {epoch+1}, Loss: {epoch_loss / len(train_dataset)}")
-        
-        # Save model
-        save_file(model.state_dict(), v_head_path, metadata={"format": "pt"}) # save model
-        print(f"Model saved to {v_head_path}")
+        output_file = f"{self.training_args.output_dir}/seletor_model.json"
+        with open(output_file, 'w') as json_file:
+            json.dump(metrics, json_file, indent=4)
 
     
     def getNet(self, params):
@@ -434,35 +302,36 @@ class LLMStrategy:
     
         return predictions
 
-    def predict_prob(self):
+    def predict_prob(self, model):
         # Predict probabilities for given data
-        accelerator = Accelerator()
-        device = accelerator.device
+        emb_dataset = self.get_training_dataset(True)
+
+        chosen_emb = np.array(emb_dataset['chosen'])
+        rejected_emb = np.array(emb_dataset['rejected'])
+
+        breakpoint()
         
-        train_dataset = self.get_embedding(self.finetuning_args.is_compute_emb) 
+        chosen_scores = model.predict_proba(chosen_emb) # [n_samples, n_classes]
+        rejected_scores = model.predict_proba(rejected_emb) # [n_samples, n_classes]
+        
+        # Get max values along axis -1 for chosen and rejected scores
+        max_chosen_scores = np.max(chosen_scores, axis=-1)
+        max_rejected_scores = np.max(rejected_scores, axis=-1)
 
-        self.v_head.to(device)
-        self.v_head.eval()
-        predictions = []
-        with torch.no_grad():
-            for idx in tqdm(range(len(train_dataset))):
-                last_hidden_state_chosen = torch.tensor(train_dataset['chosen'][idx]).to(device)
-                last_hidden_state_rejected = torch.tensor(train_dataset['rejected'][idx]).to(device)
+        # Concatenate max values of chosen and rejected scores
+        max_scores_concat = np.concatenate((max_chosen_scores, max_rejected_scores), axis=-1)
 
-                chosen_rewards = self.v_head(last_hidden_state_chosen)
-                rejected_rewards = self.v_head(last_hidden_state_rejected) 
-                rewards_concat = torch.tensor([chosen_rewards, rejected_rewards], device=device)
-                
-                probs = F.softmax(rewards_concat, dim=0)
-                
-                pred = {"question_id": train_dataset['question_id'][idx],
-                        "chosen_rewards": probs[0].item(),  
-                        "rejected_rewards": probs[1].item() 
-                }
+        # Compute softmax over concatenated max scores
+        softmax_scores = F.softmax(torch.tensor(max_scores_concat), dim=0).numpy()
 
-                predictions.append(pred)
-    
-        return predictions
+
+        # Assuming you want to keep chosen and rejected probabilities separate
+        pred = {
+            "question_id": emb_dataset['question_id'],
+            "chosen_rewards": softmax_scores[:, 0],
+            "rejected_rewards": softmax_scores[:, 1],
+        }
+        return pred
         
     def predict_prob_dropout(self, n_drop):
         # Predict probabilities using dropout for uncertainty estimation
