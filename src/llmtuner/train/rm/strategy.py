@@ -152,6 +152,9 @@ class LLMStrategy:
         self.finetuning_args = finetuning_args
 
         self.tokenizer = load_tokenizer(model_args)
+        if "mistral" in self.model_args.model_name_or_path.lower():  
+            self.tokenizer.padding_side  = 'left'
+
         self.pool_dataset = get_dataset(self.tokenizer, model_args, data_args, training_args, stage="rm")
         nearest_multiple = len(self.pool_dataset) // 8 * 8
         self.pool_dataset = self.pool_dataset.select(list(range(nearest_multiple)))
