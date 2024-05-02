@@ -1,9 +1,9 @@
-CUDA_VISIBLE_DEVICES=6,7 accelerate launch \
+CUDA_VISIBLE_DEVICES=0,1 accelerate launch \
     --config_file examples/accelerate/single_config.yaml \
     src/train_bash.py \
     --stage sft \
     --do_predict \
-    --model_name_or_path meta-llama/Llama-2-7b-hf \
+    --model_name_or_path saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy/dpo/full \
     --dataset reward_bench_train_Llama-2-7b-hf_max_entropy_check \
     --dataset_dir data \
     --template default \

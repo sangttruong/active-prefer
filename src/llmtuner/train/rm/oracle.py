@@ -40,7 +40,7 @@ from collections import Counter
 import json
 
 
-def plot_oracle_acc(metrics, output_dir):
+def plot_oracle_acc(metrics, output_dir, model_name):
     # Extract accuracy values from the metrics
     accuracies = [metric["Accuracy"] for metric in metrics]
 
@@ -54,7 +54,7 @@ def plot_oracle_acc(metrics, output_dir):
     plt.axvline(x=mean_accuracy, color='red', linestyle='--', label=f'Mean: {mean_accuracy:.2f}')
     plt.xlabel('Accuracy')
     plt.ylabel('Frequency')
-    plt.title('Distribution of Model Accuracies')
+    plt.title(f'Distribution Accuracy of {model_name}')
     plt.legend()
     plt.grid(True)
 
@@ -147,7 +147,7 @@ class Oracle(LLMStrategy):
         with open(output_file, 'w') as json_file:
             json.dump(metrics, json_file, indent=4)
 
-        plot_oracle_acc(metrics, self.training_args.output_dir)
+        plot_oracle_acc(metrics, self.training_args.output_dir, self.model_args)
         print(f"Metrics saved to {output_file}")
 
 
