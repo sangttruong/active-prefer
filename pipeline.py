@@ -470,7 +470,7 @@ def main(args):
                 --fp16
                 """
 
-        run_cli_command(dpo_ft_command) 
+        # run_cli_command(dpo_ft_command) 
         # ------------------------------------------------------------------- 
         # Export DPO finetuned model 
         dpo_full_path = f"{dpo_adapter_path}/full"
@@ -487,7 +487,7 @@ def main(args):
         
         # Export model
         print(f"Merge LoRA.............")
-        run_cli_command(export_command) 
+        # run_cli_command(export_command) 
         # ==================================================================
         
         ##########################################################
@@ -524,7 +524,7 @@ def main(args):
                     --fp16
                     """
 
-            run_cli_command(rm_ft_command) 
+            # run_cli_command(rm_ft_command) 
         elif args.method in ['qbc']:
             print("Updatse commitees")
         # ----------------------------------------------------------------
