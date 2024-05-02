@@ -439,8 +439,7 @@ class LLMStrategy:
         accelerator = Accelerator()
         device = accelerator.device
         
-        train_dataset = self.get_embedding(False)
-        # train_dataset = CustomDataset(last_hidden_states, self.pool_dataset, is_load) 
+        train_dataset = self.get_embedding(False) # 
 
         self.v_head.to(device)
         self.v_head.eval()

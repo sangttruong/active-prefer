@@ -604,7 +604,7 @@ def main(args):
                 --fp16
             """
 
-            run_cli_command(generate_text_command)
+            # run_cli_command(generate_text_command)
             jsonl_to_json(f"{dpo_full_path}/generated_predictions.jsonl", f"{args.dataset_dir}/generated_predictions_{testset}.json")
             
         # Add new dataset info to datset_info.json to run predict reward model
@@ -646,9 +646,7 @@ def main(args):
                 save_eval_metric(save_eval_metric_path, accuracy, iter)
 
             else:
-                inference_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port} \
-                    --config_file examples/accelerate/single_config.yaml \
-                    src/train_bash.py \
+                inference_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
                     --stage oracle \
                     --do_eval \
                     --flash_attn {args.flash_attn}\
