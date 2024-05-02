@@ -487,7 +487,7 @@ def main(args):
         
         # Export model
         print(f"Merge LoRA.............")
-        run_cli_command(export_command) 
+        # run_cli_command(export_command) 
         # ==================================================================
         
         ##########################################################
