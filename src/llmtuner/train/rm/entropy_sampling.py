@@ -28,7 +28,7 @@ class EntropySampling(LLMStrategy):
 
     def query(self, n=100, iteration = 0):
         if iteration != 0:
-            print(f"Update comitees ..................")
+            print(f"Update Selector ..................")
             if os.path.exists(os.path.join(self.training_args.output_dir, f"value_head.safetensors")):
                 v_head_path = f"{self.training_args.output_dir}/value_head.safetensors"
                 print(f"Load weight from {v_head_path}")
