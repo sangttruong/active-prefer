@@ -535,7 +535,7 @@ class LLMStrategy:
             # ds_engine = deepspeed.init_inference(self.base_model.model)
 
             with torch.no_grad():
-                for idx, batch in tqdm(enumerate(dataloader)):
+                for batch in tqdm(dataloader):
                     emb = self.base_model.model(**batch).last_hidden_state # (bz, ctx, 4096)
                     # emb = ds_engine(**batch)
 
