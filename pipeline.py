@@ -345,7 +345,9 @@ def main(args):
         print(f"Training Oracle model ............................")
         run_cli_command(ft_oracle_command)
     else:
-        ft_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
+        ft_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port}\
+            --config_file examples/accelerate/single_config.yaml \
+            src/train_bash.py\
             --stage oracle \
             --do_train \
             --flash_attn {args.flash_attn}\
@@ -357,15 +359,7 @@ def main(args):
             --finetuning_type freeze\
             --overwrite_output_dir \
             --cutoff_len {args.cutoff_len} \
-            --per_device_train_batch_size {args.per_device_train_batch_size} \
-            --gradient_accumulation_steps {args.gradient_accumulation_steps} \
-            --lr_scheduler_type {args.lr_scheduler_type} \
-            --logging_steps {args.logging_steps} \
-            --warmup_steps {args.warmup_steps} \
-            --save_steps {args.save_steps} \
-            --learning_rate {args.learning_rate} \
-            --num_train_epochs {5*args.num_train_epochs}\
-            --max_samples {args.max_samples} \
+            --per_device_eval_batch_size {args.per_device_eval_batch_size} \
             --is_compute_emb {args.is_retrain_oracle}\
             --plot_loss \
             --fp16
