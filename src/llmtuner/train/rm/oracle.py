@@ -84,7 +84,7 @@ class Oracle(LLMStrategy):
         #     del self.trainer, self.base_model
         pass
     
-    def train_oracle(self, emb_dataset, val_size= 0.1, random_state = 0):
+    def _train_oracle(self, emb_dataset, val_size= 0.1, random_state = 0):
         X1 = np.array(emb_dataset['chosen'])
         X2 = np.array(emb_dataset['rejected'])        
         X = X1 - X2 # chosen - rejected
@@ -135,7 +135,7 @@ class Oracle(LLMStrategy):
         metrics = []
         for m in tqdm(range(nEns)):                        
             print(f"Trainig oracle {m}th ...................")
-            val_acc = self.train_oracle(emb_dataset, val_size, random_state=m)
+            val_acc = self._train_oracle(emb_dataset, val_size, random_state=m)
 
             metrics.append({
                 "model_id": m,
