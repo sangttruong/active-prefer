@@ -216,13 +216,13 @@ class LLMStrategy:
         print("Accuracy on test set:", accuracy)
 
         # Save the model to a file
-        output_path = f"{self.training_args.output_dir}/vhead_selector.pkl"
+        output_path = f"{self.training_args.output_dir}/vhead.pkl"
         with open(output_path, 'wb') as f:
             pickle.dump(model, f)
 
         return accuracy
 
-    def train(self, is_compute_emb, val_size = 0.1):
+    def train(self, is_compute_emb, val_size = 0):
         emb_dataset = self.get_training_dataset(is_override = is_compute_emb)
 
         metrics = []
@@ -234,7 +234,7 @@ class LLMStrategy:
         })
         print(metrics)
 
-        output_file = f"{self.training_args.output_dir}/seletor_model.json"
+        output_file = f"{self.training_args.output_dir}/vhead.json"
         with open(output_file, 'w') as json_file:
             json.dump(metrics, json_file, indent=4)
 
@@ -396,13 +396,9 @@ class LLMStrategy:
                 "rejected": []
             }
 
-            # Initialize the DeepSpeed-Inference engine
-            # ds_engine = deepspeed.init_inference(self.base_model.model)
-
             with torch.no_grad():
                 for batch in tqdm(dataloader):
                     emb = self.base_model.model(**batch).last_hidden_state # (bz, ctx, 4096)
-                    # emb = ds_engine(**batch)
 
                     bz, ctx , _ = emb.shape
                     emb = emb.cpu()
@@ -427,9 +423,6 @@ class LLMStrategy:
             save_to_pkl(vector_output, f"{filename}.pkl")
             train_df = Dataset.from_dict(vector_output)
 
-
-            # Free GPU memory consumed by model parameters
-            # ds_engine.empty_partition_cache()
 
         return train_df
 

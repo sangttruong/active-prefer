@@ -26,11 +26,11 @@ class EntropySampling(LLMStrategy):
         super(EntropySampling, self).__init__(model_args, data_args, training_args, finetuning_args, callbacks)
 
 
-    def query(self, n=100, iteration = 2):
+    def query(self, n=100, iteration = 0):
         if iteration != 0:
             print(f"Load Selector ..................")
-            if os.path.exists(os.path.join(self.training_args.output_dir, f"logistic_regression_model.pkl")):
-                model_path = f"{self.training_args.output_dir}/logistic_regression_model.pkl"
+            if os.path.exists(os.path.join(self.training_args.output_dir, f"vhead.pkl")):
+                model_path = f"{self.training_args.output_dir}/vhead.pkl"
                 print(f"Load weight from {model_path}")
                 with open(model_path, 'rb') as f:
                     model = pickle.load(f)
