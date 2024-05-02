@@ -154,6 +154,7 @@ class LLMStrategy:
         self.tokenizer = load_tokenizer(model_args)
         if "mistral" in self.model_args.model_name_or_path.lower():  
             self.tokenizer.padding_side  = 'left'
+            
 
         self.pool_dataset = get_dataset(self.tokenizer, model_args, data_args, training_args, stage="rm")
         nearest_multiple = len(self.pool_dataset) // 8 * 8
@@ -542,7 +543,7 @@ class LLMStrategy:
                     emb = emb.cpu()
                     # find item != 2, set 1
                     mask = torch.zeros((bz, ctx))
-                    last_token_index  = ((batch['input_ids'] != 2).sum(-1) - 1).tolist() 
+                    last_token_index  = ((batch['input_ids'] != self.tokenizer.pad_token_id).sum(-1) - 1).tolist() 
                     for row, col in enumerate(last_token_index):
                         mask[row, col] = 1
                     # Mul
