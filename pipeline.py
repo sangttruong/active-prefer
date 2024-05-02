@@ -604,7 +604,7 @@ def main(args):
                 --fp16
             """
 
-            run_cli_command(generate_text_command)
+            # run_cli_command(generate_text_command)
             jsonl_to_json(f"{dpo_full_path}/generated_predictions.jsonl", f"{args.dataset_dir}/generated_predictions_{testset}.json")
             
         # Add new dataset info to datset_info.json to run predict reward model
@@ -642,7 +642,7 @@ def main(args):
                     "acc": accuracy 
                 })
                 print("Active accuracy:", active_accuracy)
-                save_eval_metric_path = f"{eval_metric_dir}/active_acc_{iter}.json"
+                save_eval_metric_path = f"{oracle_adapter_path}/active_acc_{iter}.json"
                 save_eval_metric(save_eval_metric_path, accuracy, iter)
             else:
                 inference_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
@@ -657,6 +657,7 @@ def main(args):
                     --output_dir {eval_metric_dir} \
                     --per_device_eval_batch_size {args.per_device_eval_batch_size} \
                     --is_compute_emb True\
+                    --vhead_oracle_path {oracle_adapter_path}\
                     --active_iter {iter}\
                     --fp16\
                     --report_to none
@@ -669,13 +670,13 @@ def main(args):
         
     print("DONE!!!")
 
-    if not os.path.exists(eval_metric_dir):
-        os.makedirs(eval_metric_dir)
+    # if not os.path.exists(eval_metric_dir):
+    #     os.makedirs(eval_metric_dir)
 
-    json_filename = os.path.join(eval_metric_dir, "active_accuracy.json")
-    with open(json_filename, 'w') as json_file:
-        json.dump(active_accuracy, json_file)
-    print(f"Results saved to {json_filename}")
+    # json_filename = os.path.join(eval_metric_dir, "active_accuracy.json")
+    # with open(json_filename, 'w') as json_file:
+    #     json.dump(active_accuracy, json_file)
+    # print(f"Results saved to {json_filename}")
     
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Iterative training and evaluation script")

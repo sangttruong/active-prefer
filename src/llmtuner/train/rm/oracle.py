@@ -114,7 +114,7 @@ class Oracle(LLMStrategy):
         
     def _eval(self, emb_testset):
         # Load the model from a file
-        model_path = f"{self.training_args.output_dir}/logistic_regression_model.pkl"
+        model_path = f"{self.finetuning_args.vhead_oracle_path}/logistic_regression_model.pkl"
         with open(model_path, 'rb') as f:
             model = pickle.load(f)
     
