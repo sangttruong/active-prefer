@@ -439,7 +439,7 @@ class LLMStrategy:
         accelerator = Accelerator()
         device = accelerator.device
         
-        train_dataset = self.get_embedding(False) # 
+        train_dataset = self.get_embedding(self.finetuning_args.is_compute_emb) 
 
         self.v_head.to(device)
         self.v_head.eval()

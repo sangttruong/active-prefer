@@ -644,7 +644,6 @@ def main(args):
                 print("Active accuracy:", active_accuracy)
                 save_eval_metric_path = f"{eval_metric_dir}/active_acc_{iter}.json"
                 save_eval_metric(save_eval_metric_path, accuracy, iter)
-
             else:
                 inference_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
                     --stage oracle \
@@ -657,7 +656,7 @@ def main(args):
                     --template {args.template} \
                     --output_dir {eval_metric_dir} \
                     --per_device_eval_batch_size {args.per_device_eval_batch_size} \
-                    --is_compute_emb False\
+                    --is_compute_emb True\
                     --fp16\
                     --report_to none
                     """
