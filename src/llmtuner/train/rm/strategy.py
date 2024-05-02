@@ -436,7 +436,6 @@ class LLMStrategy:
         device = accelerator.device
         
         train_dataset = self.get_embedding(True)
-        breakpoint()
         # train_dataset = CustomDataset(last_hidden_states, self.pool_dataset, is_load) 
 
         self.v_head.to(device)
@@ -446,9 +445,6 @@ class LLMStrategy:
             for idx in tqdm(range(len(train_dataset))):
                 last_hidden_state_chosen = torch.tensor(train_dataset['chosen'][idx]).to(device)
                 last_hidden_state_rejected = torch.tensor(train_dataset['rejected'][idx]).to(device)
-
-                # last_hidden_state_chosen = example['last_hidden_state_chosen'][-1].to(device)
-                # last_hidden_state_rejected = example['last_hidden_state_rejected'][-1].to(device)
 
                 chosen_rewards = self.v_head(last_hidden_state_chosen)
                 rejected_rewards = self.v_head(last_hidden_state_rejected) 
