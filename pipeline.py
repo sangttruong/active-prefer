@@ -361,6 +361,7 @@ def main(args):
             --cutoff_len {args.cutoff_len} \
             --per_device_eval_batch_size {args.per_device_eval_batch_size} \
             --is_compute_emb {args.is_retrain_oracle}\
+            --num_oracle 1\
             --plot_loss \
             --fp16
             """
@@ -375,7 +376,7 @@ def main(args):
         #### SELECTION
         ##########################################################
         print(f"Selection ........................")
-        if args.method in ['max_entropy', "random"]:
+        if args.method in ['max_entropy', "random", "least_conf"]:
             selection_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
                 --stage selection \
                 --do_predict \
@@ -404,7 +405,7 @@ def main(args):
                 --num_sample_selected {num_sample_selected}
             """
             run_cli_command(selection_command) 
-        elif args.method in ['qbc']:
+        elif args.method in ['qbc', 'bald']:
             selection_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
                 --stage selection \
                 --do_predict \

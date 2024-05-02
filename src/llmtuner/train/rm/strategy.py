@@ -430,23 +430,24 @@ class LLMStrategy:
     
         return predictions
 
-    def predict_prob(self, question_ids = None):
+    def predict_prob(self):
         # Predict probabilities for given data
         accelerator = Accelerator()
         device = accelerator.device
         
-        last_hidden_states, is_load = self.get_embedding(True)
-        train_dataset = CustomDataset(last_hidden_states, self.pool_dataset, is_load) 
+        train_dataset = self.get_embedding(False)
+        # train_dataset = CustomDataset(last_hidden_states, self.pool_dataset, is_load) 
 
         self.v_head.to(device)
         self.v_head.eval()
         predictions = []
         with torch.no_grad():
             for idx in tqdm(range(len(train_dataset))):
-                example = train_dataset[idx]
+                last_hidden_state_chosen = torch.tensor(train_dataset['chosen'][idx]).to(device)
+                last_hidden_state_rejected = torch.tensor(train_dataset['rejected'][idx]).to(device)
 
-                last_hidden_state_chosen = example['last_hidden_state_chosen'][-1].to(device)
-                last_hidden_state_rejected = example['last_hidden_state_rejected'][-1].to(device)
+                # last_hidden_state_chosen = example['last_hidden_state_chosen'][-1].to(device)
+                # last_hidden_state_rejected = example['last_hidden_state_rejected'][-1].to(device)
 
                 chosen_rewards = self.v_head(last_hidden_state_chosen)
                 rejected_rewards = self.v_head(last_hidden_state_rejected) 
@@ -454,7 +455,7 @@ class LLMStrategy:
                 
                 probs = F.softmax(rewards_concat, dim=0)
                 
-                pred = {"question_id": example['question_id'],
+                pred = {"question_id": train_dataset['question_id'][idx],
                         "chosen_rewards": probs[0].item(),  
                         "rejected_rewards": probs[1].item() 
                 }
@@ -524,6 +525,7 @@ class LLMStrategy:
             print("Begin complute emb..........")
             dataloader = self.trainer.get_test_dataloader(self.pool_dataset)
             vector_output = {
+                "question_id": self.pool_dataset['id'],
                 "chosen": [],
                 "rejected": []
             }
@@ -532,7 +534,7 @@ class LLMStrategy:
             # ds_engine = deepspeed.init_inference(self.base_model.model)
 
             with torch.no_grad():
-                for batch in tqdm(dataloader):
+                for idx, batch in tqdm(enumerate(dataloader)):
                     emb = self.base_model.model(**batch).last_hidden_state # (bz, ctx, 4096)
                     # emb = ds_engine(**batch)
 
@@ -551,7 +553,7 @@ class LLMStrategy:
                     rejected = [np.array(subarray) for subarray in last_token_emb[bz//2:]]
                     vector_output["chosen"].extend(chosen_emb)
                     vector_output["rejected"].extend(rejected)
-
+                    
             # Stack 
             vector_output["chosen"] = np.stack(vector_output["chosen"], axis = 0)
             vector_output["rejected"] = np.stack(vector_output["rejected"], axis = 0)

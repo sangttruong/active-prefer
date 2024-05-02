@@ -27,12 +27,13 @@ class EntropySampling(LLMStrategy):
 
 
     def query(self, n=100, iteration = 0):
-        print(f"Update comitees ..................")
-        if os.path.exists(os.path.join(self.training_args.output_dir, f"value_head.safetensors")):
-            v_head_path = f"{self.training_args.output_dir}/value_head.safetensors"
-            print(f"Load weight from {v_head_path}")
-            vhead_params = load_file(v_head_path)
-            self.v_head.load_state_dict(vhead_params, strict=False)
+        if iteration != 0:
+            print(f"Update comitees ..................")
+            if os.path.exists(os.path.join(self.training_args.output_dir, f"value_head.safetensors")):
+                v_head_path = f"{self.training_args.output_dir}/value_head.safetensors"
+                print(f"Load weight from {v_head_path}")
+                vhead_params = load_file(v_head_path)
+                self.v_head.load_state_dict(vhead_params, strict=False)
 
         # Get predictions
         print(f"Query ..................")
