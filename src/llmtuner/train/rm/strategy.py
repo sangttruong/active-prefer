@@ -304,7 +304,7 @@ class LLMStrategy:
 
     def predict_prob(self, model):
         # Predict probabilities for given data
-        emb_dataset = self.get_training_dataset(True)
+        emb_dataset = self.get_training_dataset(False)
 
         chosen_emb = np.array(emb_dataset['chosen'])
         rejected_emb = np.array(emb_dataset['rejected'])
