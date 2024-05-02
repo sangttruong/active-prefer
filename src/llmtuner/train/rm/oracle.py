@@ -170,7 +170,6 @@ class Oracle(LLMStrategy):
         with open(output_file, 'w') as json_file:
             json.dump(metrics, json_file, indent=4)
 
-        plot_oracle_acc(metrics, self.training_args.output_dir)
         print(f"Metrics saved to {output_file}")
         
              
