@@ -311,19 +311,18 @@ class LLMStrategy:
 
         breakpoint()
         
-        chosen_scores = model.predict_proba(chosen_emb) # [n_samples, n_classes]
-        rejected_scores = model.predict_proba(rejected_emb) # [n_samples, n_classes]
+        chosen_scores_prob = model.predict_log_proba(chosen_emb) # [n_samples, n_classes]
+        rejected_scores_prob = model.predict_log_proba(rejected_emb) # [n_samples, n_classes]
         
         # Get max values along axis -1 for chosen and rejected scores
-        max_chosen_scores = np.max(chosen_scores, axis=-1)
-        max_rejected_scores = np.max(rejected_scores, axis=-1)
+        chosen_scores = chosen_scores_prob[:, 1]
+        rejected_scores = rejected_scores_prob[:, 0]
 
         # Concatenate max values of chosen and rejected scores
-        max_scores_concat = np.concatenate((max_chosen_scores, max_rejected_scores), axis=-1)
+        max_scores_concat = np.concatenate((chosen_scores, rejected_scores), axis=-1)
 
         # Compute softmax over concatenated max scores
         softmax_scores = F.softmax(torch.tensor(max_scores_concat), dim=0).numpy()
-
 
         # Assuming you want to keep chosen and rejected probabilities separate
         pred = {
