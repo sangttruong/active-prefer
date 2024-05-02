@@ -11,7 +11,7 @@ import os
 import numpy as np
 from scipy.stats import entropy
 from tqdm import tqdm
-from safetensors.torch import save_file, load_file
+import pickle
 
 
 class EntropySampling(LLMStrategy):
@@ -28,16 +28,16 @@ class EntropySampling(LLMStrategy):
 
     def query(self, n=100, iteration = 0):
         if iteration != 0:
-            print(f"Update Selector ..................")
-            if os.path.exists(os.path.join(self.training_args.output_dir, f"value_head.safetensors")):
-                v_head_path = f"{self.training_args.output_dir}/value_head.safetensors"
-                print(f"Load weight from {v_head_path}")
-                vhead_params = load_file(v_head_path)
-                self.v_head.load_state_dict(vhead_params, strict=False)
+            print(f"Load Selector ..................")
+            if os.path.exists(os.path.join(self.training_args.output_dir, f"logistic_regression_model.pkl")):
+                model_path = f"{self.training_args.output_dir}/logistic_regression_model.pkl"
+                print(f"Load weight from {model_path}")
+                with open(model_path, 'rb') as f:
+                    model = pickle.load(f)
 
         # Get predictions
         print(f"Query ..................")
-        predictions = self.predict_prob()  # list of predictions
+        predictions = self.predict_prob(model)  # list of predictions
 
         # Calculate entropy for each question
         scores_vals = {}
