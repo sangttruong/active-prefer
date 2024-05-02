@@ -1,5 +1,5 @@
 #  meta-llama/Llama-2-7b-hf
-CUDA_VISIBLE_DEVICES=2,3 python src/train_bash.py\
+CUDA_VISIBLE_DEVICES=2 python src/train_bash.py\
     --stage oracle \
     --do_train \
     --flash_attn True\
@@ -15,8 +15,60 @@ CUDA_VISIBLE_DEVICES=2,3 python src/train_bash.py\
     --is_compute_emb True\
     --num_oracle 10
 
+#  meta-llama/Llama-2-7b-chat-hf
+CUDA_VISIBLE_DEVICES=2 python src/train_bash.py\
+    --stage oracle \
+    --do_train \
+    --flash_attn True\
+    --model_name_or_path meta-llama/Llama-2-7b-chat-hf \
+    --dataset_dir data \
+    --dataset  reward_bench_train\
+    --template default \
+    --finetuning_type freeze \
+    --output_dir saves/Llama-2-7b-chat-hf \
+    --overwrite_output_dir \
+    --cutoff_len 1024 \
+    --per_device_eval_batch_size 2 \
+    --is_compute_emb True\
+    --num_oracle 10
+
+
+#  meta-llama/Meta-Llama-3-8B
+CUDA_VISIBLE_DEVICES=2 python src/train_bash.py\
+    --stage oracle \
+    --do_train \
+    --flash_attn True\
+    --model_name_or_path meta-llama/Meta-Llama-3-8B \
+    --dataset_dir data \
+    --dataset  reward_bench_train\
+    --template default \
+    --finetuning_type freeze \
+    --output_dir saves/Meta-Llama-3-8B \
+    --overwrite_output_dir \
+    --cutoff_len 1024 \
+    --per_device_eval_batch_size 2 \
+    --is_compute_emb True\
+    --num_oracle 10
+
+#  meta-llama/Meta-Llama-3-8B-Instruct
+CUDA_VISIBLE_DEVICES=0 python src/train_bash.py\
+    --stage oracle \
+    --do_train \
+    --flash_attn True\
+    --model_name_or_path meta-llama/Meta-Llama-3-8B-Instruct \
+    --dataset_dir data \
+    --dataset  reward_bench_train\
+    --template default \
+    --finetuning_type freeze \
+    --output_dir saves/Meta-Llama-3-8B-Instruct \
+    --overwrite_output_dir \
+    --cutoff_len 1024 \
+    --per_device_eval_batch_size 2 \
+    --is_compute_emb True\
+    --num_oracle 10
+
 #  meta-llama/Llama-2-13b-hf
-CUDA_VISIBLE_DEVICES=2,3 python src/train_bash.py\
+CUDA_VISIBLE_DEVICES=2 python src/train_bash.py\
     --stage oracle \
     --do_train \
     --flash_attn True\
@@ -29,8 +81,27 @@ CUDA_VISIBLE_DEVICES=2,3 python src/train_bash.py\
     --overwrite_output_dir \
     --cutoff_len 1024 \
     --per_device_eval_batch_size 2 \
+    --is_compute_emb False\
+    --num_oracle 10
+
+#  meta-llama/Llama-2-13b-chat-hf
+CUDA_VISIBLE_DEVICES=2 python src/train_bash.py\
+    --stage oracle \
+    --do_train \
+    --flash_attn True\
+    --model_name_or_path meta-llama/Llama-2-13b-chat-hf \
+    --dataset_dir data \
+    --dataset  reward_bench_train\
+    --template default \
+    --finetuning_type freeze \
+    --output_dir saves/Llama-2-13b-chat-hf \
+    --overwrite_output_dir \
+    --cutoff_len 1024 \
+    --per_device_eval_batch_size 2 \
     --is_compute_emb True\
     --num_oracle 10
+
+
 
 # mistralai/Mistral-7B-v0.1
 CUDA_VISIBLE_DEVICES=3 python src/train_bash.py\
@@ -43,6 +114,41 @@ CUDA_VISIBLE_DEVICES=3 python src/train_bash.py\
     --template default \
     --finetuning_type freeze \
     --output_dir saves/Mistral-7B-v0.1 \
+    --overwrite_output_dir \
+    --cutoff_len 1024 \
+    --per_device_eval_batch_size 2 \
+    --is_compute_emb True\
+    --num_oracle 10
+
+# mistralai/Mistral-7B-Instruct-v0.2
+CUDA_VISIBLE_DEVICES=0 python src/train_bash.py\
+    --stage oracle \
+    --do_train \
+    --flash_attn True\
+    --model_name_or_path mistralai/Mistral-7B-Instruct-v0.2 \
+    --dataset_dir data \
+    --dataset  reward_bench_train\
+    --template default \
+    --finetuning_type freeze \
+    --output_dir saves/Mistral-7B-Instruct-v0.2 \
+    --overwrite_output_dir \
+    --cutoff_len 1024 \
+    --per_device_eval_batch_size 2 \
+    --is_compute_emb True\
+    --num_oracle 10
+
+
+# google/gemma-7b
+CUDA_VISIBLE_DEVICES=2 python src/train_bash.py\
+    --stage oracle \
+    --do_train \
+    --flash_attn True\
+    --model_name_or_path google/gemma-7b \
+    --dataset_dir data \
+    --dataset  reward_bench_train\
+    --template default \
+    --finetuning_type freeze \
+    --output_dir saves/gemma-7b \
     --overwrite_output_dir \
     --cutoff_len 1024 \
     --per_device_eval_batch_size 2 \

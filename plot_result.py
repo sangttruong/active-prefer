@@ -70,4 +70,46 @@ def plot_oracle_acc():
     print(f"Variance of Accuracy: {variance_accuracy:.2f}")
 
 
-plot_oracle_acc()
+
+
+def plot_model_performance(model_dict):
+    # Extract model names and accuracies
+    models = list(model_dict.keys())
+    scores = list(model_dict.values())
+
+    # Plot
+    plt.figure(figsize=(10, 6))
+    bars = plt.bar(models, scores, color='skyblue', width=0.5)  # Adjust width here
+    plt.bar(models, scores, color='skyblue')
+    plt.xlabel('Models')
+    plt.ylabel('Scores')
+    plt.title('Model Performance')
+    plt.xticks(rotation=45, ha='right')
+    # Set y-axis limit to 1
+    plt.ylim(0.5, 1)
+
+    # Annotate each bar with its accuracy score
+    for bar, score in zip(bars, scores):
+        plt.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.01, f'{score:.2f}', ha='center', va='bottom')
+
+    plt.tight_layout()
+    plt.savefig(f"images/oracle_acc.png")
+    plt.show()
+
+def main():
+    model_data = {
+        "mistralai/Mistral-7B-v0.1": 0.66,
+        "mistralai/Mistral-7B-Instruct-v0.2": 0.64,
+        "google/gemma-7b": 0.74,
+        "google/gemma-7b-it": 0.77,
+        "meta-llama/Llama-2-7b-hf": 0.8,
+        "meta-llama/Llama-2-7b-chat-hf": 0.83,
+        "meta-llama/Llama-2-13b-hf": 0.84,
+        "meta-llama/Llama-2-13b-chat-hf": 0.86
+    }
+
+    # Plot model performance
+    plot_model_performance(model_data)
+
+if __name__ == "__main__":
+    main()
