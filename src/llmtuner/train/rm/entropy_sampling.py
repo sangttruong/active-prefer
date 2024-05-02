@@ -26,7 +26,7 @@ class EntropySampling(LLMStrategy):
         super(EntropySampling, self).__init__(model_args, data_args, training_args, finetuning_args, callbacks)
 
 
-    def query(self, n=100, iteration = 0):
+    def query(self, n=100, iteration = 2):
         if iteration != 0:
             print(f"Load Selector ..................")
             if os.path.exists(os.path.join(self.training_args.output_dir, f"logistic_regression_model.pkl")):
