@@ -346,7 +346,7 @@ def main(args):
         run_cli_command(ft_oracle_command)
     else:
         ft_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py \
-            --stage rm  \
+            --stage oracle \
             --do_train \
             --flash_attn {args.flash_attn}\
             --model_name_or_path {args.model_name_or_path}\
@@ -637,43 +637,47 @@ def main(args):
                 --per_device_eval_batch_size {args.per_device_eval_batch_size} \
                 --fp16
                 """
+
+                print(f"Inference Oracle model ............................")
+                run_cli_command(inference_oracle_command)
+                # delete_item_dataset_info(args.data_info_path, dataset_name_generated) # clean dataset_info
+                # -------------------------
+                # Get accuracy        
+                accuracy = calculate_accuracy(f"{predict_rw_score_path}/generated_predictions.jsonl")
+                
+                active_accuracy.append({
+                    "iter": iter,
+                    "acc": accuracy 
+                })
+                print("Active accuracy:", active_accuracy)
+                save_eval_metric_path = f"{eval_metric_dir}/active_acc_{iter}.json"
+                save_eval_metric(save_eval_metric_path, accuracy, iter)
+
             else:
                 inference_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port} \
                     --config_file examples/accelerate/single_config.yaml \
                     src/train_bash.py \
-                    --stage rm \
-                    --do_predict \
+                    --stage oracle \
+                    --do_eval \
                     --flash_attn {args.flash_attn}\
                     --model_name_or_path {args.model_name_or_path} \
-                    --vhead_oracle_path {oracle_adapter_path}\
                     --dataset_dir {args.dataset_dir} \
                     --dataset {dataset_name_generated} \
+                    --cutoff_len {args.cutoff_len}\
                     --template {args.template} \
-                    --output_dir {oracle_adapter_path} \
+                    --output_dir {eval_metric_dir} \
                     --per_device_eval_batch_size {args.per_device_eval_batch_size} \
-                    --fp16
+                    --is_compute_emb False\
+                    --fp16\
+                    --report_to none
                     """
         
-            
-        print(f"Inference Oracle model ............................")
-        run_cli_command(inference_oracle_command)
-        # delete_item_dataset_info(args.data_info_path, dataset_name_generated) # clean dataset_info
-        # -------------------------
-        # Get accuracy        
-        accuracy = calculate_accuracy(f"{predict_rw_score_path}/generated_predictions.jsonl")
-        
-        active_accuracy.append({
-            "iter": iter,
-            "acc": accuracy 
-        })
-        print("Active accuracy:", active_accuracy)
-        save_eval_metric_path = f"{eval_metric_dir}/accuracy_results_{iter}.json"
-        save_eval_metric(save_eval_metric_path, accuracy, iter)
+                print(f"Inference Oracle model ............................")
+                run_cli_command(inference_oracle_command)
 
-        print("=========================================================")
+            print("=========================================================")
         
     print("DONE!!!")
-    print(active_accuracy)
 
     if not os.path.exists(eval_metric_dir):
         os.makedirs(eval_metric_dir)

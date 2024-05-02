@@ -528,15 +528,13 @@ class LLMStrategy:
                 "rejected": []
             }
 
-            # ds_engine, _, _, _ = deepspeed.initialize(self.base_model)
-
             # Initialize the DeepSpeed-Inference engine
-            ds_engine = deepspeed.init_inference(self.base_model.model)
+            # ds_engine = deepspeed.init_inference(self.base_model.model)
 
             with torch.no_grad():
                 for batch in tqdm(dataloader):
-                    # emb = self.base_model.model(**batch).last_hidden_state #(bz, ctx, 4096)
-                    emb = ds_engine(**batch)
+                    emb = self.base_model.model(**batch).last_hidden_state # (bz, ctx, 4096)
+                    # emb = ds_engine(**batch)
 
                     bz, ctx , _ = emb.shape
                     emb = emb.cpu()
@@ -563,7 +561,7 @@ class LLMStrategy:
 
 
             # Free GPU memory consumed by model parameters
-            ds_engine.empty_partition_cache()
+            # ds_engine.empty_partition_cache()
 
         return train_df
 

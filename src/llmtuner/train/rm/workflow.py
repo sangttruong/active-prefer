@@ -131,14 +131,16 @@ def run_oracle_rm(
     callbacks: Optional[List["TrainerCallback"]] = None,
     seed = 42,
 ):
-    
-    
     oracle = Oracle(model_args, data_args, training_args,  finetuning_args, callbacks)
-    oracle.train_eval_oracle(finetuning_args.num_oracle, finetuning_args.is_compute_emb)
+
+    # Training
+    if training_args.do_train: 
+        oracle.train_oracle(finetuning_args.num_oracle, finetuning_args.is_compute_emb)
     
-    ##########################
-    gc.collect()
-    torch.cuda.empty_cache()
+    # Evaluation
+    if training_args.do_eval:
+        oracle.eval_oracle(finetuning_args.is_compute_emb)
+
 
 def set_seed(seed):
     random.seed(seed)

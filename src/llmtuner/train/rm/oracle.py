@@ -11,6 +11,7 @@ import os
 import numpy as np
 from scipy.stats import entropy
 import random
+import pickle
 
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
@@ -81,7 +82,6 @@ class Oracle(LLMStrategy):
     def oracle_init(self,model_args, data_args, training_args, finetuning_args, callbacks):
         # if not self.finetuning_args.is_compute_emb:
         #     del self.trainer, self.base_model
-
         pass
     
     def train_oracle(self, emb_dataset, val_size= 0.1, random_state = 0):
@@ -105,10 +105,29 @@ class Oracle(LLMStrategy):
         accuracy = model.score(X_test, y_test)
         print("Accuracy on test set:", accuracy)
 
+        # Save the model to a file
+        output_path = f"{self.self.training_args.output_dir}/logistic_regression_model.pkl"
+        with open(output_path, 'wb') as f:
+            pickle.dump(model, f)
+
         return accuracy
         
+    def _eval(self, emb_testset):
+        # Load the model from a file
+        model_path = f"{self.self.training_args.output_dir}/logistic_regression_model.pkl"
+        with open(model_path, 'rb') as f:
+            model = pickle.load(f)
     
-    def train_eval_oracle(self, nEns, is_compute_emb, val_size = 0.1):
+        X = np.array(emb_testset['chosen'])
+        y = np.ones(len(X)) # chosen = 1
+
+        # Once the model is trained, you can evaluate its performance on the test set
+        accuracy = model.score(X, y)
+        print("Accuracy on test set:", accuracy)
+
+        return accuracy
+
+    def train_oracle(self, nEns, is_compute_emb, val_size = 0.1):
         # Train multiple models and return their weights and average parameter updates
         # training data
         emb_dataset = self.get_training_dataset(is_override = is_compute_emb)
@@ -125,6 +144,29 @@ class Oracle(LLMStrategy):
             print(metrics)
 
         output_file = f"{self.training_args.output_dir}/committees_{nEns}_oracle_model.json"
+        with open(output_file, 'w') as json_file:
+            json.dump(metrics, json_file, indent=4)
+
+        plot_oracle_acc(metrics, self.training_args.output_dir)
+        print(f"Metrics saved to {output_file}")
+
+
+    def eval_oracle(self, is_compute_emb):
+        # Train multiple models and return their weights and average parameter updates
+        # training data
+        emb_testset = self.get_training_dataset(is_override = is_compute_emb)
+
+        metrics = []
+        print(f"Evaluate oracle ...................")
+        active_acc = self._eval(emb_testset)
+
+        metrics.append({
+            "Iter": self.finetuning_args.active_iter,
+            "Active accuracy": active_acc,
+        })
+        print(metrics)
+
+        output_file = f"{self.training_args.output_dir}/active_acc_{self.finetuning_args.active_iter}.json"
         with open(output_file, 'w') as json_file:
             json.dump(metrics, json_file, indent=4)
 

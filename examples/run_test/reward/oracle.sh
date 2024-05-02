@@ -14,17 +14,7 @@ CUDA_VISIBLE_DEVICES=3,4 accelerate launch --main_process_port=29505\
     --output_dir saves/Llama-2-70b-hf \
     --overwrite_output_dir \
     --cutoff_len 1024 \
-    --per_device_train_batch_size 1 \
-    --per_device_eval_batch_size 1 \
-    --gradient_accumulation_steps 4 \
-    --lr_scheduler_type cosine \
-    --logging_steps 400 \
-    --warmup_steps 20 \
-    --save_steps 400 \
-    --eval_steps 4000 \
-    --evaluation_strategy steps \
-    --learning_rate 5e-5 \
-    --num_train_epochs 1\
+    --per_device_eval_batch_size 2 \
     --is_compute_emb True\
     --num_oracle 1
 
