@@ -26,7 +26,7 @@ class EntropySampling(LLMStrategy):
         super(EntropySampling, self).__init__(model_args, data_args, training_args, finetuning_args, callbacks)
 
 
-    def query(self, n=100, iteration = 0):
+    def query(self, n=100, is_compute_emb = True, iteration = 0):
         if iteration != 0:
             print(f"Load Selector ..................")
             if os.path.exists(os.path.join(self.training_args.output_dir, f"vhead.pkl")):
@@ -37,7 +37,7 @@ class EntropySampling(LLMStrategy):
 
         # Get predictions
         print(f"Query ..................")
-        predictions = self.predict_prob(model) 
+        predictions = self.predict_prob(model, is_compute_emb) 
 
         scores_vals = {}
         for question_id, chosen_prob, rejected_prob in tqdm(zip(predictions['question_id'], predictions['chosen_rewards'], predictions['rejected_rewards']), total=len(predictions['question_id'])):
