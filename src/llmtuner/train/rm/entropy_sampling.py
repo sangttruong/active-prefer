@@ -40,7 +40,7 @@ class EntropySampling(LLMStrategy):
         predictions = self.predict_prob(model) 
 
         scores_vals = {}
-        for question_id, chosen_prob, rejected_prob in tqdm(zip(predictions['question_id'], predictions['chosen_rewards'], predictions['rejected_rewards'])):
+        for question_id, chosen_prob, rejected_prob in tqdm(zip(predictions['question_id'], predictions['chosen_rewards'], predictions['rejected_rewards']), total=len(predictions['question_id'])):
             if question_id in scores_vals:
                 scores_vals[question_id].append(rejected_prob)
             else:
