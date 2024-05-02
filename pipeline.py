@@ -470,7 +470,7 @@ def main(args):
                 --fp16
                 """
 
-        # run_cli_command(dpo_ft_command) 
+        run_cli_command(dpo_ft_command) 
         # ------------------------------------------------------------------- 
         # Export DPO finetuned model 
         dpo_full_path = f"{dpo_adapter_path}/full"
@@ -487,7 +487,7 @@ def main(args):
         
         # Export model
         print(f"Merge LoRA.............")
-        # run_cli_command(export_command) 
+        run_cli_command(export_command) 
         # ==================================================================
         
         ##########################################################
@@ -524,7 +524,7 @@ def main(args):
                     --fp16
                     """
 
-            # run_cli_command(rm_ft_command) 
+            run_cli_command(rm_ft_command) 
         elif args.method in ['qbc']:
             print("Updatse commitees")
         # ----------------------------------------------------------------
@@ -604,7 +604,7 @@ def main(args):
                 --fp16
             """
 
-            # run_cli_command(generate_text_command)
+            run_cli_command(generate_text_command)
             jsonl_to_json(f"{dpo_full_path}/generated_predictions.jsonl", f"{args.dataset_dir}/generated_predictions_{testset}.json")
             
         # Add new dataset info to datset_info.json to run predict reward model
