@@ -37,15 +37,10 @@ class EntropySampling(LLMStrategy):
 
         # Get predictions
         print(f"Query ..................")
-        predictions = self.predict_prob(model)  # list of predictions
+        predictions = self.predict_prob(model) 
 
-        # Calculate entropy for each question
         scores_vals = {}
-        for prediction in tqdm(predictions):
-            question_id = prediction['question_id']
-            chosen_prob = prediction['chosen_rewards']
-            rejected_prob = prediction['rejected_rewards']
-
+        for question_id, chosen_prob, rejected_prob in tqdm(zip(predictions['question_id'], predictions['chosen_rewards'], predictions['rejected_rewards'])):
             if question_id in scores_vals:
                 scores_vals[question_id].append(rejected_prob)
             else:
