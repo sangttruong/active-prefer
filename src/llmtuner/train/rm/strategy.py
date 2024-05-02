@@ -524,7 +524,6 @@ class LLMStrategy:
             # ------------------------------------------------------
             print("Begin complute emb..........")
             dataloader = self.trainer.get_test_dataloader(self.pool_dataset)
-            breakpoint()
             vector_output = {
                 "question_id": self.pool_dataset['id'],
                 "chosen": [],
@@ -553,7 +552,7 @@ class LLMStrategy:
                     chosen_emb = [np.array(subarray) for subarray in last_token_emb[:bz//2]]
                     rejected = [np.array(subarray) for subarray in last_token_emb[bz//2:]]
                     vector_output["chosen"].extend(chosen_emb)
-                    vector_output["rejected"].extend(rejected)
+                    vector_output["rejected"].extend(rejected)  
                     
             # Stack 
             vector_output["chosen"] = np.stack(vector_output["chosen"], axis = 0)
