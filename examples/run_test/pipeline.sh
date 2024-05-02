@@ -10,9 +10,10 @@ python pipeline.py \
     --flash_attn \
     --percentage 0.1 \
     --type_of_oracle vhead\
-    --main_process_port 29507\
+    --main_process_port 29510\
     --gpu_ids 2,3\
-    --sanity_check
+    --is_retrain_oracle\
+    --sanity_check 
 
 #### Full
 python pipeline.py \

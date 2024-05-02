@@ -345,9 +345,7 @@ def main(args):
         print(f"Training Oracle model ............................")
         run_cli_command(ft_oracle_command)
     else:
-        ft_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} accelerate launch --main_process_port={args.main_process_port}\
-            --config_file examples/accelerate/single_config.yaml \
-            src/train_bash.py\
+        ft_oracle_command = f"""CUDA_VISIBLE_DEVICES={args.gpu_ids} python src/train_bash.py\
             --stage oracle \
             --do_train \
             --flash_attn {args.flash_attn}\

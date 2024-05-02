@@ -1,22 +1,22 @@
 # Deepspeed
 
-CUDA_VISIBLE_DEVICES=3,4 accelerate launch --main_process_port=29505\
-    --config_file examples/accelerate/default.yaml \
+CUDA_VISIBLE_DEVICES=2,3 accelerate launch --main_process_port=29505\
+    --config_file examples/accelerate/single_config.yaml \
     src/train_bash.py\
     --stage oracle \
     --do_train \
     --flash_attn True\
-    --model_name_or_path meta-llama/Llama-2-70b-hf \
+    --model_name_or_path meta-llama/Llama-2-13b-hf \
     --dataset_dir data \
     --dataset  reward_bench_train\
     --template default \
     --finetuning_type freeze \
-    --output_dir saves/Llama-2-70b-hf \
+    --output_dir saves/Llama-2-13b-hf \
     --overwrite_output_dir \
     --cutoff_len 1024 \
     --per_device_eval_batch_size 2 \
     --is_compute_emb True\
-    --num_oracle 1
+    --num_oracle 10
 
 
 # ===========================================
