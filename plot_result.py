@@ -86,7 +86,7 @@ def plot_model_performance(model_dict):
     plt.title('Model Performance')
     plt.xticks(rotation=45, ha='right')
     # Set y-axis limit to 1
-    plt.ylim(0.5, 1)
+    plt.ylim(0.6, 1)
 
     # Annotate each bar with its accuracy score
     for bar, score in zip(bars, scores):
@@ -105,7 +105,9 @@ def main():
         "meta-llama/Llama-2-7b-hf": 0.8,
         "meta-llama/Llama-2-7b-chat-hf": 0.83,
         "meta-llama/Llama-2-13b-hf": 0.84,
-        "meta-llama/Llama-2-13b-chat-hf": 0.86
+        "meta-llama/Llama-2-13b-chat-hf": 0.86,
+        "meta-llama/Meta-Llama-3-8B": 0.83,
+        "meta-llama/Meta-Llama-3-8B-Instruct": 0.88
     }
 
     # Plot model performance

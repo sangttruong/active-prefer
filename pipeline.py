@@ -606,7 +606,7 @@ def main(args):
             """
 
             run_cli_command(generate_text_command)
-            jsonl_to_json(f"{dpo_full_path}/predict/generated_predictions.jsonl", f"{args.dataset_dir}/generated_predictions_{testset}.json")
+            jsonl_to_json(f"{dpo_full_path}/generated_predictions.jsonl", f"{args.dataset_dir}/generated_predictions_{testset}.json")
             
         # Add new dataset info to datset_info.json to run predict reward model
         add_new_dataset_info(args.data_info_path, dataset_name_generated, f"generated_predictions_{testset}.json")
