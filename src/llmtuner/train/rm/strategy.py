@@ -524,6 +524,7 @@ class LLMStrategy:
             # ------------------------------------------------------
             print("Begin complute emb..........")
             dataloader = self.trainer.get_test_dataloader(self.pool_dataset)
+            breakpoint()
             vector_output = {
                 "question_id": self.pool_dataset['id'],
                 "chosen": [],
