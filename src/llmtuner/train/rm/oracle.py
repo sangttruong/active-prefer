@@ -114,7 +114,7 @@ class Oracle(LLMStrategy):
         
     def _eval(self, emb_testset):
         # Load the model from a file
-        model_path = f"{self.self.training_args.output_dir}/logistic_regression_model.pkl"
+        model_path = f"{self.training_args.output_dir}/logistic_regression_model.pkl"
         with open(model_path, 'rb') as f:
             model = pickle.load(f)
     
@@ -162,7 +162,7 @@ class Oracle(LLMStrategy):
 
         metrics.append({
             "Iter": self.finetuning_args.active_iter,
-            "Active accuracy": active_acc,
+            "Active_accuracy": active_acc,
         })
         print(metrics)
 
