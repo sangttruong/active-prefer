@@ -106,7 +106,7 @@ class Oracle(LLMStrategy):
         print("Accuracy on test set:", accuracy)
 
         # Save the model to a file
-        output_path = f"{self.self.training_args.output_dir}/logistic_regression_model.pkl"
+        output_path = f"{self.training_args.output_dir}/logistic_regression_model.pkl"
         with open(output_path, 'wb') as f:
             pickle.dump(model, f)
 
