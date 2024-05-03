@@ -64,6 +64,7 @@ if __name__ == "__main__":
         dataset = load_dataset("truthful_qa", "multiple_choice", split="validation")
     
     dataset = dataset.train_test_split(test_size=0.2)
+    print(dataset)
     splits = ['train', 'test']
     for split in splits:
         name = f"truthful_qa_{split}_{args.model_name}_{args.method}{'_check' if args.sanity_check == 'True' else ''}"
