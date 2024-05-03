@@ -254,18 +254,18 @@ CUDA_VISIBLE_DEVICES=2,3 python src/train_bash.py \
     --num_oracle 10
 
 --------------------------------------------------------------
-CUDA_VISIBLE_DEVICES=3,6 accelerate launch \
+CUDA_VISIBLE_DEVICES=3,6,7 accelerate launch \
     --config_file examples/accelerate/default.yaml \
     src/train_bash.py \
     --stage oracle \
     --do_train \
     --flash_attn True\
-    --model_name_or_path meta-llama/Llama-2-7b-hf \
+    --model_name_or_path meta-llama/Llama-2-70b-hf \
     --dataset_dir data \
     --dataset  reward_bench_train\
     --template default \
     --finetuning_type freeze \
-    --output_dir saves/test/Llama-2-7b-hf\
+    --output_dir saves/test/Llama-2-70b-hf\
     --overwrite_output_dir \
     --cutoff_len 1024 \
     --per_device_eval_batch_size 1 \
