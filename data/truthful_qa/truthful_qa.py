@@ -2,6 +2,7 @@ from datasets import load_dataset, Dataset
 import pandas as pd
 import json
 import copy
+import os
 
 def convert_multiple_choice_to_prompt(dataset, json_file_path):
     new_samples = []
@@ -20,7 +21,9 @@ def convert_multiple_choice_to_prompt(dataset, json_file_path):
                     "output": [correct_choice_text[correct_choice_index], choice_text],
                     "choice_label": [correct_choice_index, i],
                 })
-
+    directory = os.path.dirname(json_file_path)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
     # Write to JSON
     with open(json_file_path, 'w') as json_file:
         json.dump(new_samples, json_file, indent=4)
@@ -67,5 +70,5 @@ if __name__ == "__main__":
         output_dataset_path = f'data/{name}.json'
         convert_multiple_choice_to_prompt(dataset[split], output_dataset_path)
         add_new_dataset_info(args.dataset_info_path, name, f"{name}.json")
-        print(f"{split}: {len(dataset[split])}")
+        print(f"{split}: {len(dataset)}")
     

@@ -2,7 +2,7 @@ from datasets import load_dataset, Dataset
 import pandas as pd
 import json
 import copy
-
+import os
 
 def add_new_dataset_info(dataset_info_path, name, path):
     # Read data from dataset_info.json
@@ -38,6 +38,10 @@ def convert_multiple_choice_to_prompt(dataset, json_file_path):
                     "choice_label": [correct_choice_index, i],
                 })
 
+    directory = os.path.dirname(json_file_path)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
     # Write to JSON
     with open(json_file_path, 'w') as json_file:
         json.dump(new_samples, json_file, indent=4)
@@ -64,7 +68,7 @@ if __name__ == "__main__":
     dataset = dataset.train_test_split(test_size=0.2, seed=42, shuffle=False)
     splits = ['train', 'test']
     for split in splits:
-        print(f"{split}: {len(dataset[split])}")
+        print(f"{split}: {len(dataset)}")
         if args.sanity_check == "True":
             name = f"reward_bench_{split}_{args.model_name}_{args.method}_check"
             output_dataset_path = f'data/{name}.json'
