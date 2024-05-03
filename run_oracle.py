@@ -22,7 +22,12 @@ def run_oracle():
         "meta-llama/Meta-Llama-3-8B-Instruct"
     ]
     datasets = [
-        "arc_challenge"
+        "arc_challenge",
+        "truthful_qa",
+        "hellaswag",
+        'winogrande',
+        "mmlu",
+        "hh_rlhf",
     ]
 
     for model_name in model_names:
@@ -46,7 +51,7 @@ def run_oracle():
                 --overwrite_output_dir \
                 --cutoff_len 1024 \
                 --per_device_eval_batch_size 2 \
-                --is_compute_emb True \
+                --is_compute_emb False \
                 --num_oracle "{num_oracle}"
             """
 
