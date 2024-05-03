@@ -9,9 +9,11 @@ def convert_multiple_choice_to_prompt(dataset, json_file_path):
 
     for question_id, example in enumerate(dataset):
         instruction = example['ctx']
+        if example['label'] == "":
+            continue
         correct_choice_index = int(example['label'])
         correct_choice_text = example["endings"]
-
+        
         for i, choice_text in enumerate(correct_choice_text):
             if i != correct_choice_index:
                 new_samples.append({
