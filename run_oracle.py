@@ -8,8 +8,18 @@ def run_oracle():
     # Define 
     num_oracle = 10
     gpu_device = 7
+
     model_names = [
-        "meta-llama/Llama-2-7b-hf"
+        "mistralai/Mistral-7B-v0.1",
+        "mistralai/Mistral-7B-Instruct-v0.2",
+        "google/gemma-7b",
+        "google/gemma-7b-it",
+        "meta-llama/Llama-2-7b-hf",
+        "meta-llama/Llama-2-7b-chat-hf",
+        "meta-llama/Llama-2-13b-hf",
+        "meta-llama/Llama-2-13b-chat-hf",
+        "meta-llama/Meta-Llama-3-8B",
+        "meta-llama/Meta-Llama-3-8B-Instruct"
     ]
     datasets = [
         "arc_challenge"
