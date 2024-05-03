@@ -67,7 +67,7 @@ if __name__ == "__main__":
         
         name = f"winogrande_{split}_{args.model_name}_{args.method}{'_check' if args.sanity_check == 'True' else ''}"
         output_dataset_path = f'data/{name}.json'
-        convert_multiple_choice_to_prompt(dataset[split], output_dataset_path)
+        convert_multiple_choice_to_prompt(dataset, output_dataset_path)
         add_new_dataset_info(args.dataset_info_path, name, f"{name}.json")
 
         print(f"{split}: {len(dataset)}")

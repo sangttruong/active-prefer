@@ -68,7 +68,7 @@ if __name__ == "__main__":
     dataset = dataset.train_test_split(test_size=0.2, seed=42, shuffle=False)
     splits = ['train', 'test']
     for split in splits:
-        print(f"{split}: {len(dataset)}")
+        print(f"{split}: {len(dataset[split])}")
         if args.sanity_check == "True":
             name = f"reward_bench_{split}_{args.model_name}_{args.method}_check"
             output_dataset_path = f'data/{name}.json'
