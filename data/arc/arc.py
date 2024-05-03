@@ -59,7 +59,7 @@ if __name__ == "__main__":
 
     splits = ['train', 'test']
     for split in splits:
-        print(f"{split}: {len(dataset[split])}")
+        
         if args.sanity_check == 'True':
             dataset = load_dataset("allenai/ai2_arc", "ARC-Challenge", split=f'{split}[:50]')
         else:
@@ -69,3 +69,5 @@ if __name__ == "__main__":
         output_dataset_path = f'data/{name}.json'
         convert_multiple_choice_to_prompt(dataset[split], output_dataset_path)
         add_new_dataset_info(args.dataset_info_path, name, f"{name}.json")
+
+        print(f"{split}: {len(dataset[split])}")
