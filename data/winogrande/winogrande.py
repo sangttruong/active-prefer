@@ -9,6 +9,8 @@ def convert_multiple_choice_to_prompt(dataset, json_file_path):
 
     for question_id, example in enumerate(dataset):
         instruction = example['sentence']
+        if example['answer'] == '':
+            continue
         correct_choice_index = int(example['answer']) - 1 # index start from 0
         correct_choice_text = [example["option1"], example["option2"]]
 
