@@ -66,7 +66,7 @@ if __name__ == "__main__":
         else:
             dataset = load_dataset("Rowan/hellaswag", split=f"{split}") 
 
-        name = f"hellaswag_{split}_{args.model_name}_{args.method}{"_check" if args.sanity_check == 'True' else ""}"
+        name = f"hellaswag_{split}_{args.model_name}_{args.method}{'_check' if args.sanity_check == 'True' else ''}"
         output_dataset_path = f'data/{name}.json'
         convert_multiple_choice_to_prompt(dataset[split], output_dataset_path)
         add_new_dataset_info(args.dataset_info_path, name, f"{name}.json")

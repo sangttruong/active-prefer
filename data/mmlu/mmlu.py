@@ -66,10 +66,10 @@ if __name__ == "__main__":
             dataset = load_dataset("cais/mmlu", "all", split=f"{split}")
 
         if split == 'test':        
-            name = f"mmlu_test_{args.model_name}_{args.method}{"_check" if args.sanity_check == 'True' else ""}"
+            name = f"mmlu_test_{args.model_name}_{args.method}{'_check' if args.sanity_check == 'True' else ''}"
             output_dataset_path = f'data/{name}.json'
         else:
-            name = f"mmlu_train_{args.model_name}_{args.method}{"_check" if args.sanity_check == 'True' else ""}"
+            name = f"mmlu_train_{args.model_name}_{args.method}'_check' if args.sanity_check == 'True' else ''}"
             output_dataset_path = f'data/{name}.json'
             
         convert_multiple_choice_to_prompt(dataset[split], output_dataset_path)

@@ -88,7 +88,7 @@ if __name__ == "__main__":
         else:
             dataset = load_dataset("Anthropic/hh-rlhf", split=f"{split}") 
 
-        name = f"hh_rlhf_{split}_{args.model_name}_{args.method}{"_check" if args.sanity_check == 'True' else ""}"
+        name = f"hh_rlhf_{split}_{args.model_name}_{args.method}{'_check' if args.sanity_check == 'True' else ''}"
         output_dataset_path = f'data/{name}.json'
         convert_multiple_choice_to_prompt(dataset[split], output_dataset_path)
         add_new_dataset_info(args.dataset_info_path, name, f"{name}.json")
