@@ -2,6 +2,7 @@ import os
 
 def run_cli_command(command):
     # Run the command
+    print(command)
     os.system(command)
 
 def run_oracle():
@@ -36,7 +37,6 @@ def run_oracle():
             dataset_name = f"{dataset}_train_Llama-2-7b-hf_random"
             output_dir = f"saves/{model_name_short}/{dataset}"
 
-
             # Training command
             command = f"""CUDA_VISIBLE_DEVICES={gpu_device} python src/train_bash.py \
                 --stage oracle \
@@ -54,7 +54,6 @@ def run_oracle():
                 --is_compute_emb True \
                 --num_oracle "{num_oracle}"
             """
-
             run_cli_command(command)
 
 if __name__ == "__main__":
