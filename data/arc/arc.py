@@ -3,11 +3,12 @@ import pandas as pd
 import json
 import copy
 import os
+from tqdm import tqdm
 
 def convert_multiple_choice_to_prompt(dataset, json_file_path):
     new_samples = []
 
-    for example in dataset:
+    for example in tqdm(dataset):
         correct_choice_index = example["choices"]["label"].index(example["answerKey"])
         correct_choice_text = example["choices"]["text"][correct_choice_index]
         correct_choice_label = example["choices"]["label"][correct_choice_index]
@@ -79,4 +80,4 @@ if __name__ == "__main__":
         convert_multiple_choice_to_prompt(dataset, output_dataset_path)
         add_new_dataset_info(args.dataset_info_path, name, f"{name}.json")
 
-        print(f"{split}: {len(dataset[split])}")
+        print(f"{split}: {len(dataset)}")
