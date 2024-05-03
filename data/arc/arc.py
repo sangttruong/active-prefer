@@ -22,6 +22,9 @@ def convert_multiple_choice_to_prompt(dataset, json_file_path):
                     "choice_label": [correct_choice_label, choice_label],
                 })
 
+    directory = os.path.dirname(json_file_path)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
 
     # Write to JSON
     with open(json_file_path, 'w') as json_file:
