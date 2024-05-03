@@ -68,7 +68,8 @@ if __name__ == "__main__":
     print(dataset)
     splits = ['train', 'test']
     for split in splits:
-        name = f"truthful_qa_{split}_{args.model_name}_{args.method}{'_check' if args.sanity_check == 'True' else ''}"
+        model_name = args.model_name.split('/')[-1]
+        name = f"truthful_qa_{split}_{model_name}_{args.method}{'_check' if args.sanity_check == 'True' else ''}"
         output_dataset_path = f'data/{name}.json'
         convert_multiple_choice_to_prompt(dataset[split], output_dataset_path)
         add_new_dataset_info(args.dataset_info_path, name, f"{name}.json")

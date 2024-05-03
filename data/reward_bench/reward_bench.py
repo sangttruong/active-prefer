@@ -69,13 +69,14 @@ if __name__ == "__main__":
     splits = ['train', 'test']
     for split in splits:
         print(f"{split}: {len(dataset[split])}")
+        model_name = args.model_name.split('/')[-1]
         if args.sanity_check == "True":
-            name = f"reward_bench_{split}_{args.model_name}_{args.method}_check"
+            name = f"reward_bench_{split}_{model_name}_{args.method}_check"
             output_dataset_path = f'data/{name}.json'
             convert_multiple_choice_to_prompt(dataset[split], output_dataset_path)
             add_new_dataset_info(args.dataset_info_path, name, f"{name}.json")
         else:
-            name = f"reward_bench_{split}_{args.model_name}_{args.method}"
+            name = f"reward_bench_{split}_{model_name}_{args.method}"
             output_dataset_path = f'data/{name}.json'
             convert_multiple_choice_to_prompt(dataset[split], output_dataset_path)
             add_new_dataset_info(args.dataset_info_path, name, f"{name}.json")

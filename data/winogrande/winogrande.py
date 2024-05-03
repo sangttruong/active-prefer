@@ -67,7 +67,8 @@ if __name__ == "__main__":
         else:
             dataset = load_dataset("winogrande", "winogrande_debiased", split=f"{split}")
         
-        name = f"winogrande_{split}_{args.model_name}_{args.method}{'_check' if args.sanity_check == 'True' else ''}"
+        model_name = args.model_name.split('/')[-1]
+        name = f"winogrande_{split}_{model_name}_{args.method}{'_check' if args.sanity_check == 'True' else ''}"
         output_dataset_path = f'data/{name}.json'
         convert_multiple_choice_to_prompt(dataset, output_dataset_path)
         add_new_dataset_info(args.dataset_info_path, name, f"{name}.json")
