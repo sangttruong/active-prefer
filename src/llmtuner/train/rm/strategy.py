@@ -163,6 +163,7 @@ class LLMStrategy:
         self.pool_dataset = self.pool_dataset.select(list(range(nearest_multiple)))
         
         self.base_model = load_model(self.tokenizer, model_args, finetuning_args, False, add_valuehead=False)
+        breakpoint()
         self.data_collator = PairwiseDataCollatorWithPadding(self.tokenizer, pad_to_multiple_of=8)
         self.callbacks = callbacks
 
@@ -186,7 +187,6 @@ class LLMStrategy:
         )
 
         # Model
-        # self.v_head = ValueHead(self.base_model.config)
 
         self.dataset = self.data_args.dataset
 
