@@ -19,5 +19,4 @@ parameters:
         ]
     dataset_name:
         values: [hellaswag, mmlu, hh_rlhf]
-    gpu_device:
-        values: [4, 6]
+  

@@ -12,14 +12,11 @@ def parse_arguments():
     parser.add_argument("--dataset_name", type=str, default="False", help="Test")
     parser.add_argument("--model_name", type=str, default="meta-llama/Llama-2-7b-hf", help="Test")
     parser.add_argument("--flash_attn", type=str, default="True", help="")
-    parser.add_argument("--gpu_device", type=int, default=0, help="Test")
+    # parser.add_argument("--gpu_device", type=int, default=0, help="Test")
     return parser.parse_args()
 
 def main():
     wandb.init(project="oracle")
-
-    # Define 
-    num_oracle = 10
 
     # model_names = [
     #     "mistralai/Mistral-7B-v0.1",
@@ -46,7 +43,11 @@ def main():
     # ]
 
     args = parse_arguments()
-    gpu_device = args.gpu_device
+    # gpu_device = args.gpu_device
+    # Define 
+    num_oracle = 10
+    gpu_device = os.environ.get("CUDA_VISIBLE_DEVICES")
+
 
     model_names = [
         args.model_name

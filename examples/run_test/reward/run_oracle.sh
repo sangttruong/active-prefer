@@ -54,15 +54,15 @@ python run_oracle.py --model_name meta-llama/Llama-2-13b-chat-hf --dataset_name 
 python run_oracle.py --model_name meta-llama/Meta-Llama-3-8B --dataset_name hh_rlhf --gpu_device 6
 python run_oracle.py --model_name meta-llama/Meta-Llama-3-8B-Instruct --dataset_name hh_rlhf --gpu_device 6
 
-python run_oracle.py --model_name mistralai/Mistral-7B-v0.1 --dataset_name mmlu --gpu_device 6
-python run_oracle.py --model_name mistralai/Mistral-7B-Instruct-v0.2 --dataset_name mmlu --gpu_device 6
-python run_oracle.py --model_name google/gemma-7b --dataset_name mmlu --gpu_device 6
-python run_oracle.py --model_name google/gemma-7b-it --dataset_name mmlu --gpu_device 6
-python run_oracle.py --model_name meta-llama/Llama-2-7b-hf --dataset_name mmlu --gpu_device 6
-python run_oracle.py --model_name meta-llama/Llama-2-7b-chat-hf --dataset_name mmlu --gpu_device 6
-python run_oracle.py --model_name meta-llama/Llama-2-13b-hf --dataset_name mmlu --gpu_device 6
-python run_oracle.py --model_name meta-llama/Llama-2-13b-chat-hf --dataset_name mmlu --gpu_device 6
-python run_oracle.py --model_name meta-llama/Meta-Llama-3-8B --dataset_name mmlu --gpu_device 6
-python run_oracle.py --model_name meta-llama/Meta-Llama-3-8B-Instruct --dataset_name mmlu --gpu_device 6
+python run_oracle.py --model_name mistralai/Mistral-7B-v0.1 --dataset_name mmlu --gpu_device 1 --flash_attn False
+python run_oracle.py --model_name mistralai/Mistral-7B-Instruct-v0.2 --dataset_name mmlu --gpu_device 6 --flash_attn False
+python run_oracle.py --model_name google/gemma-7b --dataset_name mmlu --gpu_device 6 --flash_attn False
+python run_oracle.py --model_name google/gemma-7b-it --dataset_name mmlu --gpu_device 6 --flash_attn False
+python run_oracle.py --model_name meta-llama/Llama-2-7b-hf --dataset_name mmlu --gpu_device 6 --flash_attn False
+python run_oracle.py --model_name meta-llama/Llama-2-7b-chat-hf --dataset_name mmlu --gpu_device 6 --flash_attn False
+python run_oracle.py --model_name meta-llama/Llama-2-13b-hf --dataset_name mmlu --gpu_device 6 --flash_attn False
+python run_oracle.py --model_name meta-llama/Llama-2-13b-chat-hf --dataset_name mmlu --gpu_device 6 --flash_attn False
+python run_oracle.py --model_name meta-llama/Meta-Llama-3-8B --dataset_name mmlu --gpu_device 6 --flash_attn False
+python run_oracle.py --model_name meta-llama/Meta-Llama-3-8B-Instruct --dataset_name mmlu --gpu_device 6 --flash_attn False
 
 
