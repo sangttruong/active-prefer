@@ -22,14 +22,17 @@ def run_oracle():
         "meta-llama/Meta-Llama-3-8B",
         "meta-llama/Meta-Llama-3-8B-Instruct"
     ]
+    # datasets = [
+    #     "arc_challenge", 
+    #     "truthful_qa",
+    #     'winogrande',
+    #     "reward_bench"
+    # ]
+
     datasets = [
-        "arc_challenge",
-        "truthful_qa",
-        # "hellaswag",
-        'winogrande',
-        # "mmlu",
-        # "hh_rlhf",
-        "reward_bench"
+        "hellaswag",
+        "mmlu",
+        "hh_rlhf",
     ]
 
     for model_name in model_names:
