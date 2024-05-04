@@ -380,7 +380,7 @@ class LLMStrategy:
 
         if hf_emb_path is not None:
             train_df = load_dataset(hf_emb_path)
-        if is_override == False and os.path.isfile(f"{filename}.pkl"):
+        elif is_override == False and os.path.isfile(f"{filename}.pkl"):
             train_ds = pickle.load(open(f"{filename}.pkl", 'rb'))
             train_df = Dataset.from_dict(train_ds)
             print(f"Loaded data from {filename}")
