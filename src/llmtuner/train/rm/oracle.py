@@ -92,7 +92,10 @@ class Oracle(LLMStrategy):
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=val_size, random_state=random_state)
 
         # Fitting the logistic regression model
-        model = LogisticRegression(random_state=random_state, max_iter=500)
+        if len(X_train) > 10000:
+            model = LogisticRegression(andom_state=random_state, solver='sag', max_iter=500)  # 'sag' solver is efficient for large datasets
+        else:
+            model = LogisticRegression(random_state=random_state, max_iter=500)
         model.fit(X_train, y_train)
 
         # Once the model is trained, you can evaluate its performance on the test set
