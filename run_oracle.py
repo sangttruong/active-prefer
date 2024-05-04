@@ -55,7 +55,7 @@ def run_oracle():
                 --overwrite_output_dir \
                 --cutoff_len 1024 \
                 --per_device_eval_batch_size 2 \
-                --is_compute_emb True \
+                --is_compute_emb False \
                 --num_oracle "{num_oracle}"
             """
             run_cli_command(command)
