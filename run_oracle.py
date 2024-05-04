@@ -8,7 +8,7 @@ def run_cli_command(command):
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Iterative training and evaluation script")
-    parser.add_argument("dataset_name", type=str, default="False", help="Test")
+    parser.add_argument("--dataset_name", type=str, default="False", help="Test")
     return parser.parse_args()
 
 def run_oracle():
