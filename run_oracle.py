@@ -9,6 +9,7 @@ def run_cli_command(command):
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Iterative training and evaluation script")
     parser.add_argument("--dataset_name", type=str, default="False", help="Test")
+    parser.add_argument("--model_name", type=str, default="meta-llama/Llama-2-7b-hf", help="Test")
     parser.add_argument("--gpu_device", type=int, default=0, help="Test")
     return parser.parse_args()
 
@@ -16,18 +17,18 @@ def run_oracle():
     # Define 
     num_oracle = 10
 
-    model_names = [
-        "mistralai/Mistral-7B-v0.1",
-        "mistralai/Mistral-7B-Instruct-v0.2",
-        "google/gemma-7b",
-        "google/gemma-7b-it",
-        "meta-llama/Llama-2-7b-hf",
-        "meta-llama/Llama-2-7b-chat-hf",
-        "meta-llama/Llama-2-13b-hf",
-        "meta-llama/Llama-2-13b-chat-hf",
-        "meta-llama/Meta-Llama-3-8B",
-        "meta-llama/Meta-Llama-3-8B-Instruct"
-    ]
+    # model_names = [
+    #     "mistralai/Mistral-7B-v0.1",
+    #     "mistralai/Mistral-7B-Instruct-v0.2",
+    #     "google/gemma-7b",
+    #     "google/gemma-7b-it",
+    #     "meta-llama/Llama-2-7b-hf",
+    #     "meta-llama/Llama-2-7b-chat-hf",
+    #     "meta-llama/Llama-2-13b-hf",
+    #     "meta-llama/Llama-2-13b-chat-hf",
+    #     "meta-llama/Meta-Llama-3-8B",
+    #     "meta-llama/Meta-Llama-3-8B-Instruct"
+    # ]
     # datasets = [
     #     "arc_challenge", 
     #     "truthful_qa",
@@ -38,6 +39,9 @@ def run_oracle():
     args = parse_arguments()
     gpu_device = args.gpu_device
 
+    model_names = [
+        args.model_name
+    ]
     datasets = [
         args.dataset_name
     ]
