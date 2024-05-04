@@ -1,5 +1,6 @@
 import os
 import argparse
+import wandb
 
 def run_cli_command(command):
     # Run the command
@@ -14,6 +15,8 @@ def parse_arguments():
     return parser.parse_args()
 
 def run_oracle():
+    wandb.init(project="oracle")
+
     # Define 
     num_oracle = 10
 
@@ -86,5 +89,7 @@ def run_oracle():
             """
             run_cli_command(command)
 
+    wandb.log({"loss": 0})
+    wandb.finish()
 if __name__ == "__main__":
     run_oracle()
