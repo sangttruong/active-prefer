@@ -25,10 +25,11 @@ def run_oracle():
     datasets = [
         "arc_challenge",
         "truthful_qa",
-        "hellaswag",
+        # "hellaswag",
         'winogrande',
-        "mmlu",
-        "hh_rlhf",
+        # "mmlu",
+        # "hh_rlhf",
+        "reward_bench"
     ]
 
     for model_name in model_names:
