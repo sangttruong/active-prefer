@@ -14,7 +14,7 @@ def parse_arguments():
     parser.add_argument("--gpu_device", type=int, default=0, help="Test")
     return parser.parse_args()
 
-def run_oracle():
+def main():
     wandb.init(project="oracle")
 
     # Define 
@@ -92,4 +92,4 @@ def run_oracle():
     wandb.log({"loss": 0})
     wandb.finish()
 if __name__ == "__main__":
-    run_oracle()
+    main()
