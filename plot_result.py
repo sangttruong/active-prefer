@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from statistics import pvariance
+
 
 def plot_acc():
     # Data
@@ -39,14 +41,54 @@ def plot_acc():
 
 def plot_oracle_acc():
     # metrics = [{'model_id': 0, 'loss': 0.6969875154788034, 'Accuracy': 1.0, 'model_path': 'saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy/oracle_0.safetensors'}, {'model_id': 1, 'loss': 0.5134088109459793, 'Accuracy': 1.0, 'model_path': 'saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy/oracle_1.safetensors'}, {'model_id': 2, 'loss': 0.4989338775998668, 'Accuracy': 1.0, 'model_path': 'saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy/oracle_2.safetensors'}, {'model_id': 3, 'loss': 0.4770105308608005, 'Accuracy': 1.0, 'model_path': 'saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy/oracle_3.safetensors'}, {'model_id': 4, 'loss': 0.5097642797127104, 'Accuracy': 0.8571428571428571, 'model_path': 'saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy/oracle_4.safetensors'}, {'model_id': 5, 'loss': 0.5076179802417755, 'Accuracy': 1.0, 'model_path': 'saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy/oracle_5.safetensors'}, {'model_id': 6, 'loss': 0.4847733150971563, 'Accuracy': 0.7142857142857143, 'model_path': 'saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy/oracle_6.safetensors'}, {'model_id': 7, 'loss': 0.5075322198763228, 'Accuracy': 1.0, 'model_path': 'saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy/oracle_7.safetensors'}, {'model_id': 8, 'loss': 0.518027106920878, 'Accuracy': 1.0, 'model_path': 'saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy/oracle_8.safetensors'}, {'model_id': 9, 'loss': 0.5117164905134001, 'Accuracy': 1.0, 'model_path': 'saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy/oracle_9.safetensors'}, {'model_id': 10, 'loss': 0.4988821410296256, 'Accuracy': 1.0, 'model_path': 'saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy/oracle_10.safetensors'}, {'model_id': 11, 'loss': 0.5087874319992567, 'Accuracy': 0.5714285714285714, 'model_path': 'saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy/oracle_11.safetensors'}, {'model_id': 12, 'loss': 0.504003120618954, 'Accuracy': 0.8571428571428571, 'model_path': 'saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy/oracle_12.safetensors'}, {'model_id': 13, 'loss': 0.4922906165583092, 'Accuracy': 0.8571428571428571, 'model_path': 'saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy/oracle_13.safetensors'}, {'model_id': 14, 'loss': 0.5006412223242876, 'Accuracy': 1.0, 'model_path': 'saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy/oracle_14.safetensors'}, {'model_id': 15, 'loss': 0.49743010391268816, 'Accuracy': 1.0, 'model_path': 'saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy/oracle_15.safetensors'}, {'model_id': 16, 'loss': 0.49835661811786786, 'Accuracy': 0.5714285714285714, 'model_path': 'saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy/oracle_16.safetensors'}, {'model_id': 17, 'loss': 0.5118268775312524, 'Accuracy': 0.8571428571428571, 'model_path': 'saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy/oracle_17.safetensors'}, {'model_id': 18, 'loss': 0.48823955576670797, 'Accuracy': 1.0, 'model_path': 'saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy/oracle_18.safetensors'}, {'model_id': 19, 'loss': 0.4786361414089538, 'Accuracy': 0.42857142857142855, 'model_path': 'saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy/oracle_19.safetensors'}, {'model_id': 20, 'loss': 0.48317905450076387, 'Accuracy': 1.0, 'model_path': 'saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy/oracle_20.safetensors'}, {'model_id': 21, 'loss': 0.47974638614738196, 'Accuracy': 0.8571428571428571, 'model_path': 'saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy/oracle_21.safetensors'}, {'model_id': 22, 'loss': 0.4902948595975575, 'Accuracy': 1.0, 'model_path': 'saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy/oracle_22.safetensors'}, {'model_id': 23, 'loss': 0.5014702499958507, 'Accuracy': 1.0, 'model_path': 'saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy/oracle_23.safetensors'}, {'model_id': 24, 'loss': 0.5077021919321596, 'Accuracy': 0.8571428571428571, 'model_path': 'saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy/oracle_24.safetensors'}, {'model_id': 25, 'loss': 0.518485146656371, 'Accuracy': 1.0, 'model_path': 'saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy/oracle_25.safetensors'}, {'model_id': 26, 'loss': 0.516034486000998, 'Accuracy': 0.7142857142857143, 'model_path': 'saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy/oracle_26.safetensors'}, {'model_id': 27, 'loss': 0.48904681807024436, 'Accuracy': 1.0, 'model_path': 'saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy/oracle_27.safetensors'}, {'model_id': 28, 'loss': 0.5146132874907109, 'Accuracy': 1.0, 'model_path': 'saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy/oracle_28.safetensors'}, {'model_id': 29, 'loss': 0.48006389747586165, 'Accuracy': 0.8571428571428571, 'model_path': 'saves/Llama-2-7b-hf/reward_bench_train_Llama-2-7b-hf_max_entropy_check/max_entropy/oracle_29.safetensors'}]
+    metrics = [
+        {
+            "model_id": 0,
+            "Accuracy": 0.8270130304042767
+        },
+        {
+            "model_id": 1,
+            "Accuracy": 0.8267624457066488
+        },
+        {
+            "model_id": 2,
+            "Accuracy": 0.8300200467758102
+        },
+        {
+            "model_id": 3,
+            "Accuracy": 0.8305212161710658
+        },
+        {
+            "model_id": 4,
+            "Accuracy": 0.830688272636151
+        },
+        {
+            "model_id": 5,
+            "Accuracy": 0.829852990310725
+        },
+        {
+            "model_id": 6,
+            "Accuracy": 0.8387905111927831
+        },
+        {
+            "model_id": 7,
+            "Accuracy": 0.8266789174741063
+        },
+        {
+            "model_id": 8,
+            "Accuracy": 0.8337788172402272
+        },
+        {
+            "model_id": 9,
+            "Accuracy": 0.8307718008686936
+        }
+    ]
     # Extract accuracy values from the metrics
-    # accuracies = [metric["Accuracy"] for metric in metrics]
-    
-    accuracies = [0.5971, ]
+    accuracies = [metric["Accuracy"] for metric in metrics]
     
     # Calculate mean and variance of accuracy
     mean_accuracy = np.mean(accuracies)
-    variance_accuracy = np.var(accuracies)
+    variance_accuracy = pvariance(accuracies)
 
     # Plot the image
     plt.figure(figsize=(8, 6))
@@ -60,14 +102,14 @@ def plot_oracle_acc():
 
     # Annotate mean and variance on the plot
     plt.annotate(f'Mean Accuracy: {mean_accuracy:.2f}', xy=(0.5, 0.9), xycoords='axes fraction', ha='center', fontsize=12)
-    plt.annotate(f'Variance of Accuracy: {variance_accuracy:.2f}', xy=(0.5, 0.85), xycoords='axes fraction', ha='center', fontsize=12)
+    plt.annotate(f'Variance of Accuracy: {variance_accuracy:.1e}', xy=(0.5, 0.85), xycoords='axes fraction', ha='center', fontsize=12)
 
 
     plt.savefig('images/accuracy_histogram.png')
     plt.show()
 
     print(f"Mean Accuracy: {mean_accuracy:.2f}")
-    print(f"Variance of Accuracy: {variance_accuracy:.2f}")
+    print(f"Variance of Accuracy: {variance_accuracy:.1e}")
 
 
 
@@ -97,21 +139,23 @@ def plot_model_performance(model_dict):
     plt.show()
 
 def main():
-    model_data = {
-        "mistralai/Mistral-7B-v0.1": 0.66,
-        "mistralai/Mistral-7B-Instruct-v0.2": 0.64,
-        "google/gemma-7b": 0.74,
-        "google/gemma-7b-it": 0.77,
-        "meta-llama/Llama-2-7b-hf": 0.8,
-        "meta-llama/Llama-2-7b-chat-hf": 0.83,
-        "meta-llama/Llama-2-13b-hf": 0.84,
-        "meta-llama/Llama-2-13b-chat-hf": 0.86,
-        "meta-llama/Meta-Llama-3-8B": 0.83,
-        "meta-llama/Meta-Llama-3-8B-Instruct": 0.88
-    }
+    # model_data = {
+    #     "mistralai/Mistral-7B-v0.1": 0.66,
+    #     "mistralai/Mistral-7B-Instruct-v0.2": 0.64,
+    #     "google/gemma-7b": 0.74,
+    #     "google/gemma-7b-it": 0.77,
+    #     "meta-llama/Llama-2-7b-hf": 0.8,
+    #     "meta-llama/Llama-2-7b-chat-hf": 0.83,
+    #     "meta-llama/Llama-2-13b-hf": 0.84,
+    #     "meta-llama/Llama-2-13b-chat-hf": 0.86,
+    #     "meta-llama/Meta-Llama-3-8B": 0.83,
+    #     "meta-llama/Meta-Llama-3-8B-Instruct": 0.88
+    # }
 
-    # Plot model performance
-    plot_model_performance(model_data)
+    # # Plot model performance
+    # plot_model_performance(model_data)
+    # ==============================================
+    plot_oracle_acc()
 
 if __name__ == "__main__":
     main()

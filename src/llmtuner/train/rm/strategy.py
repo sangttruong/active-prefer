@@ -422,7 +422,6 @@ class LLMStrategy:
             save_to_pkl(vector_output, f"{filename}.pkl")
             train_df = Dataset.from_dict(vector_output)
 
-
         return train_df
 
     def get_training_dataset(self, is_override):

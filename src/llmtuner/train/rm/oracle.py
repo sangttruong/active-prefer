@@ -25,19 +25,12 @@ from copy import deepcopy
 from torch import nn
 import torch
 import torch.nn.functional as F
-import torch.optim.lr_scheduler as lr_scheduler
-from torch.utils.data import DataLoader
-from torch.nn.utils.rnn import pad_sequence
-
-# import deepspeed
-
-
-from safetensors.torch import save_file, load_file
-
 from matplotlib import pyplot as plt
 from tqdm import tqdm
 from collections import Counter
 import json
+from statistics import pvariance
+
 
 
 def plot_oracle_acc(metrics, output_dir, model_name):
@@ -46,7 +39,8 @@ def plot_oracle_acc(metrics, output_dir, model_name):
 
     # Calculate mean and variance of accuracy
     mean_accuracy = np.mean(accuracies)
-    variance_accuracy = np.var(accuracies)
+    variance_accuracy = pvariance(accuracies)
+
 
     # Plot the image
     plt.figure(figsize=(8, 6))
@@ -60,12 +54,12 @@ def plot_oracle_acc(metrics, output_dir, model_name):
 
     # Annotate mean and variance on the plot
     plt.annotate(f'Mean Accuracy: {mean_accuracy:.2f}', xy=(0.5, 0.9), xycoords='axes fraction', ha='center', fontsize=12)
-    plt.annotate(f'Variance of Accuracy: {variance_accuracy:.2f}', xy=(0.5, 0.85), xycoords='axes fraction', ha='center', fontsize=12)
+    plt.annotate(f'Variance of Accuracy: {variance_accuracy:.2e}', xy=(0.5, 0.85), xycoords='axes fraction', ha='center', fontsize=12)
 
     plt.savefig(f'{output_dir}/accuracy_histogram.png')
 
     print(f"Mean Accuracy: {mean_accuracy:.2f}")
-    print(f"Variance of Accuracy: {variance_accuracy:.2f}")
+    print(f"Variance of Accuracy: {variance_accuracy:.2e}")
 
 class Oracle(LLMStrategy):
     def __init__(

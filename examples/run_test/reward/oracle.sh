@@ -255,8 +255,8 @@ CUDA_VISIBLE_DEVICES=2,3 python src/train_bash.py \
     --num_oracle 10
 
 --------------------------------------------------------------
-CUDA_VISIBLE_DEVICES=6,7 accelerate launch \
-    --config_file examples/accelerate/default.yaml \
+CUDA_VISIBLE_DEVICES=1,2 accelerate launch \
+    --config_file examples/accelerate/emb_config.yaml \
     src/train_bash.py \
     --stage oracle \
     --do_train \
