@@ -1,9 +1,15 @@
 import os
+import argparse
 
 def run_cli_command(command):
     # Run the command
     print(command)
     os.system(command)
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(description="Iterative training and evaluation script")
+    parser.add_argument("dataset_name", type=str, default="False", help="Test")
+    return parser.parse_args()
 
 def run_oracle():
     # Define 
@@ -22,18 +28,18 @@ def run_oracle():
         "meta-llama/Meta-Llama-3-8B",
         "meta-llama/Meta-Llama-3-8B-Instruct"
     ]
-    datasets = [
-        "arc_challenge", 
-        "truthful_qa",
-        'winogrande',
-        "reward_bench"
-    ]
-
     # datasets = [
-    #     "hellaswag",
-    #     "mmlu",
-    #     "hh_rlhf",
+    #     "arc_challenge", 
+    #     "truthful_qa",
+    #     'winogrande',
+    #     "reward_bench"
     # ]
+
+    args = parse_arguments()
+
+    datasets = [
+        args.dataset_name
+    ]
 
     for model_name in model_names:
         for dataset in datasets:
