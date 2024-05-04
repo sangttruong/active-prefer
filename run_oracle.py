@@ -15,7 +15,6 @@ def parse_arguments():
 def run_oracle():
     # Define 
     num_oracle = 10
-    gpu_device = args.gpu_device
 
     model_names = [
         "mistralai/Mistral-7B-v0.1",
@@ -37,6 +36,7 @@ def run_oracle():
     # ]
 
     args = parse_arguments()
+    gpu_device = args.gpu_device
 
     datasets = [
         args.dataset_name
