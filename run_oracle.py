@@ -35,6 +35,21 @@ def run_oracle():
     #     'winogrande',
     #     "reward_bench"
     # ]
+    # datasets = [
+    #     "hellaswag",
+    #     "mmlu",
+    #     "hh_rlhf",
+    # ]
+
+    # python run_oracle.py --model_name mistralai/Mistral-7B-v0.1 --dataset_name hh_rlhf --gpu_device 6
+    # python run_oracle.py --model_name mistralai/Mistral-7B-Instruct-v0.2 --dataset_name hh_rlhf --gpu_device 6
+    # python run_oracle.py --model_name mistralai/Mistral-7B-v0.1 --dataset_name hh_rlhf --gpu_device 6
+    # python run_oracle.py --model_name mistralai/Mistral-7B-v0.1 --dataset_name hh_rlhf --gpu_device 6
+    # python run_oracle.py --model_name mistralai/Mistral-7B-v0.1 --dataset_name hh_rlhf --gpu_device 6
+    # python run_oracle.py --model_name mistralai/Mistral-7B-v0.1 --dataset_name hh_rlhf --gpu_device 6
+    # python run_oracle.py --model_name mistralai/Mistral-7B-v0.1 --dataset_name hh_rlhf --gpu_device 6
+    # python run_oracle.py --model_name mistralai/Mistral-7B-v0.1 --dataset_name hh_rlhf --gpu_device 6
+
 
     args = parse_arguments()
     gpu_device = args.gpu_device
