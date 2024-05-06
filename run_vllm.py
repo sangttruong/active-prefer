@@ -33,6 +33,7 @@ def get_prompt(dataset, dataset_dir):
     with open(dataset_path, 'r') as file:
         data = json.load(file)
     
+    breakpoint()
     propmts = [x for x in data.valye]
 
     # TODO: only get instruction in data 
