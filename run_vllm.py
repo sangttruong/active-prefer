@@ -28,8 +28,8 @@ def generate_texts(prompts, model_name_or_path, K=5, temperature=0.8, top_p=0.95
     return df
 
 def get_prompts(dataset, dataset_dir = 'data'):
-    dataset.replace(".json", "")
-    dataset_path = f"{dataset_dir}/{dataset}.json"
+    
+    dataset_path = f"{dataset_dir}/{dataset}_train_Llama-2-7b-hf_random.json"
 
     with open(dataset_path, 'r') as file:
         data = json.load(file)
@@ -37,13 +37,13 @@ def get_prompts(dataset, dataset_dir = 'data'):
     propmts = [x['instruction'] for x in data]
     return propmts
 
-def run_infer(model_name_or_path, dataset_name, output_dir = 'save'):
-    prompts = get_prompts(dataset_name)
+def run_infer(model_name_or_path, dataset, output_dir = 'save'):
+    prompts = get_prompts(dataset)
     df = generate_texts(prompts, model_name_or_path)
 
     # Save DataFrame to a CSV file
     model_name = model_name_or_path.split('/')[-1]
-    csv_dir = os.path.join(output_dir, model_name, dataset_name)
+    csv_dir = os.path.join(output_dir, model_name, dataset)
     os.makedirs(csv_dir, exist_ok=True)  # Create directory if it doesn't exist
     csv_path = os.path.join(csv_dir, 'generated_texts.csv')
     df.to_csv(csv_path, index=False)
@@ -51,13 +51,15 @@ def run_infer(model_name_or_path, dataset_name, output_dir = 'save'):
     
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Iterative training and evaluation script")
-    parser.add_argument("--dataset_name", type=str, default="reward_bench_train", help="Test")
+    parser.add_argument("--dataset", type=str, default="reward_bench_train", help="Test")
     parser.add_argument("--model_name_or_path", type=str, default="meta-llama/Llama-2-7b-hf", help="Test")
+    parser.add_argument("--K", type=int, default=10, help="num iteration")
+
     return parser.parse_args()
 
 def main():
     args = parse_arguments()
-    run_infer(args.model_name_or_path, args.dataset_name)
+    run_infer(args.model_name_or_path, args.dataset)
     
 if __name__ == "__main__":
     main()
