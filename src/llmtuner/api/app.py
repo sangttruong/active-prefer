@@ -102,7 +102,6 @@ def create_app(chat_model: "ChatModel") -> "FastAPI":
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Only supports u/a/u/a/u...")
 
         input_messages = []
-        print(f"{len(request.messages)=}")
         for i, message in enumerate(request.messages):
             if i % 2 == 0 and message.role not in [Role.USER, Role.TOOL]:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid role")
