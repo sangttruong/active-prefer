@@ -1,3 +1,4 @@
+import pandas as pd
 from vllm import LLM, SamplingParams
 
 # Sample prompts.
@@ -7,17 +8,31 @@ prompts = [
     "The capital of France is",
     "The future of AI is",
 ]
+
 # Create a sampling params object.
 sampling_params = SamplingParams(temperature=0.8, top_p=0.95)
 
 # Create an LLM.
 model_name_or_path = "meta-llama/Llama-2-7b-hf"
 llm = LLM(model=model_name_or_path)
-# Generate texts from the prompts. The output is a list of RequestOutput objects
-# that contain the prompt, generated text, and other information.
-outputs = llm.generate(prompts, sampling_params)
-# Print the outputs.
-for output in outputs:
-    prompt = output.prompt
-    generated_text = output.outputs[0].text
-    print(f"Prompt: {prompt!r}, Generated text: {generated_text!r}")
+
+# Initialize a dictionary to store the results.
+results = {"Prompt": []}
+
+# Generate texts from the prompts.
+K = 5
+for k in range(1, K + 1):
+    results[f"Generated_Text_{k}"] = []
+
+for prompt in prompts:
+    results["Prompt"].append(prompt)
+    outputs = llm.generate([prompt] * K, sampling_params)
+    for k, output in enumerate(outputs, start=1):
+        generated_text = output.outputs[0].text
+        results[f"Generated_Text_{k}"].append(generated_text)
+
+# Convert the results dictionary to a DataFrame.
+df = pd.DataFrame(results)
+
+# Display the DataFrame.
+print(df)
