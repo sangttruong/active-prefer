@@ -1,6 +1,7 @@
 import argparse
 import pandas as pd
 import json
+import os
 from vllm import LLM, SamplingParams
 
 def generate_texts(prompts, model_name_or_path, K=5, temperature=0.8, top_p=0.95):
@@ -34,9 +35,6 @@ def get_prompts(dataset, dataset_dir = 'data'):
         data = json.load(file)
     
     propmts = [x['instruction'] for x in data]
-
-    # TODO: only get instruction in data 
-
     return propmts
 
 def run_infer(model_name_or_path, dataset_name, output_dir = 'save'):
@@ -45,7 +43,9 @@ def run_infer(model_name_or_path, dataset_name, output_dir = 'save'):
 
     # Save DataFrame to a CSV file
     model_name = model_name_or_path.split('/')[-1]
-    csv_path = f"{output_dir}/{model_name}/{dataset_name}/generated_texts.csv"
+    csv_dir = os.path.join(output_dir, model_name, dataset_name)
+    os.makedirs(csv_dir, exist_ok=True)  # Create directory if it doesn't exist
+    csv_path = os.path.join(csv_dir, 'generated_texts.csv')
     df.to_csv(csv_path, index=False)
     print(f"Generated texts saved to {csv_path}")
     
