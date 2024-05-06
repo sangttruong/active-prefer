@@ -15,7 +15,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="API Demo Arguments")
     parser.add_argument("--model_name_or_path", type=str, default='meta-llama/Llama-2-7b-hf', help="Path to the model")
     parser.add_argument("--testset", type=str, default="reward_bench_test", help="testset for generations")
-    parser.add_argument("--template", type=str, required='llama2', help="Template to use")
+    parser.add_argument("--template", type=str, default='llama2', help="Template to use")
     parser.add_argument("--infer_backend", type=str, default = 'vllm', help="Inference backend")
     parser.add_argument("--vllm_enforce_eager", action="store_true", help="Enforce eager execution for VLLM")
     parser.add_argument("--gpu_ids", type=str, default="3,4", help="Enforce eager execution for VLLM")
