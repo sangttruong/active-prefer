@@ -11,10 +11,10 @@ from vllm import LLM, SamplingParams
 
 def generate_texts(prompts, 
                    model_name_or_path, 
-                   K=5, 
+                   K=100, 
                    temperature=0.8, 
                    top_p=0.95,
-                   max_tokens = 1024):
+                   max_tokens = 512):
     # Create a sampling params object.
     sampling_params = SamplingParams(temperature=temperature, top_p=top_p, max_tokens=max_tokens)
 
@@ -77,11 +77,11 @@ def parse_arguments():
     return parser.parse_args()
 
 def main():
-    wandb.init(project="Generate-text")
+    # wandb.init(project="Generate-text")
 
     args = parse_arguments()
     run_infer(args.model_name_or_path, args.dataset)
 
-    wandb.finish()
+    # wandb.finish()
 if __name__ == "__main__":
     main()

@@ -6,3 +6,6 @@ CUDA_VISIBLE_DEVICES=6 API_PORT=8005 python src/api_demo.py \
     --infer_backend vllm \
     --vllm_enforce_eager
 
+
+
+CUDA_VISIBLE_DEVICES=0  python run_vllm.py
