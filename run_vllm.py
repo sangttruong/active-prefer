@@ -26,27 +26,21 @@ def generate_texts(prompts, model_name_or_path, K=5, temperature=0.8, top_p=0.95
     df = pd.DataFrame(results)
     return df
 
-def get_prompt(dataset, dataset_dir = 'data'):
+def get_prompts(dataset, dataset_dir = 'data'):
     dataset.replace(".json", "")
     dataset_path = f"{dataset_dir}/{dataset}.json"
 
     with open(dataset_path, 'r') as file:
         data = json.load(file)
     
-    breakpoint()
-    propmts = [x for x in data.valye]
+    propmts = [x['instruction'] for x in data]
 
     # TODO: only get instruction in data 
 
-    return  [
-        "Hello, my name is",
-        "The president of the United States is",
-        "The capital of France is",
-        "The future of AI is",
-    ]
+    return propmts
 
 def run_infer(model_name_or_path, dataset_name, output_dir = 'save'):
-    prompts = get_prompt(dataset_name)
+    prompts = get_prompts(dataset_name)
     df = generate_texts(prompts, model_name_or_path)
 
     # Save DataFrame to a CSV file
