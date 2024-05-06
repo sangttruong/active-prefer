@@ -5,6 +5,7 @@ __pycache__/
 
 data/*train.json
 data/*test.json
+saves/
 
 # C extensions
 *.so
