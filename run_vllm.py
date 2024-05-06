@@ -7,9 +7,14 @@ from datasets import Dataset
 
 from vllm import LLM, SamplingParams
 
-def generate_texts(prompts, model_name_or_path, K=5, temperature=0.8, top_p=0.95):
+def generate_texts(prompts, 
+                   model_name_or_path, 
+                   K=5, 
+                   temperature=0.8, 
+                   top_p=0.95,
+                   max_tokens = 1024):
     # Create a sampling params object.
-    sampling_params = SamplingParams(temperature=temperature, top_p=top_p)
+    sampling_params = SamplingParams(temperature=temperature, top_p=top_p, max_tokens=max_tokens)
 
     # Create an LLM.
     llm = LLM(model=model_name_or_path)
@@ -60,11 +65,11 @@ def run_infer(model_name_or_path, dataset, output_dir = 'saves'):
     train_df.push_to_hub(link, 
                         commit_message=f"Upload data generated of {dataset}",
                         token="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")
-    print(f"Uploaded embeddings for {model_name} to Hugging Face Hub.")
+    print(f"Uploaded generated texts for {model_name} to Hugging Face Hub.")
     
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Iterative training and evaluation script")
-    parser.add_argument("--dataset", type=str, default="reward_bench_train", help="Test")
+    parser.add_argument("--dataset", type=str, default="reward_bench", help="Test")
     parser.add_argument("--model_name_or_path", type=str, default="meta-llama/Llama-2-7b-hf", help="Test")
     parser.add_argument("--K", type=int, default=10, help="num iteration")
     return parser.parse_args()
