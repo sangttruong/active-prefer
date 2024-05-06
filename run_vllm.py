@@ -26,7 +26,7 @@ def generate_texts(prompts, model_name_or_path, K=5, temperature=0.8, top_p=0.95
     df = pd.DataFrame(results)
     return df
 
-def get_prompt(dataset, dataset_dir):
+def get_prompt(dataset, dataset_dir = 'data'):
     dataset.replace(".json", "")
     dataset_path = f"{dataset_dir}/{dataset}.json"
 
