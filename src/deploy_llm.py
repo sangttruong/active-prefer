@@ -13,9 +13,9 @@ from openai import OpenAI
 
 def parse_args():
     parser = argparse.ArgumentParser(description="API Demo Arguments")
-    parser.add_argument("--model_name_or_path", type=str, required=True, help="Path to the model")
+    parser.add_argument("--model_name_or_path", type=str, default='meta-llama/Llama-2-7b-hf', help="Path to the model")
     parser.add_argument("--testset", type=str, default="reward_bench_test", help="testset for generations")
-    parser.add_argument("--template", type=str, required=True, help="Template to use")
+    parser.add_argument("--template", type=str, required='llama2', help="Template to use")
     parser.add_argument("--infer_backend", type=str, required=True, help="Inference backend")
     parser.add_argument("--vllm_enforce_eager", action="store_true", help="Enforce eager execution for VLLM")
     parser.add_argument("--gpu_ids", type=str, default="3,4", help="Enforce eager execution for VLLM")
@@ -38,8 +38,7 @@ def main():
     print("Visit http://localhost:{}/docs for API document.".format(args.api_port))
     uvicorn.run(app, host="0.0.0.0", port=args.api_port, workers=1)
 
-    ### Begin inference DPO model
-    
+    ### Begin inference 
     client = OpenAI(
         base_url=f"http://localhost:{args.api_port}/v1",
         api_key="token-abc123",
@@ -67,7 +66,7 @@ def main():
 
 
     # Save result at "args.dataset_dir}/generated_predictions.json" 
-    output_file_path = os.path.join(args.dataset_dir, "generated_predictions.json")
+    output_file_path = os.path.join(args.dataset_dir, "gen_text.json")
     # Save the predictions to the JSON file
     with open(output_file_path, 'w') as output_file:
         json.dump(predictions, output_file)
