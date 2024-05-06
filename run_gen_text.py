@@ -2,8 +2,6 @@ import os
 import argparse
 import wandb
 
-
-
 def run_cli_command(command):
     # Run the command
     print(command)

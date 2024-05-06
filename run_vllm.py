@@ -77,7 +77,7 @@ def parse_arguments():
     return parser.parse_args()
 
 def main():
-    wandb.init(project="oracle")
+    wandb.init(project="Generate-text")
 
     args = parse_arguments()
     run_infer(args.model_name_or_path, args.dataset)
