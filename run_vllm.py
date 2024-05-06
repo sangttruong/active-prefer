@@ -5,6 +5,8 @@ import os
 
 from datasets import Dataset
 
+import wandb
+
 from vllm import LLM, SamplingParams
 
 def generate_texts(prompts, 
@@ -42,7 +44,7 @@ def get_prompts(dataset, dataset_dir = 'data'):
     with open(dataset_path, 'r') as file:
         data = json.load(file)
     
-    propmts = [x['instruction'] for x in data[:10]]
+    propmts = [x['instruction'] for x in data]
     return propmts
 
 def run_infer(model_name_or_path, dataset, output_dir = 'saves'):
@@ -75,8 +77,11 @@ def parse_arguments():
     return parser.parse_args()
 
 def main():
+    wandb.init(project="oracle")
+
     args = parse_arguments()
     run_infer(args.model_name_or_path, args.dataset)
-    
+
+    wandb.finish()
 if __name__ == "__main__":
     main()
