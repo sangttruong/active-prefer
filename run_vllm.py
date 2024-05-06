@@ -31,6 +31,7 @@ for k in range(K):
         results[f"Generated_Text_{k}"].append(generated_text)
 
 df = pd.DataFrame(results)
-df.to_csv(f"saves/generated_text_{model_name_or_path}.csv", index=False)
+model_name = model_name_or_path.split('/')[-1]
+df.to_csv(f"saves/generated_text_{model_name}.csv", index=False)
 
         
