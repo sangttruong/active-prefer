@@ -57,7 +57,7 @@ def run_infer(model_name_or_path, dataset_name, output_dir = 'save'):
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Iterative training and evaluation script")
     parser.add_argument("--dataset_name", type=str, default="reward_bench_train", help="Test")
-    parser.add_argument("--model_name", type=str, default="meta-llama/Llama-2-7b-hf", help="Test")
+    parser.add_argument("--model_name_or_path", type=str, default="meta-llama/Llama-2-7b-hf", help="Test")
     return parser.parse_args()
 
 def main():
