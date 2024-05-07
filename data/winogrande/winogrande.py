@@ -5,6 +5,7 @@ import copy
 import os
 
 def convert_multiple_choice_to_prompt(dataset, json_file_path):
+    template = f"""Complete the sentence below by filling in the blank with an appropriate word: {{sentence}}"""
     new_samples = []
 
     for question_id, example in enumerate(dataset):
@@ -18,7 +19,7 @@ def convert_multiple_choice_to_prompt(dataset, json_file_path):
             if i != correct_choice_index:
                 new_samples.append({
                     "id": f"question_{question_id}",
-                    "instruction": instruction,
+                    "instruction": template.format(sentence = instruction),
                     'input': "",
                     "output": [correct_choice_text[correct_choice_index], choice_text],
                     "choice_label": [correct_choice_index, i],
