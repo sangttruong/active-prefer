@@ -46,7 +46,7 @@ python src/train_bash.py \
 
 
 # ========================================
-python run_oracle.py --model_name meta-llama/Llama-2-7b-hf --dataset_name winogrande --gpu_device 6
+CUDA_VISIBLE_DEVICES=6 python run_oracle.py --model_name meta-llama/Llama-2-7b-hf --dataset_name winogrande --re_compute_emb True
 
 
 python run_oracle.py --model_name mistralai/Mistral-7B-v0.1 --dataset_name hellaswag --gpu_device 6

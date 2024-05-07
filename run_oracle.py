@@ -12,7 +12,7 @@ def parse_arguments():
     parser.add_argument("--dataset_name", type=str, default="reward_bench", help="Test")
     parser.add_argument("--model_name", type=str, default="meta-llama/Llama-2-7b-hf", help="Test")
     parser.add_argument("--flash_attn", type=str, default="True", help="")
-    parser.add_argument("--re_compute_emb", type=str, default="False" help="")
+    parser.add_argument("--re_compute_emb", type=str, default="False", help="")
     return parser.parse_args()
 
 def main():
