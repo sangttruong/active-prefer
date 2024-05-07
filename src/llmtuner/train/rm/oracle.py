@@ -11,6 +11,7 @@ import os
 import numpy as np
 from scipy.stats import entropy
 import random
+import time
 import pickle
 
 from sklearn.model_selection import train_test_split
@@ -78,7 +79,10 @@ class Oracle(LLMStrategy):
         #     del self.trainer, self.base_model
         pass
     
-    def _train_oracle(self, emb_dataset, val_size= 0.1, random_state = 0):
+
+    def _train_oracle(self, emb_dataset, val_size=0.1, random_state=0):
+        start_time = time.time()
+
         X1 = np.array(emb_dataset['chosen'])
         X2 = np.array(emb_dataset['rejected'])        
         X = X1 - X2 # chosen - rejected
@@ -92,22 +96,32 @@ class Oracle(LLMStrategy):
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=val_size, random_state=random_state)
 
         # Fitting the logistic regression model
-        if len(X_train) > 10000:
-            model = LogisticRegression(random_state=random_state, solver='sag', max_iter=500)  # 'sag' solver is efficient for large datasets
-        else:
-            model = LogisticRegression(random_state=random_state, max_iter=500)
+        model = LogisticRegression(random_state=random_state, solver='lbfgs', max_iter=500)  # 'sag' solver is efficient for large datasets
+
+
+        training_start_time = time.time()
         model.fit(X_train, y_train)
+        training_time = time.time() - training_start_time
 
         # Once the model is trained, you can evaluate its performance on the test set
+        prediction_start_time = time.time()
         accuracy = model.score(X_test, y_test)
+        prediction_time = time.time() - prediction_start_time
+
         print("Accuracy on test set:", accuracy)
+        print("Training time:", training_time)
+        print("Prediction time:", prediction_time)
 
         # Save the model to a file
         output_path = f"{self.training_args.output_dir}/logistic_regression_model.pkl"
         with open(output_path, 'wb') as f:
             pickle.dump(model, f)
 
+        total_time = time.time() - start_time
+        print("Total time:", total_time)
+
         return accuracy
+
         
     def _eval(self, emb_testset):
         # Load the model from a file

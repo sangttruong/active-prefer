@@ -381,8 +381,7 @@ class LLMStrategy:
         if hf_emb_path is not None:
             train_df = load_dataset(hf_emb_path)
         elif is_override == False and os.path.isfile(f"{filename}.pkl"):
-            train_ds = pickle.load(open(f"{filename}.pkl", 'rb'))
-            train_df = Dataset.from_dict(train_ds)
+            train_df = pickle.load(open(f"{filename}.pkl", 'rb'))
             print(f"Loaded data from {filename}")
         else:
             self.base_model.eval()
@@ -398,7 +397,6 @@ class LLMStrategy:
             with torch.no_grad():
                 for batch in tqdm(dataloader):
                     emb = self.base_model.model(**batch).last_hidden_state # (bz, ctx, 4096)
-
                     bz, ctx , _ = emb.shape
                     emb = emb.cpu()
                     # find item != 2, set 1
@@ -420,8 +418,7 @@ class LLMStrategy:
             vector_output["rejected"] = np.stack(vector_output["rejected"], axis = 0)
 
             save_to_pkl(vector_output, f"{filename}.pkl")
-            train_df = Dataset.from_dict(vector_output)
-
+            train_df = vector_output
         return train_df
 
     def get_training_dataset(self, is_override):
