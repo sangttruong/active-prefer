@@ -5,7 +5,7 @@ import copy
 import os
 
 def convert_multiple_choice_to_prompt(dataset, json_file_path):
-    template = f"""Complete the sentence below by filling in the blank with an appropriate word: {{sentence}}"""
+    template = f"""Complete the sentence below by filling in the blank with an appropriate word: {{sentence}}\nAnwers: """
     new_samples = []
 
     for question_id, example in enumerate(dataset):
