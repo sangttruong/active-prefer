@@ -3,6 +3,19 @@ import pandas as pd
 import json
 import copy
 import os
+import re
+
+def extract_dialogues(dialogue_string):
+    human_dialogues = re.findall(r'Human: (.+?)(?=(?:Assistant:|Human:)|$)', dialogue_string)
+    assistant_dialogues = re.findall(r'Assistant: (.+?)(?=(?:Assistant:|Human:)|$)', dialogue_string)
+    return human_dialogues, assistant_dialogues
+
+def join_dialogues(human_dialogues, assistant_dialogues):
+    joined_dialogue = f"\nAssistant: {assistant_dialogues[0]}\n"
+    dialogue_pairs = zip(human_dialogues, assistant_dialogues[1:])
+    for human, assistant in dialogue_pairs:
+        joined_dialogue += f"Human: {human}\nAssistant: {assistant}\n"
+    return joined_dialogue
 
 def convert_multiple_choice_to_prompt(dataset, json_file_path):
     new_samples = []
@@ -11,26 +24,8 @@ def convert_multiple_choice_to_prompt(dataset, json_file_path):
         chosen = example["chosen"]
         rejected = example["rejected"]
 
-        # assist_idx = rejected.rfind("\n\nAssistant: ")
-        # r_reject = rejected[assist_idx+13:].strip()
-        # assist_idx = chosen.rfind("\n\nAssistant: ")
-        # r_accept = chosen[assist_idx+13:].strip()
-
-        # human_idx = chosen.rfind("\n\nHuman: ")
-        # query = chosen[human_idx+9:assist_idx].strip()
-        # prompt = chosen[:human_idx]
-        # history = []
-
-        # while prompt.rfind("\n\nAssistant: ") != -1:
-        #     assist_idx = prompt.rfind("\n\nAssistant: ")
-        #     human_idx = prompt.rfind("\n\nHuman: ")
-        #     if human_idx != -1:
-        #         old_query = prompt[human_idx+9:assist_idx].strip()
-        #         old_resp = prompt[assist_idx+13:].strip()
-        #         history.insert(0, (old_query, old_resp))
-        #     else:
-        #         break
-        #     prompt = prompt[:human_idx]
+        human_dialogues, assistant_dialogues = extract_dialogues(chosen)
+        human_dialogues, assistant_dialogues = extract_dialogues(chosen)
         
         correct_choice_index = 0 
         correct_choice_text =  [chosen, rejected]

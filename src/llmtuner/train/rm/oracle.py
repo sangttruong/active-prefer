@@ -93,7 +93,7 @@ class Oracle(LLMStrategy):
 
         # Fitting the logistic regression model
         if len(X_train) > 10000:
-            model = LogisticRegression(andom_state=random_state, solver='sag', max_iter=500)  # 'sag' solver is efficient for large datasets
+            model = LogisticRegression(random_state=random_state, solver='sag', max_iter=500)  # 'sag' solver is efficient for large datasets
         else:
             model = LogisticRegression(random_state=random_state, max_iter=500)
         model.fit(X_train, y_train)

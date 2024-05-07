@@ -1,9 +1,12 @@
 #!/bin/bash
 
 # Set variables
-sanity_check="False"
+sanity_check="True"
 model_name="meta-llama/Llama-2-7b-hf"
 method="random"
+
+python data/hh_rlhf/hh_rlhf.py --sanity_check $sanity_check --model_name $model_name --method $method
+
 
 # Command to run ARC script
 python data/arc/arc.py --sanity_check $sanity_check --model_name $model_name --method $method
