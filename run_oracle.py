@@ -12,6 +12,7 @@ def parse_arguments():
     parser.add_argument("--dataset_name", type=str, default="reward_bench", help="Test")
     parser.add_argument("--model_name", type=str, default="meta-llama/Llama-2-7b-hf", help="Test")
     parser.add_argument("--flash_attn", type=str, default="True", help="")
+    parser.add_argument("--re_compute_emb", type=str, default="False" help="")
     return parser.parse_args()
 
 def main():
@@ -75,7 +76,7 @@ def main():
                 --overwrite_output_dir \
                 --cutoff_len 1024 \
                 --per_device_eval_batch_size 2 \
-                --is_compute_emb False \
+                --is_compute_emb {args.re_compute_emb} \
                 --num_oracle "{num_oracle}"
             """
             run_cli_command(command)
