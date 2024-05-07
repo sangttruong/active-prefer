@@ -19,4 +19,6 @@ parameters:
         ]
     dataset_name:
         values: [mmlu]
+    flash_attn:
+        values: [False]
   
