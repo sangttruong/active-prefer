@@ -9,14 +9,13 @@ def run_cli_command(command):
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Iterative training and evaluation script")
-    parser.add_argument("--dataset_name", type=str, default="False", help="Test")
+    parser.add_argument("--dataset_name", type=str, default="reward_bench", help="Test")
     parser.add_argument("--model_name", type=str, default="meta-llama/Llama-2-7b-hf", help="Test")
     parser.add_argument("--flash_attn", type=str, default="True", help="")
-    # parser.add_argument("--gpu_device", type=int, default=0, help="Test")
     return parser.parse_args()
 
 def main():
-    wandb.init(project="oracle")
+    # wandb.init(project="oracle")
 
     # model_names = [
     #     "mistralai/Mistral-7B-v0.1",
@@ -81,7 +80,7 @@ def main():
             """
             run_cli_command(command)
 
-    wandb.log({"loss": 0})
-    wandb.finish()
+    # wandb.log({"loss": 0})
+    # wandb.finish()
 if __name__ == "__main__":
     main()
