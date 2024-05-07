@@ -15,36 +15,8 @@ def parse_arguments():
     parser.add_argument("--re_compute_emb", type=str, default="False", help="")
     return parser.parse_args()
 
-def main():
-    # wandb.init(project="oracle")
-
-    # model_names = [
-    #     "mistralai/Mistral-7B-v0.1",
-    #     "mistralai/Mistral-7B-Instruct-v0.2",
-    #     "google/gemma-7b",
-    #     "google/gemma-7b-it",
-    #     "meta-llama/Llama-2-7b-hf",
-    #     "meta-llama/Llama-2-7b-chat-hf",
-    #     "meta-llama/Llama-2-13b-hf",
-    #     "meta-llama/Llama-2-13b-chat-hf",
-    #     "meta-llama/Meta-Llama-3-8B",
-    #     "meta-llama/Meta-Llama-3-8B-Instruct"
-    # ]
-    # datasets = [
-    #     "arc_challenge", 
-    #     "truthful_qa",
-    #     'winogrande',
-    #     "reward_bench"
-    # ]
-    # datasets = [
-    #     "hellaswag",
-    #     "mmlu",
-    #     "hh_rlhf",
-    # ]
-
+def main():    
     args = parse_arguments()
-    # gpu_device = args.gpu_device
-    # Define 
     num_oracle = 10
     gpu_device = os.environ.get("CUDA_VISIBLE_DEVICES")
 

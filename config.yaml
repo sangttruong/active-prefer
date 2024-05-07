@@ -18,5 +18,5 @@ parameters:
             meta-llama/Meta-Llama-3-8B-Instruct
         ]
     dataset_name:
-        values: [hellaswag, mmlu, hh_rlhf]
+        values: [mmlu]
   

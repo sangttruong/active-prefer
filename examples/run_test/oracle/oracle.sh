@@ -57,7 +57,7 @@ python run_oracle.py --model_name meta-llama/Llama-2-7b-hf --dataset_name hellas
 python run_oracle.py --model_name meta-llama/Llama-2-7b-chat-hf --dataset_name hellaswag --gpu_device 6
 python run_oracle.py --model_name meta-llama/Llama-2-13b-hf --dataset_name hellaswag --gpu_device 6
 python run_oracle.py --model_name meta-llama/Llama-2-13b-chat-hf --dataset_name hellaswag --gpu_device 6
-python run_oracle.py --model_name meta-llama/Meta-Llama-3-8B --dataset_name hellaswag
+python run_oracle.py --model_name meta-llama/Meta-Llama-3-8B --dataset_name hellaswag --flash_attn False
 python run_oracle.py --model_name meta-llama/Meta-Llama-3-8B-Instruct --dataset_name hellaswag --gpu_device 6
 
 python run_oracle.py --model_name mistralai/Mistral-7B-v0.1 --dataset_name hh_rlhf --gpu_device 6
