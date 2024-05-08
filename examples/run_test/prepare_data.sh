@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set variables
-sanity_check="True"
+sanity_check="False"
 model_name="meta-llama/Llama-2-7b-hf"
 method="random"
 
