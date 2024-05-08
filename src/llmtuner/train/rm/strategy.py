@@ -37,7 +37,6 @@ from .metric import compute_accuracy
 from .trainer import PairwiseTrainer, OracleTrainer
 from ..utils import load_valuehead_params 
 
-# from .workflow import CustomDataset, ValueHead, set_seed
 
 from accelerate import Accelerator
 from trl import AutoModelForCausalLMWithValueHead
