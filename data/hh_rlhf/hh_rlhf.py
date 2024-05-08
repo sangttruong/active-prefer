@@ -4,6 +4,7 @@ import json
 import copy
 import os
 import re
+from tqdm import tqdm
 
 def extract_dialogues(dialogue_string):
     human_dialogues = re.findall(r'\n\nHuman: (.+?)(?=\n\n(?:Assistant:|Human:)|$)', dialogue_string, re.DOTALL)
@@ -11,17 +12,19 @@ def extract_dialogues(dialogue_string):
     return human_dialogues, assistant_dialogues
     
 def join_dialogues(human_dialogues, assistant_dialogues):
-    joined_dialogue = f"\nAssistant: {assistant_dialogues[0]}\n"
+    if assistant_dialogues == []:
+        assistant_dialogues = [""]
+    joined_dialogue = f"\nAssistant: {assistant_dialogues[0]}"
     dialogue_pairs = zip(human_dialogues, assistant_dialogues[1:])
     for human, assistant in dialogue_pairs:
-        joined_dialogue += f"Human: {human}\nAssistant: {assistant}\n"
+        joined_dialogue += f"\nHuman: {human}\nAssistant: {assistant}\n"
     return joined_dialogue
 
 
 def convert_multiple_choice_to_prompt(dataset, json_file_path):
     new_samples = []
 
-    for question_id, example in enumerate(dataset):
+    for question_id, example in tqdm(enumerate(dataset), total=len(dataset)):
         chosen = example["chosen"]
         rejected = example["rejected"]
 
