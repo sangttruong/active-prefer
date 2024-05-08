@@ -83,3 +83,5 @@ python run_oracle.py --model_name meta-llama/Meta-Llama-3-8B --dataset_name mmlu
 python run_oracle.py --model_name meta-llama/Meta-Llama-3-8B-Instruct --dataset_name mmlu --gpu_device 6 --flash_attn False
 
 
+
+CUDA_VISIBLE_DEVICES=8 wandb agent tranquocvinh2611/oracle/2v4v9lyd

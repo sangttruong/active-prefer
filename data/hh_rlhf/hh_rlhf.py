@@ -24,8 +24,11 @@ def convert_multiple_choice_to_prompt(dataset, json_file_path):
         chosen = example["chosen"]
         rejected = example["rejected"]
 
-        human_dialogues, assistant_dialogues = extract_dialogues(chosen)
-        human_dialogues, assistant_dialogues = extract_dialogues(chosen)
+        instruction, chosen_dialogues = extract_dialogues(chosen)
+        _, rejected_dialogues = extract_dialogues(chosen)
+
+        chosen = join_dialogues(instruction[1:], chosen_dialogues)
+        rejected = join_dialogues(instruction[1:], rejected_dialogues)
         
         correct_choice_index = 0 
         correct_choice_text =  [chosen, rejected]
@@ -34,7 +37,7 @@ def convert_multiple_choice_to_prompt(dataset, json_file_path):
             if i != correct_choice_index:
                 new_samples.append({
                     "id": f"{question_id}",
-                    "instruction": "",
+                    "instruction": instruction[0],
                     'input': "",
                     "output": [correct_choice_text[correct_choice_index], choice_text],
                     "choice_label": [correct_choice_index, i],
