@@ -1,0 +1,24 @@
+program: run_oracle.py
+project: oracle
+method: grid
+metric:
+    goal: minimize
+    name: loss
+parameters:
+    model_name: 
+        values: [mistralai/Mistral-7B-v0.1,
+            mistralai/Mistral-7B-Instruct-v0.2,
+            google/gemma-7b,
+            google/gemma-7b-it,
+            meta-llama/Llama-2-7b-hf,
+            meta-llama/Llama-2-7b-chat-hf,
+            meta-llama/Llama-2-13b-hf,
+            meta-llama/Llama-2-13b-chat-hf,
+            meta-llama/Meta-Llama-3-8B,
+            meta-llama/Meta-Llama-3-8B-Instruct
+        ]
+    dataset_name:
+        values: [hellaswag]
+    flash_attn:
+        values: [False]
+  
