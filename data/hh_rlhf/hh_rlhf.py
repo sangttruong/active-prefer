@@ -6,16 +6,17 @@ import os
 import re
 
 def extract_dialogues(dialogue_string):
-    human_dialogues = re.findall(r'Human: (.+?)(?=(?:Assistant:|Human:)|$)', dialogue_string)
-    assistant_dialogues = re.findall(r'Assistant: (.+?)(?=(?:Assistant:|Human:)|$)', dialogue_string)
+    human_dialogues = re.findall(r'\n\nHuman: (.+?)(?=\n\n(?:Assistant:|Human:)|$)', dialogue_string, re.DOTALL)
+    assistant_dialogues = re.findall(r'\n\nAssistant: (.+?)(?=\n\n(?:Assistant:|Human:)|$)', dialogue_string, re.DOTALL)
     return human_dialogues, assistant_dialogues
-
+    
 def join_dialogues(human_dialogues, assistant_dialogues):
     joined_dialogue = f"\nAssistant: {assistant_dialogues[0]}\n"
     dialogue_pairs = zip(human_dialogues, assistant_dialogues[1:])
     for human, assistant in dialogue_pairs:
         joined_dialogue += f"Human: {human}\nAssistant: {assistant}\n"
     return joined_dialogue
+
 
 def convert_multiple_choice_to_prompt(dataset, json_file_path):
     new_samples = []
@@ -25,7 +26,7 @@ def convert_multiple_choice_to_prompt(dataset, json_file_path):
         rejected = example["rejected"]
 
         instruction, chosen_dialogues = extract_dialogues(chosen)
-        _, rejected_dialogues = extract_dialogues(chosen)
+        _, rejected_dialogues = extract_dialogues(rejected)
 
         chosen = join_dialogues(instruction[1:], chosen_dialogues)
         rejected = join_dialogues(instruction[1:], rejected_dialogues)
@@ -82,13 +83,13 @@ if __name__ == "__main__":
     splits = ['train', 'test']
     for split in splits:
         if args.sanity_check == 'True':
-            dataset = load_dataset("Anthropic/hh-rlhf", split=f"{split}[:100]")
+            dataset = load_dataset("Anthropic/hh-rlhf", split=f"{split}[:10]")
         else:
             dataset = load_dataset("Anthropic/hh-rlhf", split=f"{split}") 
 
         model_name = args.model_name.split('/')[-1]
         name = f"hh_rlhf_{split}_{model_name}_{args.method}{'_check' if args.sanity_check == 'True' else ''}"
-        output_dataset_path = f'data/{name}.json'
+        output_dataset_path = f'data/{name}.json' # remove hh_rlhf
         convert_multiple_choice_to_prompt(dataset, output_dataset_path)
         add_new_dataset_info(args.dataset_info_path, name, f"{name}.json")
 
