@@ -10,8 +10,6 @@ def convert_multiple_choice_to_prompt(dataset, json_file_path):
 
     for question_id, example in enumerate(dataset):
         instruction = example['sentence']
-        if example['answer'] == '':
-            continue
         correct_choice_index = int(example['answer']) - 1 # index start from 0
         correct_choice_text = [example["option1"], example["option2"]]
 
@@ -51,7 +49,7 @@ def parse_arguments():
     import argparse
     parser = argparse.ArgumentParser(description="Iterative training and evaluation script")
     parser.add_argument("--sanity_check", type=str, default="False", help="Test")
-    parser.add_argument("--model_name", type=str, default="llama2", help="Test")
+    parser.add_argument("--model_name", type=str, default="meta-llama/Llama-2-7b-hf", help="Test")
     parser.add_argument("--dataset_info_path", type=str, default="data/dataset_info.json", help="Test")
     parser.add_argument("--method", type=str, default="random", help="Test")
 
@@ -61,19 +59,19 @@ def parse_arguments():
 if __name__ == "__main__":
     args = parse_arguments()
 
+    if args.sanity_check == "True":
+        dataset = load_dataset("winogrande", "winogrande_debiased", split=f"train[:100]")
+    else:
+        dataset = load_dataset("winogrande", "winogrande_debiased", split=f"train")
+
+    dataset = dataset.train_test_split(test_size=0.2)
     splits = ['train', 'test']
     for split in splits:
-        if args.sanity_check == "True":
-            dataset = load_dataset("winogrande", "winogrande_debiased", split=f"{split}[:100]")
-        else:
-            dataset = load_dataset("winogrande", "winogrande_debiased", split=f"{split}")
-        
         model_name = args.model_name.split('/')[-1]
         name = f"winogrande_{split}_{model_name}_{args.method}{'_check' if args.sanity_check == 'True' else ''}"
         output_dataset_path = f'data/{name}.json'
         convert_multiple_choice_to_prompt(dataset, output_dataset_path)
         add_new_dataset_info(args.dataset_info_path, name, f"{name}.json")
-
         print(f"{split}: {len(dataset)}")
 
 

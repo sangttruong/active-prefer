@@ -84,4 +84,4 @@ python run_oracle.py --model_name meta-llama/Meta-Llama-3-8B-Instruct --dataset_
 
 
 
-CUDA_VISIBLE_DEVICES=8 wandb agent tranquocvinh2611/oracle/2v4v9lyd
+CUDA_VISIBLE_DEVICES=7 wandb agent tranquocvinh2611/winogrande/u82vof98
