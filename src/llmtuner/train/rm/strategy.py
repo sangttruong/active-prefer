@@ -38,16 +38,9 @@ from .trainer import PairwiseTrainer, OracleTrainer
 from ..utils import load_valuehead_params 
 
 
-from accelerate import Accelerator
-from trl import AutoModelForCausalLMWithValueHead
 from datasets import Dataset
 from datasets import load_dataset
 
-
-from safetensors import safe_open
-from safetensors.torch import save_file, load_file
-
-# import deepspeed
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
@@ -56,7 +49,6 @@ if TYPE_CHECKING:
     from transformers import Seq2SeqTrainingArguments, TrainerCallback
 
     from ...hparams import DataArguments, FinetuningArguments, ModelArguments
-
 
 def save_to_json(data, name):
     jsonString = json.dumps(data, indent=4)
@@ -68,75 +60,6 @@ def save_to_pkl(data, name):
     pklFile = open(name, "wb")
     pickle.dump(data, pklFile)
     pklFile.close()
-
-
-class ValueHead(nn.Module):
-    r"""
-    The ValueHead class implements a head for GPT2 that returns a scalar for each output token.
-    """
-
-    def __init__(self, config, **kwargs):
-        super().__init__()
-        if not hasattr(config, "summary_dropout_prob"):
-            summary_dropout_prob = kwargs.pop("summary_dropout_prob", 0.1)
-        else:
-            summary_dropout_prob = config.summary_dropout_prob
-
-        self.dropout = nn.Dropout(summary_dropout_prob) if summary_dropout_prob else nn.Identity()
-
-        # some models such as OPT have a projection layer before the word embeddings - e.g. OPT-350m
-        if hasattr(config, "word_embed_proj_dim"):
-            hidden_size = config.word_embed_proj_dim
-        else:
-            hidden_size = config.hidden_size
-
-        self.summary = nn.Linear(hidden_size, 1)
-
-        self.flatten = nn.Flatten()
-
-    def forward(self, hidden_states):
-        output = self.dropout(hidden_states)
-
-        # For now force upcast in fp32 if needed. Let's keep the
-        # output in fp32 for numerical stability.
-        if output.dtype != self.summary.weight.dtype:
-            output = output.to(self.summary.weight.dtype)
-
-        output = self.summary(output)
-        return output
-
-class CustomDataset(Dataset):
-    def __init__(self, embeddings_feature, dataset, is_load=False):
-        self.embeddings_feature = embeddings_feature # tuple
-        self.dataset = dataset
-        self.is_load = is_load
-
-    def __len__(self):
-        return len(self.dataset)
-
-    def __getitem__(self, i):
-        example = self.dataset[i]
-        
-        if self.is_load:
-            return {"question_id": example['id'], # string 
-                    "last_hidden_state_chosen": torch.tensor(self.embeddings_feature[f'arr_{i}'][0]), # tensor (ctx x 4096)
-                    "last_hidden_state_rejected": torch.tensor(self.embeddings_feature[f'arr_{i}'][1]),  # tensor (ctx x 4096)
-                    # 'chosen_ids': torch.tensor(example['chosen_ids']), # list ids
-                    # 'rejected_ids': torch.tensor(example['rejected_ids']), # list ids
-                    }
-        else:
-            return {"question_id": example['id'], # string 
-                    "last_hidden_state_chosen": self.embeddings_feature[i][0].clone(), # tensor (ctx x 4096)
-                    "last_hidden_state_rejected": self.embeddings_feature[i][1].clone(),  # tensor (ctx x 4096)
-                    # 'chosen_ids': torch.tensor(example['chosen_ids']), # list ids
-                    # 'rejected_ids': torch.tensor(example['rejected_ids']), # list ids
-                    }
-
-def set_seed(seed):
-    random.seed(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)
 
 class LLMStrategy:
     def __init__(
@@ -192,7 +115,7 @@ class LLMStrategy:
         # Select instances from the pool for labeling
         pass
 
-    def _train_vhead(self, emb_dataset, val_size= 0.1, random_state = 0):
+    def train_vhead(self, emb_dataset, val_size= 0.1, random_state = 0):
         X1 = np.array(emb_dataset['chosen'])
         X2 = np.array(emb_dataset['rejected'])        
         X = X1 - X2 # chosen - rejected
@@ -213,29 +136,71 @@ class LLMStrategy:
         accuracy = model.score(X_test, y_test)
         print("Accuracy on test set:", accuracy)
 
-        # Save the model to a file
-        output_path = f"{self.training_args.output_dir}/vhead.pkl"
-        with open(output_path, 'wb') as f:
-            pickle.dump(model, f)
+        return accuracy, model
 
+    def eval_vhead(self, emb_testset, model_path):
+        # Load the model from a file
+        with open(model_path, 'rb') as f:
+            model = pickle.load(f)
+    
+        X = np.array(emb_testset['chosen'])
+        y = np.ones(len(X)) # chosen = 1
+
+        # Once the model is trained, you can evaluate its performance on the test set
+        accuracy = model.score(X, y)
+        print("Accuracy on test set:", accuracy)
         return accuracy
+    
+    def predict_prob(self, emb_dataset, model_path):
+        # Predict probabilities for given data
+        # emb_dataset = self.get_training_dataset(is_compute_emb)
 
-    def train(self, is_compute_emb, val_size = 0):
+        # Load the model from a file
+        with open(model_path, 'rb') as f:
+            model = pickle.load(f)
+    
+        chosen_emb = np.array(emb_dataset['chosen'])
+        rejected_emb = np.array(emb_dataset['rejected'])
+        
+        chosen_scores_prob = model.predict_log_proba(chosen_emb) # [n_samples, n_classes]
+        rejected_scores_prob = model.predict_log_proba(rejected_emb) # [n_samples, n_classes]
+        
+        # Get max values along axis -1 for chosen and rejected scores
+        chosen_scores = chosen_scores_prob[:, 1].reshape(-1, 1)
+        rejected_scores = rejected_scores_prob[:, 0].reshape(-1, 1)
+
+        # Concatenate max values of chosen and rejected scores
+        max_scores_concat = np.concatenate((chosen_scores, rejected_scores), axis=-1)
+
+        # Compute softmax over concatenated max scores
+        softmax_scores = F.softmax(torch.tensor(max_scores_concat), dim=-1).numpy()
+
+        # Assuming you want to keep chosen and rejected probabilities separate
+        pred = {
+            "question_id": emb_dataset['question_id'],
+            "chosen_rewards": softmax_scores[:, 0],
+            "rejected_rewards": softmax_scores[:, 1],
+        }
+        return pred
+
+    def train(self, nEns, is_compute_emb, val_size = 0.1):
         emb_dataset = self.get_training_dataset(is_override = is_compute_emb)
 
         metrics = []
-        print(f"Trainig selector  ...................")
-        val_acc = self._train_vhead(emb_dataset, val_size)
+        for m in tqdm(range(nEns)):                        
+            print(f"Trainig selector {m} ...................")
+            model_path = f"{self.training_args.output_dir}/vhead_{m}.pkl"
+            val_acc = self.train_vhead(emb_dataset, model_path, val_size, random_state=m)
 
-        metrics.append({
-            "Accuracy": val_acc,
-        })
-        print(metrics)
+            metrics.append({
+                "model_id": m,
+                "Accuracy": val_acc,
+            })
+            print(metrics)
 
         output_file = f"{self.training_args.output_dir}/vhead.json"
         with open(output_file, 'w') as json_file:
             json.dump(metrics, json_file, indent=4)
-
     
     def getNet(self, params):
         # Construct and return a model given parameters
@@ -272,105 +237,7 @@ class LLMStrategy:
             print(i+2, torch.sum(torch.argmax(output, 1) == Y).item() / len(Y), flush=True)
         return output.numpy()
 
-    def predict(self, question_ids=None):
-        # Predict labels for given data
-        accelerator = Accelerator()
-        device = accelerator.device
-        
-        last_hidden_states, is_load = self.get_embedding()
-        train_dataset = CustomDataset(last_hidden_states, self.pool_dataset, is_load) 
-
-        self.v_head.eval()
-        predictions = []
-        with torch.no_grad():
-            for idx in tqdm(range(len(train_dataset))):
-                example = train_dataset[idx]
-                last_hidden_state_chosen = example['last_hidden_state_chosen'][-1].to(device)
-                last_hidden_state_rejected = example['last_hidden_state_rejected'][-1].to(device)
-
-                chosen_rewards = self.v_head(last_hidden_state_chosen)
-                rejected_rewards = self.v_head(last_hidden_state_rejected) 
-
-                pred = {"question_id": example['question_id'],
-                        "chosen_rewards": chosen_rewards,
-                        "rejected_rewards": rejected_rewards
-                }
-
-                predictions.append(pred)
     
-        return predictions
-
-    def predict_prob(self, model, is_compute_emb):
-        # Predict probabilities for given data
-        emb_dataset = self.get_training_dataset(True)
-
-        chosen_emb = np.array(emb_dataset['chosen'])
-        rejected_emb = np.array(emb_dataset['rejected'])
-        
-        chosen_scores_prob = model.predict_log_proba(chosen_emb) # [n_samples, n_classes]
-        rejected_scores_prob = model.predict_log_proba(rejected_emb) # [n_samples, n_classes]
-        
-        # Get max values along axis -1 for chosen and rejected scores
-        chosen_scores = chosen_scores_prob[:, 1].reshape(-1, 1)
-        rejected_scores = rejected_scores_prob[:, 0].reshape(-1, 1)
-
-        # Concatenate max values of chosen and rejected scores
-        max_scores_concat = np.concatenate((chosen_scores, rejected_scores), axis=-1)
-
-        # Compute softmax over concatenated max scores
-        softmax_scores = F.softmax(torch.tensor(max_scores_concat), dim=-1).numpy()
-
-        # Assuming you want to keep chosen and rejected probabilities separate
-        pred = {
-            "question_id": emb_dataset['question_id'],
-            "chosen_rewards": softmax_scores[:, 0],
-            "rejected_rewards": softmax_scores[:, 1],
-        }
-        return pred
-        
-    def predict_prob_dropout(self, n_drop):
-        # Predict probabilities using dropout for uncertainty estimation
-
-        accelerator = Accelerator()
-        device = accelerator.device
-        
-        last_hidden_states, is_load = self.get_embedding()
-        train_dataset = CustomDataset(last_hidden_states, self.pool_dataset, is_load) 
-
-        self.v_head.eval()
-        predictions = {}
-        with torch.no_grad():
-            for _ in range(n_drop):
-                for idx in range(len(train_dataset)):
-                    example = train_dataset[idx]
-                    last_hidden_state_chosen = example['last_hidden_state_chosen'][-1].to(device)
-                    last_hidden_state_rejected = example['last_hidden_state_rejected'][-1].to(device)
-
-                    chosen_rewards = self.v_head(last_hidden_state_chosen)
-                    rejected_rewards = self.v_head(last_hidden_state_rejected) 
-                    rewards_concat = torch.tensor([chosen_rewards, rejected_rewards], device=device)
-                    
-                    probs = F.softmax(rewards_concat, dim=0)
-
-                    question_id = example['question_id']
-                    if question_id in predictions:
-                        predictions[question_id]['chosen_rewards'] += probs[0].item()
-                        predictions[question_id]['rejected_rewards'] += probs[1].item()
-                    else: 
-                        predictions[question_id] = {
-                            "chosen_rewards": probs[0].item(),  
-                            "rejected_rewards": probs[1].item() 
-                        }
-        
-        for question_id in predictions.keys():
-            predictions[question_id]["chosen_rewards"] /= n_drop
-            predictions[question_id]["rejected_rewards"] /= n_drop
-
-        return predictions
-
-    def predict_prob_dropout_split(self, X, Y, n_drop):
-        # Predict probabilities using dropout but return individual dropout iterations
-        pass
 
     def get_embedding(self, is_override = False, hf_emb_path = None):
         # Get embeddings from the penultimate layer of the network

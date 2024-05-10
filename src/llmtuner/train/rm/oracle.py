@@ -79,80 +79,38 @@ class Oracle(LLMStrategy):
         #     del self.trainer, self.base_model
         pass
     
-
-    def _train_oracle(self, emb_dataset, val_size=0.1, random_state=0):
-        start_time = time.time()
-
-        X1 = np.array(emb_dataset['chosen'])
-        X2 = np.array(emb_dataset['rejected'])        
-        X = X1 - X2 # chosen - rejected
-        y = np.ones(len(X)) # chosen = 1
-
-        chosen_index = np.random.choice(len(X), size=int(0.5 * len(X)), replace=False)
-        for idx in chosen_index:    
-            X[idx] = -X[idx]
-            y[idx] = 0 # chosen label
-
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=val_size, random_state=random_state)
-
-        # Fitting the logistic regression model
-        model = LogisticRegression(random_state=random_state, solver='lbfgs', max_iter=500)  # 'sag' solver is efficient for large datasets
-
-
-        training_start_time = time.time()
-        model.fit(X_train, y_train)
-        training_time = time.time() - training_start_time
-
-        # Once the model is trained, you can evaluate its performance on the test set
-        prediction_start_time = time.time()
-        accuracy = model.score(X_test, y_test)
-        prediction_time = time.time() - prediction_start_time
-
-        print("Accuracy on test set:", accuracy)
-        print("Training time:", training_time)
-        print("Prediction time:", prediction_time)
-
-        # Save the model to a file
-        output_path = f"{self.training_args.output_dir}/logistic_regression_model.pkl"
-        with open(output_path, 'wb') as f:
-            pickle.dump(model, f)
-
-        total_time = time.time() - start_time
-        print("Total time:", total_time)
-
-        return accuracy
-
-        
-    def _eval(self, emb_testset):
-        # Load the model from a file
-        model_path = f"{self.finetuning_args.vhead_oracle_path}/logistic_regression_model.pkl"
-        with open(model_path, 'rb') as f:
-            model = pickle.load(f)
     
-        X = np.array(emb_testset['chosen'])
-        y = np.ones(len(X)) # chosen = 1
-
-        # Once the model is trained, you can evaluate its performance on the test set
-        accuracy = model.score(X, y)
-        print("Accuracy on test set:", accuracy)
-
-        return accuracy
-
     def train_oracle(self, nEns, is_compute_emb, val_size = 0.1):
         # Train multiple models and return their weights and average parameter updates
         # training data
         emb_dataset = self.get_training_dataset(is_override = is_compute_emb)
+        best_val_acc = -1  # Initialize with a value lower than any possible accuracy
+        best_model = None
 
         metrics = []
         for m in tqdm(range(nEns)):                        
             print(f"Trainig oracle {m}th ...................")
-            val_acc = self._train_oracle(emb_dataset, val_size, random_state=m)
+            model_path = f"{self.training_args.output_dir}/oracle_{m}.pkl"
+            val_acc, model = self.train_vhead(emb_dataset, model_path, val_size, random_state=m)
 
             metrics.append({
                 "model_id": m,
                 "Accuracy": val_acc,
             })
+            if val_acc > best_val_acc:
+                best_val_acc = val_acc
+                best_model = model
+            
             print(metrics)
+
+            # Save the model to a file
+            with open(model_path, 'wb') as f:
+                pickle.dump(model, f)
+
+        # Save the best model to a file
+        best_model_path = f"{self.training_args.output_dir}/best_oracle_model.pkl"
+        with open(best_model_path, 'wb') as f:
+            pickle.dump(best_model, f)
 
         output_file = f"{self.training_args.output_dir}/committees_{nEns}_oracle_model.json"
         with open(output_file, 'w') as json_file:
@@ -165,11 +123,12 @@ class Oracle(LLMStrategy):
     def eval_oracle(self, is_compute_emb):
         # Train multiple models and return their weights and average parameter updates
         # training data
+        model_path = f"{self.training_args.output_dir}/best_oracle_model.pkl"
         emb_testset = self.get_training_dataset(is_override = is_compute_emb)
 
         metrics = []
         print(f"Evaluate oracle ...................")
-        active_acc = self._eval(emb_testset)
+        active_acc = self.eval_vhead(emb_testset, model_path)
 
         metrics.append({
             "Iter": self.finetuning_args.active_iter,

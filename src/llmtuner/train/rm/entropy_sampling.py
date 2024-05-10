@@ -33,15 +33,13 @@ class EntropySampling(LLMStrategy):
             selected_questions = random.sample(question_ids, n)
         elif iteration != 0:
             print(f"Load Selector ..................")
-            if os.path.exists(os.path.join(self.training_args.output_dir, f"vhead.pkl")):
-                model_path = f"{self.training_args.output_dir}/vhead.pkl"
-                print(f"Load weight from {model_path}")
-                with open(model_path, 'rb') as f:
-                    model = pickle.load(f)
+            if os.path.exists(os.path.join(self.training_args.output_dir, f"vhead_0.pkl")):
+                model_path = f"{self.training_args.output_dir}/vhead_0.pkl"
 
             # Get predictions
             print(f"Query ..................")
-            predictions = self.predict_prob(model, is_compute_emb) 
+            emb_dataset = self.get_training_dataset(is_compute_emb)
+            predictions = self.predict_prob(emb_dataset, model_path, is_compute_emb) 
 
             scores_vals = {}
             for question_id, chosen_prob, rejected_prob in tqdm(zip(predictions['question_id'], predictions['chosen_rewards'], predictions['rejected_rewards']), total=len(predictions['question_id'])):
